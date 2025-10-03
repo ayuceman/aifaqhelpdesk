@@ -3,8 +3,11 @@ import path from 'path';
 
 const router = express.Router();
 
-// Serve the chat widget HTML
+// Serve the chat widget HTML (with project support)
 router.get('/', (req, res) => {
+  const project = req.query.project || 'default';
+  const supportEmail = process.env.SUPPORT_EMAIL || 'support@yourcompany.com';
+  
   const widgetHTML = `
 <!DOCTYPE html>
 <html lang="en">
@@ -148,7 +151,8 @@ router.get('/', (req, res) => {
         </div>
         <div class="chat-messages" id="messages">
             <div class="welcome-message">
-                Ask me anything! I'm here to help with your questions.
+                Ask me anything! I'm here to help with your questions.<br>
+                <small style="font-size: 12px; color: #9ca3af;">Project: ${project}</small>
             </div>
         </div>
         <div class="chat-input-container">
@@ -160,6 +164,8 @@ router.get('/', (req, res) => {
 
     <script>
         const API_BASE = window.location.origin.replace(/\\d+$/, '3001') + '/api/public';
+        const PROJECT = '${project}';
+        const SUPPORT_EMAIL = '${supportEmail}';
         
         const messagesContainer = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
@@ -201,15 +207,17 @@ router.get('/', (req, res) => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ question: message })
+                    body: JSON.stringify({ question: message, project: PROJECT })
                 });
                 
                 const data = await response.json();
                 
                 if (data.success) {
                     addMessage(data.answer);
+                } else if (response.status === 429) {
+                    showError('Too many requests. Please wait a moment and try again.');
                 } else {
-                    showError(data.error || 'Failed to get response');
+                    showError(data.error || \`Failed to get response. Contact \${SUPPORT_EMAIL} for help.\`);
                 }
             } catch (error) {
                 console.error('Chat error:', error);
