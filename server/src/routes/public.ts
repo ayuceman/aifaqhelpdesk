@@ -25,11 +25,12 @@ router.post('/chat', async (req, res) => {
       return res.status(400).json({ error: 'Question is required' });
     }
 
-    console.log('Chat request:', question, 'Project:', project);
+    const startTime = Date.now();
+    console.log(`[CHAT] Request: "${question}" | Project: ${project} | IP: ${req.ip}`);
 
     // Generate embedding for the question
     const queryEmbedding = await llmService.generateEmbedding(question);
-    console.log('Generated embedding, length:', queryEmbedding.embedding.length);
+    console.log(`[CHAT] Embedding generated (length: ${queryEmbedding.embedding.length}) in ${Date.now() - startTime}ms`);
     
     // Find similar FAQs with lower threshold for better matching
     const matches = await storageService.findSimilarEmbeddings(
@@ -39,11 +40,11 @@ router.post('/chat', async (req, res) => {
       project
     );
 
-    console.log('Found matches:', matches.length, matches.map(m => ({ q: m.faq.question.substring(0, 50), score: m.score })));
+    console.log(`[CHAT] Found ${matches.length} matches:`, matches.map(m => ({ q: m.faq.question.substring(0, 40), score: m.score.toFixed(3) })));
 
     // Fallback: if no embedding matches, try intelligent keyword search
     if (matches.length === 0) {
-      console.log('No embedding matches, trying keyword search...');
+      console.log('[CHAT] No embedding matches, trying keyword search...');
       const allFAQs = await storageService.getFAQs(project);
       
       // Extract meaningful keywords (filter out common words)
@@ -75,7 +76,7 @@ router.post('/chat', async (req, res) => {
         .sort((a, b) => b.score - a.score)
         .slice(0, 5); // Get top 5 matches
       
-      console.log('Keyword matches:', keywordMatches.length, keywordMatches.map(m => ({ q: m.faq.question.substring(0, 40), score: m.score.toFixed(2) })));
+      console.log(`[CHAT] Keyword matches: ${keywordMatches.length}`, keywordMatches.map(m => ({ q: m.faq.question.substring(0, 40), score: m.score.toFixed(2) })));
       
       if (keywordMatches.length > 0) {
         // Always use LLM to generate contextual answer from matches
@@ -84,8 +85,11 @@ router.post('/chat', async (req, res) => {
             `Q: ${m.faq.question}\nA: ${m.faq.answer}`
           ).join('\n\n');
           
-          console.log('Generating answer from context with', keywordMatches.length, 'FAQs');
+          console.log(`[CHAT] Generating answer from ${keywordMatches.length} keyword matches using LLM`);
           const generatedAnswer = await llmService.generateAnswer(question, [context]);
+          
+          const totalTime = Date.now() - startTime;
+          console.log(`[CHAT] Response: keyword_llm | Confidence: ${keywordMatches[0].score.toFixed(2)} | Time: ${totalTime}ms`);
           
           return res.json({
             success: true,
@@ -122,6 +126,9 @@ router.post('/chat', async (req, res) => {
     
     // Lower threshold for direct match (was 0.9, now 0.75)
     if (bestMatch.score >= 0.75) {
+      const totalTime = Date.now() - startTime;
+      console.log(`[CHAT] Response: faq_match | Confidence: ${bestMatch.score.toFixed(2)} | Time: ${totalTime}ms`);
+      
       return res.json({
         success: true,
         answer: bestMatch.faq.answer,
@@ -136,11 +143,15 @@ router.post('/chat', async (req, res) => {
 
     // If confidence is moderate, try to generate a better answer using context
     try {
+      console.log(`[CHAT] Generating contextual answer from ${matches.length} embedding matches`);
       const context = matches.map(match => 
         `Q: ${match.faq.question}\nA: ${match.faq.answer}`
       ).join('\n\n');
       
       const generatedAnswer = await llmService.generateAnswer(question, [context]);
+      
+      const totalTime = Date.now() - startTime;
+      console.log(`[CHAT] Response: generated | Confidence: ${bestMatch.score.toFixed(2)} | Time: ${totalTime}ms`);
       
       return res.json({
         success: true,
@@ -167,9 +178,10 @@ router.post('/chat', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Chat error:', error);
+    console.error('[CHAT] Error:', error);
     res.status(500).json({ 
-      error: 'Failed to process your question. Please try again.' 
+      error: 'Failed to process your question. Please try again.',
+      supportEmail: process.env.SUPPORT_EMAIL || 'support@yourcompany.com'
     });
   }
 });
