@@ -1,0 +1,422 @@
+[
+  {
+    "id": "1759484787505",
+    "question": "What is the purpose of this Memorandum of Understanding?",
+    "answer": "The MOU aims to outline the terms and conditions for Creatrix's implementation of a custom nopCommerce theme, as detailed in the document you provided.",
+    "createdAt": "2025-10-03T09:46:27.505Z",
+    "updatedAt": "2025-10-03T09:46:27.505Z"
+  },
+  {
+    "id": "1759484787971",
+    "question": "Who are the parties involved in this MOU?",
+    "answer": "The Client is EMPR Australia Pty Ltd, located in Australia. The Partner is Creatrix Ventures LLC from the USA.",
+    "createdAt": "2025-10-03T09:46:27.971Z",
+    "updatedAt": "2025-10-03T09:46:27.971Z"
+  },
+  {
+    "id": "1759484788027",
+    "question": "What does Creatrix's role include in the implementation of the nopCommerce theme?",
+    "answer": "Creatrix will handle all aspects related to custom design and implementation (CSS, HTML), testing of frontend features, and overall project coordination for the nopCommerce theme. Backend development or changes are not covered under this scope.",
+    "createdAt": "2025-10-03T09:46:28.027Z",
+    "updatedAt": "2025-10-03T09:46:28.027Z"
+  },
+  {
+    "id": "1759484788115",
+    "question": "What are the responsibilities of the Client in relation to Creatrix's work?",
+    "answer": "The Client needs to provide all necessary images and contents required for the website, as delays in providing these can affect the project timeline. They also need to ensure any backend development or changes requested by Creatrix remain their responsibility.",
+    "createdAt": "2025-10-03T09:46:28.115Z",
+    "updatedAt": "2025-10-03T09:46:28.115Z"
+  },
+  {
+    "id": "1759484788199",
+    "question": "How is the project timeline structured?",
+    "answer": "Creatrix commits to completing the nopCommerce theme implementation within 145 hours, with the possibility of extension due to additional service requests, significant scope changes, or delays in client-provided data and resources.",
+    "createdAt": "2025-10-03T09:46:28.199Z",
+    "updatedAt": "2025-10-03T09:46:28.199Z"
+  },
+  {
+    "id": "1759484788286",
+    "question": "What does 'Completion' mean for this project?",
+    "answer": "'Completion' is defined as delivering a fully functional and responsive theme that has been tested across modern browsers and devices, with all defects resolved, and received formal written acceptance from the Client.",
+    "createdAt": "2025-10-03T09:46:28.286Z",
+    "updatedAt": "2025-10-03T09:46:28.286Z"
+  },
+  {
+    "id": "1759484788357",
+    "question": "How long will Creatrix ensure smooth website operation after handover?",
+    "answer": "Creatrix will ensure smooth website operation for 1 month post-handover. Any additional work required due to out-of-scope requests will incur hourly billing and need prior written approval from the Client.",
+    "createdAt": "2025-10-03T09:46:28.357Z",
+    "updatedAt": "2025-10-03T09:46:28.357Z"
+  },
+  {
+    "id": "1759484788450",
+    "question": "Who owns all designs, code, and deliverables created under this agreement?",
+    "answer": "All design, code, and deliverables created by Creatrix within this agreement will become the sole property of EMPR once full payment is made.",
+    "createdAt": "2025-10-03T09:46:28.450Z",
+    "updatedAt": "2025-10-03T09:46:28.450Z"
+  },
+  {
+    "id": "1759484788520",
+    "question": "How are development payments structured according to this MOU?",
+    "answer": "Payment for the nopCommerce theme implementation will be made in two installments: 50% upon signing the contract and another 50% after completion of the project, prior to going live.",
+    "createdAt": "2025-10-03T09:46:28.520Z",
+    "updatedAt": "2025-10-03T09:46:28.520Z"
+  },
+  {
+    "id": "1759484788591",
+    "question": "What warranties does Creatrix provide regarding their work?",
+    "answer": "Creatrix warrants that all designs, code, and deliverables created during the term of this agreement will be free from any defects upon delivery. However, the document you provided seems incomplete as it ends abruptly with 'Warranties and Liability...'.",
+    "createdAt": "2025-10-03T09:46:28.591Z",
+    "updatedAt": "2025-10-03T09:46:28.591Z"
+  },
+  {
+    "id": "1759484797683",
+    "question": "What is the purpose of this Memorandum of Understanding?",
+    "answer": "The MOU aims to outline the terms and conditions for Creatrix's implementation of a custom nopCommerce theme, as detailed in the document you provided.",
+    "createdAt": "2025-10-03T09:46:37.683Z",
+    "updatedAt": "2025-10-03T09:46:37.683Z"
+  },
+  {
+    "id": "1759484797739",
+    "question": "Who are the parties involved in this MOU?",
+    "answer": "The Client is EMPR Australia Pty Ltd, located in Australia. The Partner is Creatrix Ventures LLC from the USA.",
+    "createdAt": "2025-10-03T09:46:37.739Z",
+    "updatedAt": "2025-10-03T09:46:37.739Z"
+  },
+  {
+    "id": "1759484797787",
+    "question": "What does Creatrix's role include in the implementation of the nopCommerce theme?",
+    "answer": "Creatrix will handle all aspects related to custom design and implementation (CSS, HTML), testing of frontend features, and overall project coordination for the nopCommerce theme. Backend development or changes are not covered under this scope.",
+    "createdAt": "2025-10-03T09:46:37.787Z",
+    "updatedAt": "2025-10-03T09:46:37.787Z"
+  },
+  {
+    "id": "1759484797868",
+    "question": "What are the responsibilities of the Client in relation to Creatrix's work?",
+    "answer": "The Client needs to provide all necessary images and contents required for the website, as delays in providing these can affect the project timeline. They also need to ensure any backend development or changes requested by Creatrix remain their responsibility.",
+    "createdAt": "2025-10-03T09:46:37.868Z",
+    "updatedAt": "2025-10-03T09:46:37.868Z"
+  },
+  {
+    "id": "1759484797936",
+    "question": "How is the project timeline structured?",
+    "answer": "Creatrix commits to completing the nopCommerce theme implementation within 145 hours, with the possibility of extension due to additional service requests, significant scope changes, or delays in client-provided data and resources.",
+    "createdAt": "2025-10-03T09:46:37.936Z",
+    "updatedAt": "2025-10-03T09:46:37.936Z"
+  },
+  {
+    "id": "1759484798002",
+    "question": "What does 'Completion' mean for this project?",
+    "answer": "'Completion' is defined as delivering a fully functional and responsive theme that has been tested across modern browsers and devices, with all defects resolved, and received formal written acceptance from the Client.",
+    "createdAt": "2025-10-03T09:46:38.002Z",
+    "updatedAt": "2025-10-03T09:46:38.002Z"
+  },
+  {
+    "id": "1759484798079",
+    "question": "How long will Creatrix ensure smooth website operation after handover?",
+    "answer": "Creatrix will ensure smooth website operation for 1 month post-handover. Any additional work required due to out-of-scope requests will incur hourly billing and need prior written approval from the Client.",
+    "createdAt": "2025-10-03T09:46:38.079Z",
+    "updatedAt": "2025-10-03T09:46:38.079Z"
+  },
+  {
+    "id": "1759484798178",
+    "question": "Who owns all designs, code, and deliverables created under this agreement?",
+    "answer": "All design, code, and deliverables created by Creatrix within this agreement will become the sole property of EMPR once full payment is made.",
+    "createdAt": "2025-10-03T09:46:38.178Z",
+    "updatedAt": "2025-10-03T09:46:38.179Z"
+  },
+  {
+    "id": "1759484798273",
+    "question": "How are development payments structured according to this MOU?",
+    "answer": "Payment for the nopCommerce theme implementation will be made in two installments: 50% upon signing the contract and another 50% after completion of the project, prior to going live.",
+    "createdAt": "2025-10-03T09:46:38.273Z",
+    "updatedAt": "2025-10-03T09:46:38.273Z"
+  },
+  {
+    "id": "1759484798365",
+    "question": "What warranties does Creatrix provide regarding their work?",
+    "answer": "Creatrix warrants that all designs, code, and deliverables created during the term of this agreement will be free from any defects upon delivery. However, the document you provided seems incomplete as it ends abruptly with 'Warranties and Liability...'.",
+    "createdAt": "2025-10-03T09:46:38.365Z",
+    "updatedAt": "2025-10-03T09:46:38.365Z"
+  },
+  {
+    "id": "1759484911570",
+    "question": "What is the purpose of this Memorandum of Understanding?",
+    "answer": "The purpose of this MOU is to outline the terms and conditions under which Creatrix will implement a custom nopCommerce theme, as described in the MoU.",
+    "createdAt": "2025-10-03T09:48:31.570Z",
+    "updatedAt": "2025-10-03T09:48:31.570Z"
+  },
+  {
+    "id": "1759484911636",
+    "question": "Who are the parties involved in this agreement?",
+    "answer": "This MoU involves EMPR Australia Pty Ltd (Client) and Creatrix Ventures LLC (Creatrix).",
+    "createdAt": "2025-10-03T09:48:31.636Z",
+    "updatedAt": "2025-10-03T09:48:31.636Z"
+  },
+  {
+    "id": "1759484911689",
+    "question": "What does Creatrix agree to deliver under this MOU?",
+    "answer": "Creatrix agrees to deliver nopCommerce theme implementation on the frontend, which includes custom design and implementation (CSS, HTML), testing of frontend features, and overall project coordination.",
+    "createdAt": "2025-10-03T09:48:31.689Z",
+    "updatedAt": "2025-10-03T09:48:31.689Z"
+  },
+  {
+    "id": "1759484911759",
+    "question": "Are backend changes included in the scope of work provided by Creatrix?",
+    "answer": "No, backend development or changes are excluded from this scope and remain the responsibility of the Client’s Indian development team.",
+    "createdAt": "2025-10-03T09:48:31.759Z",
+    "updatedAt": "2025-10-03T09:48:31.759Z"
+  },
+  {
+    "id": "1759484911820",
+    "question": "What happens if there is a delay in providing necessary information or resources by the Client?",
+    "answer": "The project timeline may extend if there are delays in client-provided necessary information, approval, and resources.",
+    "createdAt": "2025-10-03T09:48:31.820Z",
+    "updatedAt": "2025-10-03T09:48:31.820Z"
+  },
+  {
+    "id": "1759484911881",
+    "question": "How is the project completion defined according to this MOU?",
+    "answer": "Completion is defined as delivery of a fully functional and responsive theme, tested across modern browsers and devices, with defects resolved, and formally reviewed and accepted by the Client in writing.",
+    "createdAt": "2025-10-03T09:48:31.881Z",
+    "updatedAt": "2025-10-03T09:48:31.881Z"
+  },
+  {
+    "id": "1759484911968",
+    "question": "What is included in Creatrix's maintenance responsibilities after the project handover?",
+    "answer": "Creatrix will ensure smooth website operation and fix reported bugs within 1 month of handover. Major maintenance such as new modules or design changes will be billed hourly.",
+    "createdAt": "2025-10-03T09:48:31.968Z",
+    "updatedAt": "2025-10-03T09:48:31.968Z"
+  },
+  {
+    "id": "1759484912052",
+    "question": "Who owns all designs, code, and deliverables created by Creatrix under this agreement?",
+    "answer": "All designs, code, and deliverables created by Creatrix under this agreement shall become the sole property of EMPR once full payment has been made.",
+    "createdAt": "2025-10-03T09:48:32.052Z",
+    "updatedAt": "2025-10-03T09:48:32.052Z"
+  },
+  {
+    "id": "1759484912133",
+    "question": "How is payment for the project handled according to the payment terms?",
+    "answer": "Development payments are paid in two installments: 50% upon signing the contract and 50% after project completion, prior to going live.",
+    "createdAt": "2025-10-03T09:48:32.133Z",
+    "updatedAt": "2025-10-03T09:48:32.133Z"
+  },
+  {
+    "id": "1759484912198",
+    "question": "What happens if a request falls outside of the agreed scope or requires additional work?",
+    "answer": "Any requests deemed out-of-scope will require a written change request. Creatrix will provide a revised estimate, and no additional work will be undertaken without prior written approval from the Client.",
+    "createdAt": "2025-10-03T09:48:32.198Z",
+    "updatedAt": "2025-10-03T09:48:32.198Z"
+  },
+  {
+    "id": "1759485248870",
+    "question": "What does this Memorandum of Understanding cover?",
+    "answer": "This MoU outlines the terms and conditions for the implementation of a custom nopCommerce theme, including roles, responsibilities, project timeline, maintenance, ownership of deliverables, and payment terms.",
+    "createdAt": "2025-10-03T09:54:08.870Z",
+    "updatedAt": "2025-10-03T09:54:08.870Z"
+  },
+  {
+    "id": "1759485249339",
+    "question": "Who is responsible for backend development or changes?",
+    "answer": "Backend development or any significant changes to the agreed scope of work are the responsibility of the Client’s Indian development team. Creatrix will focus solely on frontend implementation as per this MoU.",
+    "createdAt": "2025-10-03T09:54:09.339Z",
+    "updatedAt": "2025-10-03T09:54:09.339Z"
+  },
+  {
+    "id": "1759485249413",
+    "question": "How many hours does Creatrix agree to complete the theme implementation project?",
+    "answer": "Creatrix agrees to deliver the nopCommerce theme implementation within 145 hours, though this may extend if additional work is requested or delays occur in providing necessary information and resources.",
+    "createdAt": "2025-10-03T09:54:09.413Z",
+    "updatedAt": "2025-10-03T09:54:09.413Z"
+  },
+  {
+    "id": "1759485249482",
+    "question": "What happens after the UAT step before final acceptance and payment?",
+    "answer": "A formal User Acceptance Testing (UAT) step will be conducted by the Client prior to final acceptance of the theme, ensuring it meets all requirements before payment is finalized.",
+    "createdAt": "2025-10-03T09:54:09.482Z",
+    "updatedAt": "2025-10-03T09:54:09.482Z"
+  },
+  {
+    "id": "1759485249543",
+    "question": "How long does Creatrix guarantee website operation after handover?",
+    "answer": "Creatrix guarantees smooth website operation and bug fixing for 1 month post-handover. Any major maintenance or design changes will be billed on an hourly basis.",
+    "createdAt": "2025-10-03T09:54:09.544Z",
+    "updatedAt": "2025-10-03T09:54:09.544Z"
+  },
+  {
+    "id": "1759485249602",
+    "question": "Can any out-of-scope requests be accepted without approval?",
+    "answer": "No, any requests deemed out of scope require a written change request. Creatrix will provide revised estimates and won’t undertake additional work unless prior written approval is obtained from the Client.",
+    "createdAt": "2025-10-03T09:54:09.602Z",
+    "updatedAt": "2025-10-03T09:54:09.602Z"
+  },
+  {
+    "id": "1759485249670",
+    "question": "What happens to all designs and code created under this agreement?",
+    "answer": "All designs, code, and deliverables created by Creatrix under this agreement shall become the sole property of EMPR Australia Pty Ltd once full payment has been made.",
+    "createdAt": "2025-10-03T09:54:09.670Z",
+    "updatedAt": "2025-10-03T09:54:09.670Z"
+  },
+  {
+    "id": "1759485249733",
+    "question": "How are payments structured according to this MoU?",
+    "answer": "Payments will be made in two installments: 50% upon signing the contract, and another 50% after project completion, prior to going live.",
+    "createdAt": "2025-10-03T09:54:09.733Z",
+    "updatedAt": "2025-10-03T09:54:09.733Z"
+  },
+  {
+    "id": "1759485249800",
+    "question": "What does Creatrix provide for warranties and liability?",
+    "answer": "Creatrix warrants that all designs, code, and deliverables created under this agreement are free from defects once full payment has been made. They also warrant against any loss or damage arising directly from their work.",
+    "createdAt": "2025-10-03T09:54:09.800Z",
+    "updatedAt": "2025-10-03T09:54:09.800Z"
+  },
+  {
+    "id": "1759485249872",
+    "question": "Are there specific descriptions of the cost breakdown for nopCommerce Theme implementation?",
+    "answer": "The cost breakdown includes a single item with an estimate of 145 hours at $35 per hour, totaling $5075. No additional services or costs are mentioned in this breakdown.",
+    "createdAt": "2025-10-03T09:54:09.872Z",
+    "updatedAt": "2025-10-03T09:54:09.872Z"
+  },
+  {
+    "id": "1759485636671",
+    "question": "What is the purpose of this Memorandum of Understanding?",
+    "answer": "The purpose of this MOU is to outline the terms and conditions under which Creatrix will implement a custom nopCommerce theme, as described in the MOU.",
+    "createdAt": "2025-10-03T10:00:36.671Z",
+    "updatedAt": "2025-10-03T10:00:36.671Z"
+  },
+  {
+    "id": "1759485637158",
+    "question": "Who are the parties involved in this agreement?",
+    "answer": "EMPR Australia Pty Ltd (Client) and Creatrix Ventures LLC (Creatrix).",
+    "createdAt": "2025-10-03T10:00:37.158Z",
+    "updatedAt": "2025-10-03T10:00:37.158Z"
+  },
+  {
+    "id": "1759485637211",
+    "question": "What does Creatrix promise to do for the Client as part of the nopCommerce theme implementation?",
+    "answer": "Creatrix will deliver a custom nopCommerce theme on the frontend, including custom design and implementation (CSS, HTML), testing of frontend features, and overall project coordination.",
+    "createdAt": "2025-10-03T10:00:37.211Z",
+    "updatedAt": "2025-10-03T10:00:37.211Z"
+  },
+  {
+    "id": "1759485637304",
+    "question": "Are there any backend development responsibilities that are outside Creatrix's scope?",
+    "answer": "Backend development or changes remain the responsibility of the Client’s Indian development team. Creatrix will not be involved in these tasks.",
+    "createdAt": "2025-10-03T10:00:37.304Z",
+    "updatedAt": "2025-10-03T10:00:37.304Z"
+  },
+  {
+    "id": "1759485637399",
+    "question": "What is included in the project timeline for the nopCommerce theme implementation?",
+    "answer": "The scope includes delivering a fully functional and responsive theme, tested across modern browsers and devices with defects resolved, and formally reviewed and accepted by the Client. A formal UAT step will be conducted prior to final acceptance and before release of final payment.",
+    "createdAt": "2025-10-03T10:00:37.399Z",
+    "updatedAt": "2025-10-03T10:00:37.399Z"
+  },
+  {
+    "id": "1759485637509",
+    "question": "How does Creatrix handle maintenance after project completion?",
+    "answer": "Creatrix will ensure smooth website operation and fix reported bugs within 1 month of handover. Any requests for new modules or design changes will be billed hourly, unless they are deemed out-of-scope.",
+    "createdAt": "2025-10-03T10:00:37.509Z",
+    "updatedAt": "2025-10-03T10:00:37.509Z"
+  },
+  {
+    "id": "1759485637634",
+    "question": "What happens to the deliverables created by Creatrix under this agreement?",
+    "answer": "All designs, code, and deliverables shall become the sole property of EMPR once full payment has been made.",
+    "createdAt": "2025-10-03T10:00:37.634Z",
+    "updatedAt": "2025-10-03T10:00:37.634Z"
+  },
+  {
+    "id": "1759485637692",
+    "question": "How are payments structured for the nopCommerce theme implementation project?",
+    "answer": "The project will be paid in two installments: 50% upon signing the contract, and 50% after completion prior to going live.",
+    "createdAt": "2025-10-03T10:00:37.692Z",
+    "updatedAt": "2025-10-03T10:00:37.692Z"
+  },
+  {
+    "id": "1759485637749",
+    "question": "What is included in the one-time cost for the nopCommerce theme implementation?",
+    "answer": "The estimate includes 145 hours at $35 per hour, totaling $5075. Any additional service or significant changes will require a written change request and possibly an updated estimate.",
+    "createdAt": "2025-10-03T10:00:37.749Z",
+    "updatedAt": "2025-10-03T10:00:37.749Z"
+  },
+  {
+    "id": "1759485637817",
+    "question": "What warranties does Creatrix provide regarding the theme development?",
+    "answer": "The warranty states that all designs, code, and deliverables created by Creatrix under this agreement shall become the sole property of EMPR once full payment has been made. Other conditions are not detailed in your provided text.",
+    "createdAt": "2025-10-03T10:00:37.817Z",
+    "updatedAt": "2025-10-03T10:00:37.817Z"
+  },
+  {
+    "id": "1759486058631",
+    "question": "How do I pay the balance by January 15, 2025?",
+    "answer": "To settle the remaining amount by January 15, 2025, you can use a bank payment. The total due amount is $12,427.10.",
+    "createdAt": "2025-10-03T10:07:38.631Z",
+    "updatedAt": "2025-10-03T10:07:38.631Z"
+  },
+  {
+    "id": "1759486059152",
+    "question": "What is the web API source code fee included in this invoice?",
+    "answer": "The $750 fee for the WEB API Source Code is not part of the initial invoice amount and should be paid separately.",
+    "createdAt": "2025-10-03T10:07:39.152Z",
+    "updatedAt": "2025-10-03T10:07:39.152Z"
+  },
+  {
+    "id": "1759486059225",
+    "question": "When are taxes applicable, and how will they be added to my invoice total?",
+    "answer": "Taxes will be charged based on prevailing rates. If you have questions about specific tax rates or additional fees, please let us know.",
+    "createdAt": "2025-10-03T10:07:39.226Z",
+    "updatedAt": "2025-10-03T10:07:39.226Z"
+  },
+  {
+    "id": "1759486059299",
+    "question": "How do I track the payments made so far?",
+    "answer": "You can find a summary of your payments in the Invoice Details section where we listed Payments 1 and Payment 2.",
+    "createdAt": "2025-10-03T10:07:39.299Z",
+    "updatedAt": "2025-10-03T10:07:39.299Z"
+  },
+  {
+    "id": "1759486059363",
+    "question": "Is there an option to pay more than once before January 15, 2025?",
+    "answer": "Yes, you could make additional payments before January 15, 2025. Just ensure that the total amount is fully settled by then.",
+    "createdAt": "2025-10-03T10:07:39.363Z",
+    "updatedAt": "2025-10-03T10:07:39.363Z"
+  },
+  {
+    "id": "1759486059451",
+    "question": "Will I receive an updated invoice after making a payment for the remaining balance?",
+    "answer": "Once your final payment is processed, we will send you an updated invoice reflecting the new amount due and no longer including taxes or any additional fees.",
+    "createdAt": "2025-10-03T10:07:39.451Z",
+    "updatedAt": "2025-10-03T10:07:39.451Z"
+  },
+  {
+    "id": "1759486059527",
+    "question": "Can I pay in installments instead of one lump sum by January 15th?",
+    "answer": "For installment payments, please contact our finance department for instructions on how to set up such arrangements. They will help you create a plan that suits your financial situation.",
+    "createdAt": "2025-10-03T10:07:39.527Z",
+    "updatedAt": "2025-10-03T10:07:39.527Z"
+  },
+  {
+    "id": "1759486059607",
+    "question": "What if I miss the January 15 payment deadline? Will it affect my credit score?",
+    "answer": "Missing the payment deadline could impact your financial standing and potentially your credit score, depending on how your lender or bank processes late payments. Please check with your financial advisor for more information.",
+    "createdAt": "2025-10-03T10:07:39.607Z",
+    "updatedAt": "2025-10-03T10:07:39.607Z"
+  },
+  {
+    "id": "1759486059680",
+    "question": "Do I need to provide any additional details beyond what's included in the invoice?",
+    "answer": "No, all necessary details are provided within the invoice itself. If you have specific questions about usage or additional services required, please let us know so we can assist better.",
+    "createdAt": "2025-10-03T10:07:39.680Z",
+    "updatedAt": "2025-10-03T10:07:39.680Z"
+  },
+  {
+    "id": "1759486059764",
+    "question": "Where do I find the Invoice Details section for tracking payments?",
+    "answer": "You should easily locate the Invoice Details section in your account history where previous transactions and payment summaries are listed. If you cannot find it, contact customer support who can guide you further.",
+    "createdAt": "2025-10-03T10:07:39.764Z",
+    "updatedAt": "2025-10-03T10:07:39.764Z"
+  }
+]

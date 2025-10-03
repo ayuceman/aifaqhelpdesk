@@ -31,18 +31,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
             Transform your documents into intelligent FAQs in minutes. Upload content, 
             generate questions & answers with AI, and embed a smart chat widget anywhere.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center flex-wrap">
             <button
               onClick={onGetStarted}
               className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105"
             >
               Get Started
             </button>
+            <a
+              href="/demo"
+              className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all border-2 border-blue-600 inline-flex items-center"
+            >
+              View Live Demo
+            </a>
             <button
               onClick={onLoadDemo}
-              className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all border-2 border-blue-600"
+              className="px-8 py-4 bg-purple-600 text-white font-semibold rounded-lg shadow-lg hover:bg-purple-700 transition-all"
             >
-              Try Demo
+              Try It Now
             </button>
           </div>
         </div>

@@ -10,9 +10,10 @@ import LandingPage from './components/LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import ContactPage from './components/ContactPage';
+import DemoPage from './components/DemoPage';
 
 type Step = 'upload' | 'generate' | 'review' | 'embed';
-type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact';
+type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo';
 
 interface FAQ {
   id?: string;
@@ -88,6 +89,7 @@ function App() {
       if (path === '/privacy') setCurrentPage('privacy');
       else if (path === '/terms') setCurrentPage('terms');
       else if (path === '/contact') setCurrentPage('contact');
+      else if (path === '/demo') setCurrentPage('demo');
       else setCurrentPage('landing');
     };
 
@@ -111,6 +113,9 @@ function App() {
         } else if (path === '/contact') {
           setCurrentPage('contact');
           window.history.pushState({}, '', '/contact');
+        } else if (path === '/demo') {
+          setCurrentPage('demo');
+          window.history.pushState({}, '', '/demo');
         }
       }
     };
@@ -119,7 +124,7 @@ function App() {
     return () => document.removeEventListener('click', handleLinkClick);
   }, []);
 
-  // Render legal pages
+  // Render pages
   if (currentPage === 'privacy') {
     return <PrivacyPolicy onBack={handleBackToHome} />;
   }
@@ -130,6 +135,10 @@ function App() {
 
   if (currentPage === 'contact') {
     return <ContactPage onBack={handleBackToHome} />;
+  }
+
+  if (currentPage === 'demo') {
+    return <DemoPage />;
   }
 
   // Render landing page
@@ -223,7 +232,9 @@ function App() {
               toast={{ success, error, info }}
             />
           )}
-          {currentStep === 'embed' && <EmbedSnippet />}
+          {currentStep === 'embed' && (
+            <EmbedSnippet toast={{ success, error, info }} />
+          )}
         </div>
       </main>
     </div>
