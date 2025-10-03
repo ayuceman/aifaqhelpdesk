@@ -4,27 +4,28 @@ import { llmService } from '../services/llmService';
 
 const router = express.Router();
 
-// Get all FAQs for public access
+// Get all FAQs for public access (with project support)
 router.get('/faq', async (req, res) => {
   try {
-    const faqs = await storageService.getFAQs();
-    res.json({ success: true, faqs });
+    const project = (req.query.project as string) || 'default';
+    const faqs = await storageService.getFAQs(project);
+    res.json({ success: true, faqs, project });
   } catch (error) {
     console.error('Get public FAQs error:', error);
     res.status(500).json({ error: 'Failed to get FAQs' });
   }
 });
 
-// Chat endpoint for widget
+// Chat endpoint for widget (with project support)
 router.post('/chat', async (req, res) => {
   try {
-    const { question, threshold = 0.5, topK = 5 } = req.body;
+    const { question, project = 'default', threshold = 0.5, topK = 5 } = req.body;
     
     if (!question || typeof question !== 'string') {
       return res.status(400).json({ error: 'Question is required' });
     }
 
-    console.log('Chat request:', question);
+    console.log('Chat request:', question, 'Project:', project);
 
     // Generate embedding for the question
     const queryEmbedding = await llmService.generateEmbedding(question);
@@ -34,7 +35,8 @@ router.post('/chat', async (req, res) => {
     const matches = await storageService.findSimilarEmbeddings(
       queryEmbedding.embedding, 
       topK, 
-      threshold
+      threshold,
+      project
     );
 
     console.log('Found matches:', matches.length, matches.map(m => ({ q: m.faq.question.substring(0, 50), score: m.score })));
@@ -42,7 +44,7 @@ router.post('/chat', async (req, res) => {
     // Fallback: if no embedding matches, try intelligent keyword search
     if (matches.length === 0) {
       console.log('No embedding matches, trying keyword search...');
-      const allFAQs = await storageService.getFAQs();
+      const allFAQs = await storageService.getFAQs(project);
       
       // Extract meaningful keywords (filter out common words)
       const stopWords = new Set(['what', 'when', 'where', 'who', 'how', 'why', 'which', 'the', 'is', 'are', 'was', 'were', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'about', 'this', 'that', 'these', 'those']);

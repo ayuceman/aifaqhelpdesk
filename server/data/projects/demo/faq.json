@@ -1,0 +1,72 @@
+[
+  {
+    "id": "demo-1",
+    "question": "What is AI FAQ Generator?",
+    "answer": "AI FAQ Generator is a tool that automatically creates frequently asked questions and answers from your documents or website content using AI. It helps you build a knowledge base and embed an intelligent chat widget on your website.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-2",
+    "question": "How does the FAQ generation work?",
+    "answer": "Simply upload your documents (PDF, DOCX, TXT, Markdown) or provide a website URL. Our AI analyzes the content and generates relevant questions and answers based on the information. You can customize the tone (formal, concise, or friendly) and choose how many questions to generate.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-3",
+    "question": "Can I edit the generated FAQs?",
+    "answer": "Yes! After generation, you can review and edit all questions and answers. You can add new FAQs, delete unwanted ones, or modify existing content. The editor includes validation to ensure quality (non-empty Q&A, max 1200 characters per answer).",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-4",
+    "question": "What is the chat widget?",
+    "answer": "The chat widget is an embeddable FAQ assistant that you can add to any website. It uses intelligent keyword matching and AI to answer visitor questions based on your published FAQs. Simply copy the embed code and paste it into your site.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-5",
+    "question": "Do I need technical knowledge to use this?",
+    "answer": "No technical knowledge required! The interface is designed to be user-friendly. Just follow the 4-step process: (1) Upload content, (2) Generate FAQs, (3) Review & Publish, (4) Get embed code. The whole process takes just a few minutes.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-6",
+    "question": "Is my data secure and private?",
+    "answer": "Yes, your data is secure. We process content only to generate FAQs and answers. All data is stored locally on your server by default. We don't sell or share your data with third parties. You can delete your data anytime by contacting support.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-7",
+    "question": "What file formats are supported?",
+    "answer": "We support PDF, DOCX (Microsoft Word), TXT (plain text), and Markdown files. You can also provide a website URL to crawl and extract content automatically. File size limit is 10MB per upload.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-8",
+    "question": "How accurate are the AI-generated answers?",
+    "answer": "The AI generates answers based solely on your provided content, ensuring accuracy. We use advanced language models (Ollama or OpenAI) that understand context. However, we recommend reviewing and editing the generated FAQs before publishing to ensure they meet your standards.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-9",
+    "question": "Can I use this for multiple projects?",
+    "answer": "Yes! The system supports multi-tenant architecture. Each project gets its own FAQ set and can be accessed via a unique project identifier. This makes it perfect for agencies managing multiple clients or businesses with different product lines.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-10",
+    "question": "How do I get help or support?",
+    "answer": "If you need help, you can contact us at support@yourcompany.com. We're here to assist with any questions about setup, usage, or troubleshooting. You can also check our documentation for detailed guides and tips.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+]
