@@ -32,7 +32,7 @@ export const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration =
   };
 
   return (
-    <div className={`fixed top-4 right-4 max-w-md w-full p-4 rounded-lg border shadow-lg ${typeStyles[type]} animate-slide-in z-50`}>
+    <div className={`max-w-md w-full p-4 rounded-lg border shadow-lg ${typeStyles[type]} animate-slide-in`}>
       <div className="flex items-start">
         <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white flex items-center justify-center font-bold text-sm mr-3">
           {iconMap[type]}
@@ -42,7 +42,8 @@ export const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration =
         </div>
         <button
           onClick={onClose}
-          className="ml-3 flex-shrink-0 text-gray-400 hover:text-gray-600"
+          className="ml-3 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+          aria-label="Close notification"
         >
           <span className="text-xl leading-none">×</span>
         </button>
@@ -53,10 +54,10 @@ export const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration =
 
 interface ToastContainerProps {
   toasts: Array<{ id: string; message: string; type: ToastType }>;
-  removeToast: (id: string) => void;
+  onRemove: (id: string) => void;
 }
 
-export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeToast }) => {
+export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => {
   return (
     <div className="fixed top-0 right-0 p-4 z-50 space-y-2">
       {toasts.map((toast) => (
@@ -64,7 +65,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeTo
           key={toast.id}
           message={toast.message}
           type={toast.type}
-          onClose={() => removeToast(toast.id)}
+          onClose={() => onRemove(toast.id)}
         />
       ))}
     </div>
