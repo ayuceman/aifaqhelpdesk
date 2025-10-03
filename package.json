@@ -1,0 +1,19 @@
+{
+  "name": "ai-faq-chatgen",
+  "version": "1.0.0",
+  "description": "AI FAQ/Helpdesk Generator",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["ai", "faq", "helpdesk", "chatbot"],
+  "author": "",
+  "license": "MIT"
+}
