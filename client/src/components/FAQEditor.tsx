@@ -84,13 +84,17 @@ export const FAQEditor: React.FC<FAQEditorProps> = ({ initialFAQs, onPublish, to
 
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3001/api/faq/bulk', { faqs });
+      const response = await axios.post('http://localhost:3001/api/faq/bulk', { 
+        faqs,
+        project: 'default' // Use default project for now
+      });
       
       if (response.data.success) {
         toast.success(`Published ${faqs.length} FAQs successfully!`);
         onPublish();
       }
     } catch (err: any) {
+      console.error('Publish error:', err);
       toast.error(err.response?.data?.error || 'Failed to publish FAQs');
     } finally {
       setLoading(false);

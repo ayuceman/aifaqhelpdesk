@@ -220,6 +220,7 @@ function App() {
             <FAQEditor
               initialFAQs={generatedFAQs}
               onPublish={handleFAQsPublished}
+              toast={{ success, error, info }}
             />
           )}
           {currentStep === 'embed' && <EmbedSnippet />}
