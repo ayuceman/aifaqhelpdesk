@@ -270,7 +270,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
             </button>
             <a
               href="/contact"
-              className="btn-secondary border-white text-white hover:bg-white hover:text-slate-900 text-lg px-8 py-4"
+              className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-transparent border-2 border-white rounded-lg shadow-sm hover:bg-white hover:text-slate-900 transition-all duration-200"
             >
               Contact Sales
             </a>
