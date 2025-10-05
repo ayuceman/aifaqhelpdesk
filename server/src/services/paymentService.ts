@@ -137,13 +137,11 @@ export class PaymentService {
       price = plan.price * 12 * 0.8; // 20% discount for yearly
     }
 
-    // Check if PayPal credentials are configured
-    if (PAYPAL_CLIENT_ID === 'your-paypal-client-id' || PAYPAL_CLIENT_SECRET === 'your-paypal-client-secret') {
-      console.log('PayPal credentials not configured, returning mock payment URL');
-      return {
-        orderId: `mock-order-${Date.now()}`,
-        approvalUrl: `${process.env.CLIENT_URL || 'http://localhost:5175'}/payment/success?mock=true`
-      };
+    // Validate PayPal credentials
+    if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET || 
+        PAYPAL_CLIENT_ID === 'your-paypal-client-id' || 
+        PAYPAL_CLIENT_SECRET === 'your-paypal-client-secret') {
+      throw new Error('PayPal credentials not configured. Please set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET environment variables.');
     }
 
     try {
@@ -156,14 +154,16 @@ export class PaymentService {
             currency_code: 'USD',
             value: price.toFixed(2)
           },
-          description: `${plan.name} Plan - ${interval === 'year' ? 'Yearly' : 'Monthly'} subscription`
+          description: `${plan.name} Plan - ${interval === 'year' ? 'Yearly' : 'Monthly'} subscription`,
+          custom_id: `user_${userId}_plan_${planId}_${interval}`,
+          soft_descriptor: 'AI FAQ Generator'
         }],
         application_context: {
           brand_name: 'AI FAQ Generator',
           landing_page: 'NO_PREFERENCE',
           user_action: 'PAY_NOW',
-          return_url: `${process.env.CLIENT_URL || 'http://localhost:5175'}/payment/success`,
-          cancel_url: `${process.env.CLIENT_URL || 'http://localhost:5175'}/payment/cancel`
+          return_url: `http://localhost:3001/api/payment/success`,
+          cancel_url: `http://localhost:3001/api/payment/cancel`
         }
       };
 

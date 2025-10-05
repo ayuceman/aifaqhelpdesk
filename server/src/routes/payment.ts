@@ -80,4 +80,32 @@ router.post('/cancel-subscription', authenticateToken, async (req, res) => {
   }
 });
 
+// Handle PayPal success redirect
+router.get('/success', async (req, res) => {
+  try {
+    const { token, PayerID } = req.query;
+    
+    if (!token) {
+      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/payment/cancel?error=missing_token`);
+    }
+
+    // Capture the payment
+    const result = await paymentService.capturePayment(token as string);
+    
+    if (result.success) {
+      res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/payment/success?orderId=${token}`);
+    } else {
+      res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/payment/cancel?error=capture_failed`);
+    }
+  } catch (error) {
+    console.error('Payment success handler error:', error);
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/payment/cancel?error=processing_failed`);
+  }
+});
+
+// Handle PayPal cancel redirect
+router.get('/cancel', async (req, res) => {
+  res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/payment/cancel`);
+});
+
 export default router;

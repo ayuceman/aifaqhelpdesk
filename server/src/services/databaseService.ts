@@ -411,6 +411,23 @@ export class DatabaseService {
     );
   }
 
+  createPaymentIntent(paymentData: any) {
+    const stmt = this.db.prepare(`
+      INSERT INTO payment_intents (id, userId, planId, interval, amount, status, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+    
+    return stmt.run(
+      paymentData.id,
+      paymentData.userId,
+      paymentData.planId,
+      paymentData.interval,
+      paymentData.amount,
+      paymentData.status,
+      paymentData.createdAt
+    );
+  }
+
   updatePaymentIntent(orderId: string, updateData: any) {
     const stmt = this.db.prepare(`
       UPDATE payment_intents 
