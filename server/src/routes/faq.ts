@@ -133,4 +133,57 @@ router.get('/projects', async (req, res) => {
   }
 });
 
+// Build embeddings for existing FAQs (with project support)
+router.post('/build-embeddings', async (req, res) => {
+  try {
+    const { project = 'default' } = req.body;
+    
+    console.log(`Building embeddings for project: ${project}`);
+    
+    // Get all FAQs for the project
+    const faqs = await storageService.getFAQs(project);
+    console.log(`Found ${faqs.length} FAQs in project ${project}`);
+    
+    if (faqs.length === 0) {
+      return res.json({ success: true, message: 'No FAQs found to build embeddings for', count: 0 });
+    }
+    
+    // Clear existing embeddings
+    await storageService.saveEmbeddings([], project);
+    console.log('Cleared existing embeddings');
+    
+    let successCount = 0;
+    let errorCount = 0;
+    
+    // Build embeddings for each FAQ
+    for (let i = 0; i < faqs.length; i++) {
+      const faq = faqs[i];
+      try {
+        console.log(`Processing FAQ ${i + 1}/${faqs.length}: ${faq.question.substring(0, 50)}...`);
+        
+        const combinedText = `${faq.question} ${faq.answer}`;
+        const embeddingResponse = await llmService.generateEmbedding(combinedText);
+        await storageService.addEmbedding(combinedText, embeddingResponse.embedding, faq.id, project);
+        successCount++;
+      } catch (error) {
+        console.error(`Error processing FAQ ${faq.id}:`, error);
+        errorCount++;
+      }
+    }
+    
+    console.log(`✅ Embeddings built: ${successCount} success, ${errorCount} errors`);
+    
+    res.json({ 
+      success: true, 
+      message: `Built embeddings for ${successCount} FAQs`, 
+      count: successCount,
+      errors: errorCount
+    });
+    
+  } catch (error) {
+    console.error('Build embeddings error:', error);
+    res.status(500).json({ error: 'Failed to build embeddings' });
+  }
+});
+
 export { router as faqRoutes };
