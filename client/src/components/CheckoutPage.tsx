@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeftIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { useToast } from '../hooks/useToast';
+import { ToastContainer } from './Toast';
 
 // Declare PayPal types for TypeScript
 declare global {
@@ -39,6 +41,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
   const paypalRef = useRef<HTMLDivElement>(null);
+  const { success, error } = useToast();
 
   const price = interval === 'year' ? plan.price * 12 * 0.8 : plan.price;
   const savings = interval === 'year' ? plan.price * 12 * 0.2 : 0;
@@ -127,6 +130,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
             const result = await response.json();
             
             if (result.success) {
+              success('Payment successful! Your subscription is now active.');
               onPaymentSuccess();
             } else {
               throw new Error(result.error || 'Payment capture failed');
@@ -140,11 +144,14 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
         },
         onError: (err: any) => {
           console.error('PayPal error:', err);
-          onPaymentCancel();
+          setIsProcessing(false);
+          error('Payment failed. Please try again.');
         },
         onCancel: () => {
           console.log('PayPal payment cancelled');
-          onPaymentCancel();
+          setIsProcessing(false);
+          // Show info message instead of error
+          success('Payment cancelled. You can try again when ready.');
         }
       }).render(paypalRef.current);
     }
@@ -361,6 +368,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
           </div>
         </div>
       </main>
+      <ToastContainer />
     </div>
   );
 };
