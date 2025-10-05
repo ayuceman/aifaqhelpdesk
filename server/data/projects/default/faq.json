@@ -488,5 +488,75 @@
     "answer": "A: Yes, we offer comprehensive documentation and sometimes tutorials to help you get started with our products. You can find more details in the Help section of our website.",
     "createdAt": "2025-10-05T04:24:48.995Z",
     "updatedAt": "2025-10-05T04:24:48.995Z"
+  },
+  {
+    "id": "1759643800189",
+    "question": "Who is this invoice for?",
+    "answer": "This invoice is for EMPR Australia Pty Ltd located at 21, 453-455 Victoria Street, Wetherill Park, New South Wales, Australia.",
+    "createdAt": "2025-10-05T05:56:40.189Z",
+    "updatedAt": "2025-10-05T05:56:40.189Z"
+  },
+  {
+    "id": "1759643800251",
+    "question": "When is the payment due?",
+    "answer": "The payment on this invoice is due by September 9, 2025.",
+    "createdAt": "2025-10-05T05:56:40.251Z",
+    "updatedAt": "2025-10-05T05:56:40.251Z"
+  },
+  {
+    "id": "1759643800296",
+    "question": "What amount does the full invoice total to in USD?",
+    "answer": "The total amount of the invoice in USD is $5,075.00.",
+    "createdAt": "2025-10-05T05:56:40.296Z",
+    "updatedAt": "2025-10-05T05:56:40.296Z"
+  },
+  {
+    "id": "1759643800344",
+    "question": "How much do I need to pay now?",
+    "answer": "You need to pay 50% upon signing the contract and the remaining 50% after project completion, prior to going live.",
+    "createdAt": "2025-10-05T05:56:40.344Z",
+    "updatedAt": "2025-10-05T05:56:40.345Z"
+  },
+  {
+    "id": "1759643800394",
+    "question": "What does 'nopCommerce Theme implementation' mean on the invoice?",
+    "answer": "'nopCommerce Theme implementation' refers to the theme customization or setup for the nopCommerce e-commerce platform used in this project.",
+    "createdAt": "2025-10-05T05:56:40.394Z",
+    "updatedAt": "2025-10-05T05:56:40.394Z"
+  },
+  {
+    "id": "1759643800456",
+    "question": "Where can I find terms and conditions associated with this invoice?",
+    "answer": "The notes section at the bottom of the invoice provides details about payment terms, including a breakdown of when payments are due (50% on signing and 50% after completion).",
+    "createdAt": "2025-10-05T05:56:40.456Z",
+    "updatedAt": "2025-10-05T05:56:40.456Z"
+  },
+  {
+    "id": "1759643800517",
+    "question": "Is there anything else I need to know about EMPR Australia Pty Ltd or this contract?",
+    "answer": "Please refer to the Notes section for any specific terms or conditions that might apply. If you have further questions, it would be best to contact their legal team directly.",
+    "createdAt": "2025-10-05T05:56:40.517Z",
+    "updatedAt": "2025-10-05T05:56:40.517Z"
+  },
+  {
+    "id": "1759643800591",
+    "question": "Who is Creatrix Ventures LLC and how can I reach them if needed?",
+    "answer": "Creatrix Ventures LLC is the company providing the service. You can reach out to them at 612-582-7037 or via creatrixtechnologies.com for any inquiries.",
+    "createdAt": "2025-10-05T05:56:40.591Z",
+    "updatedAt": "2025-10-05T05:56:40.591Z"
+  },
+  {
+    "id": "1759643800673",
+    "question": "Where is EMPR Australia Pty Ltd located?",
+    "answer": "EMPR Australia Pty Ltd is located in Wetherill Park, New South Wales, Australia. Their address is 21, 453-455 Victoria Street.",
+    "createdAt": "2025-10-05T05:56:40.673Z",
+    "updatedAt": "2025-10-05T05:56:40.673Z"
+  },
+  {
+    "id": "1759643800731",
+    "question": "What are the contact details for EMPR Australia Pty Ltd?",
+    "answer": "You can reach out to EMPR Australia Pty Ltd at +61296165400 or via email at artur.rzasa@emprgroup.com.",
+    "createdAt": "2025-10-05T05:56:40.731Z",
+    "updatedAt": "2025-10-05T05:56:40.731Z"
   }
 ]

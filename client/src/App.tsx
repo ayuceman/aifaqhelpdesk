@@ -11,6 +11,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import ContactPage from './components/ContactPage';
 import DemoPage from './components/DemoPage';
+import TrialStatus from './components/TrialStatus';
 
 type Step = 'upload' | 'generate' | 'review' | 'embed';
 type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo';
@@ -223,28 +224,42 @@ function App() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-5xl mx-auto">
-          {currentStep === 'upload' && (
-            <UploadPanel 
-              onContentExtracted={handleContentExtracted} 
-              toast={{ success, error, info }}
-            />
-          )}
-          {currentStep === 'generate' && (
-            <GeneratorPanel
-              content={extractedContent}
-              onFAQsGenerated={handleFAQsGenerated}
-            />
-          )}
-          {currentStep === 'review' && (
-            <FAQEditor
-              initialFAQs={generatedFAQs}
-              onPublish={handleFAQsPublished}
-              toast={{ success, error, info }}
-            />
-          )}
-          {currentStep === 'embed' && (
-            <EmbedSnippet toast={{ success, error, info }} />
-          )}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="lg:col-span-3">
+              {currentStep === 'upload' && (
+                <UploadPanel 
+                  onContentExtracted={handleContentExtracted} 
+                  toast={{ success, error, info }}
+                />
+              )}
+              {currentStep === 'generate' && (
+                <GeneratorPanel
+                  content={extractedContent}
+                  onFAQsGenerated={handleFAQsGenerated}
+                  toast={{ success, error, info }}
+                />
+              )}
+              {currentStep === 'review' && (
+                <FAQEditor
+                  initialFAQs={generatedFAQs}
+                  onPublish={handleFAQsPublished}
+                  toast={{ success, error, info }}
+                />
+              )}
+              {currentStep === 'embed' && (
+                <EmbedSnippet toast={{ success, error, info }} />
+              )}
+            </div>
+            <div className="lg:col-span-1">
+              <TrialStatus 
+                project="default" 
+                onUpgrade={() => {
+                  // TODO: Implement upgrade flow
+                  info('Upgrade functionality coming soon!');
+                }}
+              />
+            </div>
+          </div>
         </div>
       </main>
     </div>

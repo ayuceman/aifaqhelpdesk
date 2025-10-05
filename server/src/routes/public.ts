@@ -1,6 +1,8 @@
 import express from 'express';
 import { storageService } from '../services/storageService';
 import { llmService } from '../services/llmService';
+import { trialService } from '../services/trialService';
+import { checkChatLimit } from '../middleware/trialMiddleware';
 
 const router = express.Router();
 
@@ -17,7 +19,7 @@ router.get('/faq', async (req, res) => {
 });
 
 // Chat endpoint for widget (with project support)
-router.post('/chat', async (req, res) => {
+router.post('/chat', checkChatLimit, async (req, res) => {
   try {
     const { question, project = 'default', threshold = 0.5, topK = 5 } = req.body;
     
@@ -27,6 +29,9 @@ router.post('/chat', async (req, res) => {
 
     const startTime = Date.now();
     console.log(`[CHAT] Request: "${question}" | Project: ${project} | IP: ${req.ip}`);
+
+    // Increment chat count for trial
+    await trialService.incrementChatCount(project);
 
     // Generate embedding for the question
     const queryEmbedding = await llmService.generateEmbedding(question);

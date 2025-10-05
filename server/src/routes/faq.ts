@@ -1,6 +1,8 @@
 import express from 'express';
 import { storageService } from '../services/storageService';
 import { llmService } from '../services/llmService';
+import { trialService } from '../services/trialService';
+import { checkFAQLimit } from '../middleware/trialMiddleware';
 
 const router = express.Router();
 
@@ -17,7 +19,7 @@ router.get('/', async (req, res) => {
 });
 
 // Create new FAQ (with project support)
-router.post('/', async (req, res) => {
+router.post('/', checkFAQLimit, async (req, res) => {
   try {
     const { question, answer, project = 'default' } = req.body;
     
@@ -31,6 +33,9 @@ router.post('/', async (req, res) => {
     const combinedText = `${question} ${answer}`;
     const embeddingResponse = await llmService.generateEmbedding(combinedText);
     await storageService.addEmbedding(combinedText, embeddingResponse.embedding, faq.id, project);
+
+    // Increment FAQ count for trial
+    await trialService.incrementFAQCount(project);
 
     res.json({ success: true, faq });
   } catch (error) {
@@ -90,7 +95,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Bulk save FAQs (for generated FAQs) with project support
-router.post('/bulk', async (req, res) => {
+router.post('/bulk', checkFAQLimit, async (req, res) => {
   try {
     const { faqs, project = 'default' } = req.body;
     
@@ -99,6 +104,7 @@ router.post('/bulk', async (req, res) => {
     }
 
     const savedFAQs = [];
+    let faqCount = 0;
     
     for (const faqData of faqs) {
       if (!faqData.question || !faqData.answer) {
@@ -113,6 +119,12 @@ router.post('/bulk', async (req, res) => {
       await storageService.addEmbedding(combinedText, embeddingResponse.embedding, faq.id, project);
       
       savedFAQs.push(faq);
+      faqCount++;
+    }
+
+    // Increment FAQ count for trial
+    for (let i = 0; i < faqCount; i++) {
+      await trialService.incrementFAQCount(project);
     }
 
     res.json({ success: true, faqs: savedFAQs, project });
@@ -183,6 +195,18 @@ router.post('/build-embeddings', async (req, res) => {
   } catch (error) {
     console.error('Build embeddings error:', error);
     res.status(500).json({ error: 'Failed to build embeddings' });
+  }
+});
+
+// Get trial status for a project
+router.get('/trial-status', async (req, res) => {
+  try {
+    const project = req.query.project as string || 'default';
+    const status = await trialService.getTrialStatus(project);
+    res.json({ success: true, trialStatus: status });
+  } catch (error) {
+    console.error('Get trial status error:', error);
+    res.status(500).json({ error: 'Failed to get trial status' });
   }
 });
 
