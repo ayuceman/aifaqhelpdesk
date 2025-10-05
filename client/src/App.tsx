@@ -153,48 +153,55 @@ function App() {
 
   // Render main app
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-slate-50">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={handleBackToHome}
-              className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-80 transition-opacity"
-            >
-              AI FAQ Generator
-            </button>
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">AI</span>
+              </div>
+              <button 
+                onClick={handleBackToHome}
+                className="text-xl font-bold text-slate-900 hover:text-slate-700 transition-colors"
+              >
+                FAQ Generator
+              </button>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={handleBackToHome}
+                className="btn-ghost text-sm"
+              >
+                ← Back to Home
+              </button>
+            </div>
           </div>
-          <button
-            onClick={handleBackToHome}
-            className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
-          >
-            ← Back to Home
-          </button>
         </div>
       </header>
 
       {/* Step Progress */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-6">
+      <div className="bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between max-w-4xl mx-auto">
             {steps.map((step, index) => (
               <React.Fragment key={step.id}>
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg transition-all duration-300 ${
                       index <= currentStepIndex
-                        ? 'bg-blue-600 text-white shadow-lg'
-                        : 'bg-gray-200 text-gray-500'
+                        ? 'bg-gradient-to-br from-slate-900 to-slate-700 text-white shadow-lg'
+                        : 'bg-slate-100 text-slate-400'
                     }`}
                   >
                     {step.number}
                   </div>
                   <span
-                    className={`mt-2 text-sm font-medium transition-colors ${
-                      index <= currentStepIndex ? 'text-blue-600' : 'text-gray-500'
+                    className={`mt-3 text-sm font-semibold transition-colors ${
+                      index <= currentStepIndex ? 'text-slate-900' : 'text-slate-400'
                     }`}
                   >
                     {step.label}
@@ -202,8 +209,8 @@ function App() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`flex-1 h-1 mx-4 rounded transition-colors ${
-                      index < currentStepIndex ? 'bg-blue-600' : 'bg-gray-200'
+                    className={`flex-1 h-1 mx-6 rounded-full transition-colors duration-300 ${
+                      index < currentStepIndex ? 'bg-slate-900' : 'bg-slate-200'
                     }`}
                   />
                 )}
@@ -214,8 +221,8 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-5xl mx-auto">
           {currentStep === 'upload' && (
             <UploadPanel 
               onContentExtracted={handleContentExtracted} 
