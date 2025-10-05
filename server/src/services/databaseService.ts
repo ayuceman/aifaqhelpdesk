@@ -34,6 +34,11 @@ export class DatabaseService {
         plan TEXT DEFAULT 'free' CHECK(plan IN ('free', 'trial', 'starter', 'professional', 'enterprise')),
         trial_start_date TEXT,
         trial_end_date TEXT,
+        subscription_id TEXT,
+        subscription_status TEXT,
+        subscription_start_date TEXT,
+        subscription_end_date TEXT,
+        interval TEXT DEFAULT 'month',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
@@ -66,6 +71,22 @@ export class DatabaseService {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE
+      )
+    `);
+
+    // Payment intents table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS payment_intents (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        plan_id TEXT NOT NULL,
+        interval TEXT NOT NULL,
+        amount REAL NOT NULL,
+        status TEXT DEFAULT 'pending',
+        transaction_id TEXT,
+        completed_at TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
       )
     `);
 
@@ -346,6 +367,68 @@ export class DatabaseService {
   getProjectUsage(projectId: string) {
     const stmt = this.db.prepare('SELECT * FROM project_usage WHERE project_id = ?');
     return stmt.get(projectId) as any;
+  }
+
+  // Payment methods
+  createPaymentIntent(paymentData: any) {
+    const stmt = this.db.prepare(`
+      INSERT INTO payment_intents (id, userId, planId, interval, amount, status, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+    
+    return stmt.run(
+      paymentData.id,
+      paymentData.userId,
+      paymentData.planId,
+      paymentData.interval,
+      paymentData.amount,
+      paymentData.status,
+      paymentData.createdAt
+    );
+  }
+
+  updatePaymentIntent(orderId: string, updateData: any) {
+    const stmt = this.db.prepare(`
+      UPDATE payment_intents 
+      SET status = ?, transactionId = ?, completedAt = ?
+      WHERE id = ?
+    `);
+    
+    return stmt.run(
+      updateData.status,
+      updateData.transactionId,
+      updateData.completedAt,
+      orderId
+    );
+  }
+
+  getPaymentIntent(orderId: string) {
+    const stmt = this.db.prepare('SELECT * FROM payment_intents WHERE id = ?');
+    return stmt.get(orderId) as any;
+  }
+
+  updateUserPlan(userId: string, planData: any) {
+    const stmt = this.db.prepare(`
+      UPDATE users 
+      SET plan = ?, trialStartDate = ?, trialEndDate = ?, 
+          subscriptionId = ?, subscriptionStatus = ?, 
+          subscriptionStartDate = ?, subscriptionEndDate = ?,
+          interval = ?, updatedAt = ?
+      WHERE id = ?
+    `);
+    
+    return stmt.run(
+      planData.plan,
+      planData.trialStartDate,
+      planData.trialEndDate,
+      planData.subscriptionId,
+      planData.subscriptionStatus,
+      planData.subscriptionStartDate,
+      planData.subscriptionEndDate,
+      planData.interval,
+      new Date().toISOString(),
+      userId
+    );
   }
 
   // Utility methods
