@@ -48,8 +48,12 @@ const UpgradePage: React.FC<UpgradePageProps> = ({ onBack, onUpgrade }) => {
   };
 
   const handleUpgrade = () => {
+    console.log('Upgrade clicked:', { selectedPlan, selectedInterval });
     if (selectedPlan) {
+      console.log('Calling onUpgrade with:', selectedPlan, selectedInterval);
       onUpgrade(selectedPlan, selectedInterval);
+    } else {
+      console.log('No plan selected');
     }
   };
 

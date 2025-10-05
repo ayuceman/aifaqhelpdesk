@@ -82,8 +82,12 @@ function App() {
   };
 
   const handleUpgrade = async (planId: string, interval: 'month' | 'year') => {
+    console.log('App handleUpgrade called with:', planId, interval);
     try {
       const token = localStorage.getItem('token');
+      console.log('Token exists:', !!token);
+      
+      console.log('Making payment request...');
       const response = await axios.post('http://localhost:3001/api/payment/create-payment', {
         planId,
         interval
@@ -91,7 +95,9 @@ function App() {
         headers: { Authorization: `Bearer ${token}` }
       });
 
+      console.log('Payment response:', response.data);
       if (response.data.success) {
+        console.log('Redirecting to PayPal:', response.data.approvalUrl);
         // Redirect to PayPal
         window.location.href = response.data.approvalUrl;
       }
