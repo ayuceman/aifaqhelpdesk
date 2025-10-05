@@ -19,6 +19,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <span className="text-xl font-bold text-slate-900">AI FAQ Generator</span>
             </div>
             <div className="flex items-center space-x-6">
+              <a href="/pricing" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Pricing</a>
               <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
               <a href="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</a>
               <a href="/privacy" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Privacy</a>
@@ -432,6 +433,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
             <div>
               <h4 className="font-semibold text-slate-900 mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-slate-600">
+                <li><a href="/pricing" className="hover:text-slate-900 transition-colors">Pricing</a></li>
                 <li><a href="/demo" className="hover:text-slate-900 transition-colors">Demo</a></li>
                 <li><button onClick={onGetStarted} className="text-left hover:text-slate-900 transition-colors">Get Started</button></li>
                 <li><button onClick={onLoadDemo} className="text-left hover:text-slate-900 transition-colors">Try Demo</button></li>

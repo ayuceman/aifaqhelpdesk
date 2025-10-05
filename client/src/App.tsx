@@ -11,10 +11,11 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import ContactPage from './components/ContactPage';
 import DemoPage from './components/DemoPage';
+import PricingPage from './components/PricingPage';
 import TrialStatus from './components/TrialStatus';
 
 type Step = 'upload' | 'generate' | 'review' | 'embed';
-type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo';
+type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo' | 'pricing';
 
 interface FAQ {
   id?: string;
@@ -41,6 +42,10 @@ function App() {
   const handleGetStarted = () => {
     setCurrentPage('app');
     setCurrentStep('upload');
+  };
+
+  const handleNavigateToPricing = () => {
+    setCurrentPage('pricing');
   };
 
   const handleLoadDemo = async () => {
@@ -117,6 +122,9 @@ function App() {
         } else if (path === '/demo') {
           setCurrentPage('demo');
           window.history.pushState({}, '', '/demo');
+        } else if (path === '/pricing') {
+          setCurrentPage('pricing');
+          window.history.pushState({}, '', '/pricing');
         }
       }
     };
@@ -140,6 +148,10 @@ function App() {
 
   if (currentPage === 'demo') {
     return <DemoPage onNavigateToApp={handleGetStarted} />;
+  }
+
+  if (currentPage === 'pricing') {
+    return <PricingPage onNavigateToApp={handleGetStarted} />;
   }
 
   // Render landing page
