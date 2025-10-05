@@ -217,7 +217,10 @@ function App() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {currentStep === 'upload' && (
-            <UploadPanel onContentExtracted={handleContentExtracted} />
+            <UploadPanel 
+              onContentExtracted={handleContentExtracted} 
+              toast={{ success, error, info }}
+            />
           )}
           {currentStep === 'generate' && (
             <GeneratorPanel
