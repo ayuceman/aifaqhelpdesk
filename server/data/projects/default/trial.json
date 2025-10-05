@@ -1,0 +1,11 @@
+{
+  "projectId": "default",
+  "startDate": "2025-10-05T07:07:44.175Z",
+  "endDate": "2025-10-19T07:07:44.176Z",
+  "faqCount": 0,
+  "chatCount": 0,
+  "dailyChatCount": 0,
+  "lastChatDate": "2025-10-05T07:07:44.175Z",
+  "isActive": true,
+  "plan": "trial"
+}

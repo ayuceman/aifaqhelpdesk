@@ -202,6 +202,10 @@ router.post('/build-embeddings', async (req, res) => {
 router.get('/trial-status', async (req, res) => {
   try {
     const project = req.query.project as string || 'default';
+    
+    // Initialize trial if it doesn't exist
+    await trialService.initializeTrial(project);
+    
     const status = await trialService.getTrialStatus(project);
     res.json({ success: true, trialStatus: status });
   } catch (error) {
