@@ -72,7 +72,7 @@ router.post('/file', upload.single('file'), async (req, res) => {
 // Crawl URL and extract content
 router.post('/url', async (req, res) => {
   try {
-    const { url } = req.body;
+    const { url, depth = 1 } = req.body;
     
     if (!url) {
       return res.status(400).json({ error: 'URL is required' });
@@ -85,13 +85,19 @@ router.post('/url', async (req, res) => {
       return res.status(400).json({ error: 'Invalid URL format' });
     }
 
-    const parsedContent = await FileParser.parseURL(url);
+    // Validate depth (1-3 levels)
+    const crawlDepth = Math.min(Math.max(parseInt(depth) || 1, 1), 3);
+    
+    console.log(`[CRAWL] Starting crawl: ${url} (depth: ${crawlDepth})`);
+    
+    const parsedContent = await FileParser.parseURL(url, crawlDepth);
 
     res.json({
       success: true,
       content: parsedContent.text,
       metadata: parsedContent.metadata,
-      url
+      url,
+      depth: crawlDepth
     });
   } catch (error) {
     console.error('URL crawling error:', error);

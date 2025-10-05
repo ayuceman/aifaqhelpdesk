@@ -21,9 +21,10 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ onContentExtracted, to
   const [mode, setMode] = useState<'file' | 'url'>('file');
   const [files, setFiles] = useState<File[]>([]);
   const [url, setUrl] = useState('');
+  const [crawlDepth, setCrawlDepth] = useState(1);
   const [loading, setLoading] = useState(false);
   const [parsedFiles, setParsedFiles] = useState<ParsedFile[]>([]);
-  const [urlContent, setUrlContent] = useState<{ content: string; charCount: number } | null>(null);
+  const [urlContent, setUrlContent] = useState<{ content: string; charCount: number; pagesCrawled?: number } | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -81,15 +82,22 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ onContentExtracted, to
 
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3001/api/upload/url', { url });
+      toast.info(`Crawling website with depth ${crawlDepth}...`);
+      const response = await axios.post('http://localhost:3001/api/upload/url', { 
+        url, 
+        depth: crawlDepth 
+      });
       
       if (response.data.success) {
         const content = response.data.content;
+        const metadata = response.data.metadata;
         setUrlContent({
           content,
           charCount: content.length,
+          pagesCrawled: metadata?.pagesCrawled || 1,
         });
         onContentExtracted(content);
+        toast.success(`Successfully crawled ${metadata?.pagesCrawled || 1} page(s) with ${content.length.toLocaleString()} characters`);
       }
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Failed to fetch URL');
@@ -237,11 +245,70 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ onContentExtracted, to
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Crawl Depth
+            </label>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="depth1"
+                  name="depth"
+                  value="1"
+                  checked={crawlDepth === 1}
+                  onChange={(e) => setCrawlDepth(parseInt(e.target.value))}
+                  className="text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="depth1" className="text-sm text-gray-700">
+                  Single page (1)
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="depth2"
+                  name="depth"
+                  value="2"
+                  checked={crawlDepth === 2}
+                  onChange={(e) => setCrawlDepth(parseInt(e.target.value))}
+                  className="text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="depth2" className="text-sm text-gray-700">
+                  +1 level (2)
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="depth3"
+                  name="depth"
+                  value="3"
+                  checked={crawlDepth === 3}
+                  onChange={(e) => setCrawlDepth(parseInt(e.target.value))}
+                  className="text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="depth3" className="text-sm text-gray-700">
+                  +2 levels (3)
+                </label>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Higher depth crawls more pages but takes longer. Only crawls same domain.
+            </p>
+          </div>
+
           {urlContent && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-blue-900">Content Fetched</span>
-                <span className="text-sm text-blue-600">{urlContent.charCount.toLocaleString()} characters</span>
+                <div className="text-sm text-blue-600">
+                  {urlContent.pagesCrawled && urlContent.pagesCrawled > 1 ? (
+                    <span>{urlContent.pagesCrawled} pages • {urlContent.charCount.toLocaleString()} chars</span>
+                  ) : (
+                    <span>{urlContent.charCount.toLocaleString()} characters</span>
+                  )}
+                </div>
               </div>
               <div className="mt-3 p-3 bg-white rounded border border-blue-100 max-h-32 overflow-y-auto">
                 <p className="text-xs text-gray-600 line-clamp-4">{urlContent.content.substring(0, 200)}...</p>
@@ -254,7 +321,7 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ onContentExtracted, to
             disabled={loading || !url.trim()}
             className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
           >
-            {loading ? 'Fetching...' : 'Fetch Text'}
+            {loading ? 'Crawling...' : `Crawl Website (Depth ${crawlDepth})`}
           </button>
         </div>
       )}
