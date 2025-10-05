@@ -34,15 +34,13 @@ export class DatabaseService {
         plan TEXT DEFAULT 'free' CHECK(plan IN ('free', 'trial', 'starter', 'professional', 'enterprise')),
         trial_start_date TEXT,
         trial_end_date TEXT,
-        subscription_id TEXT,
-        subscription_status TEXT,
-        subscription_start_date TEXT,
-        subscription_end_date TEXT,
-        interval TEXT DEFAULT 'month',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Add new columns if they don't exist (for existing databases)
+    this.addMissingColumns();
 
     // Projects table
     this.db.exec(`
@@ -126,6 +124,32 @@ export class DatabaseService {
       CREATE INDEX IF NOT EXISTS idx_embeddings_project_id ON embeddings(project_id);
       CREATE INDEX IF NOT EXISTS idx_project_usage_project_id ON project_usage(project_id);
     `);
+  }
+
+  private addMissingColumns() {
+    try {
+      // Check if subscription columns exist, if not add them
+      const columns = this.db.pragma('table_info(users)') as any[];
+      const columnNames = columns.map(col => col.name);
+      
+      if (!columnNames.includes('subscription_id')) {
+        this.db.exec('ALTER TABLE users ADD COLUMN subscription_id TEXT');
+      }
+      if (!columnNames.includes('subscription_status')) {
+        this.db.exec('ALTER TABLE users ADD COLUMN subscription_status TEXT');
+      }
+      if (!columnNames.includes('subscription_start_date')) {
+        this.db.exec('ALTER TABLE users ADD COLUMN subscription_start_date TEXT');
+      }
+      if (!columnNames.includes('subscription_end_date')) {
+        this.db.exec('ALTER TABLE users ADD COLUMN subscription_end_date TEXT');
+      }
+      if (!columnNames.includes('interval')) {
+        this.db.exec('ALTER TABLE users ADD COLUMN interval TEXT DEFAULT "month"');
+      }
+    } catch (error) {
+      console.log('Migration completed or no migration needed:', error);
+    }
   }
 
   // User methods

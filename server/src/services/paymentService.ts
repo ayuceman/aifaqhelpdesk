@@ -1,14 +1,11 @@
-import { paypal } from '@paypal/paypal-server-sdk';
 import { databaseService } from './databaseService';
 
-// PayPal configuration
-const paypalClient = new paypal.PayPalHttpClient({
-  clientId: process.env.PAYPAL_CLIENT_ID!,
-  clientSecret: process.env.PAYPAL_CLIENT_SECRET!,
-  environment: process.env.NODE_ENV === 'production' 
-    ? paypal.Environment.Live 
-    : paypal.Environment.Sandbox
-});
+// PayPal configuration - using direct API calls instead of SDK
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || 'your-paypal-client-id';
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || 'your-paypal-client-secret';
+const PAYPAL_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://api-m.paypal.com' 
+  : 'https://api-m.sandbox.paypal.com';
 
 export interface PricingPlan {
   id: string;
@@ -104,6 +101,21 @@ export const pricingPlans: PricingPlan[] = [
 ];
 
 export class PaymentService {
+  private async getPayPalAccessToken() {
+    const response = await fetch(`${PAYPAL_BASE_URL}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Accept-Language': 'en_US',
+        'Authorization': `Basic ${Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64')}`
+      },
+      body: 'grant_type=client_credentials'
+    });
+
+    const data = await response.json();
+    return data.access_token;
+  }
+
   async createPaymentIntent(userId: string, planId: string, interval: 'month' | 'year' = 'month') {
     const plan = pricingPlans.find(p => p.id === planId);
     if (!plan) {
@@ -116,45 +128,60 @@ export class PaymentService {
       price = plan.price * 12 * 0.8; // 20% discount for yearly
     }
 
-    const request = new paypal.orders.OrdersCreateRequest();
-    request.prefer('return=representation');
-    request.requestBody({
-      intent: 'CAPTURE',
-      purchase_units: [{
-        amount: {
-          currency_code: 'USD',
-          value: price.toFixed(2)
-        },
-        description: `${plan.name} Plan - ${interval === 'year' ? 'Yearly' : 'Monthly'} subscription`
-      }],
-      application_context: {
-        brand_name: 'AI FAQ Generator',
-        landing_page: 'NO_PREFERENCE',
-        user_action: 'PAY_NOW',
-        return_url: `${process.env.CLIENT_URL}/payment/success`,
-        cancel_url: `${process.env.CLIENT_URL}/payment/cancel`
-      }
-    });
-
     try {
-      const response = await paypalClient.execute(request);
-      const orderId = response.result.id;
+      const accessToken = await this.getPayPalAccessToken();
+      
+      const orderData = {
+        intent: 'CAPTURE',
+        purchase_units: [{
+          amount: {
+            currency_code: 'USD',
+            value: price.toFixed(2)
+          },
+          description: `${plan.name} Plan - ${interval === 'year' ? 'Yearly' : 'Monthly'} subscription`
+        }],
+        application_context: {
+          brand_name: 'AI FAQ Generator',
+          landing_page: 'NO_PREFERENCE',
+          user_action: 'PAY_NOW',
+          return_url: `${process.env.CLIENT_URL || 'http://localhost:5175'}/payment/success`,
+          cancel_url: `${process.env.CLIENT_URL || 'http://localhost:5175'}/payment/cancel`
+        }
+      };
 
-      // Store payment intent in database
-      await databaseService.createPaymentIntent({
-        id: orderId,
-        userId,
-        planId,
-        interval,
-        amount: price,
-        status: 'pending',
-        createdAt: new Date().toISOString()
+      const response = await fetch(`${PAYPAL_BASE_URL}/v2/checkout/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+          'PayPal-Request-Id': Math.random().toString(36).substring(2, 15)
+        },
+        body: JSON.stringify(orderData)
       });
 
-      return {
-        orderId,
-        approvalUrl: response.result.links.find(link => link.rel === 'approve')?.href
-      };
+      const result = await response.json();
+      
+      if (result.id) {
+        // Store payment intent in database
+        await databaseService.createPaymentIntent({
+          id: result.id,
+          userId,
+          planId,
+          interval,
+          amount: price,
+          status: 'pending',
+          createdAt: new Date().toISOString()
+        });
+
+        const approvalUrl = result.links.find((link: any) => link.rel === 'approve')?.href;
+        
+        return {
+          orderId: result.id,
+          approvalUrl
+        };
+      } else {
+        throw new Error('Failed to create PayPal order');
+      }
     } catch (error) {
       console.error('PayPal payment creation error:', error);
       throw new Error('Failed to create payment intent');
@@ -162,41 +189,55 @@ export class PaymentService {
   }
 
   async capturePayment(orderId: string) {
-    const request = new paypal.orders.OrdersCaptureRequest(orderId);
-    request.requestBody({});
-
     try {
-      const response = await paypalClient.execute(request);
-      const capture = response.result.purchase_units[0].payments.captures[0];
-
-      // Update payment intent status
-      await databaseService.updatePaymentIntent(orderId, {
-        status: 'completed',
-        transactionId: capture.id,
-        completedAt: new Date().toISOString()
+      const accessToken = await this.getPayPalAccessToken();
+      
+      const response = await fetch(`${PAYPAL_BASE_URL}/v2/checkout/orders/${orderId}/capture`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+          'PayPal-Request-Id': Math.random().toString(36).substring(2, 15)
+        },
+        body: JSON.stringify({})
       });
 
-      // Get payment intent details
-      const paymentIntent = await databaseService.getPaymentIntent(orderId);
-      if (paymentIntent) {
-        // Update user plan
-        await databaseService.updateUserPlan(paymentIntent.userId, {
-          plan: paymentIntent.planId,
-          interval: paymentIntent.interval,
-          subscriptionId: capture.id,
-          subscriptionStatus: 'active',
-          subscriptionStartDate: new Date().toISOString(),
-          subscriptionEndDate: paymentIntent.interval === 'year' 
-            ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-            : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        });
-      }
+      const result = await response.json();
+      
+      if (result.status === 'COMPLETED') {
+        const capture = result.purchase_units[0].payments.captures[0];
 
-      return {
-        success: true,
-        transactionId: capture.id,
-        amount: capture.amount.value
-      };
+        // Update payment intent status
+        await databaseService.updatePaymentIntent(orderId, {
+          status: 'completed',
+          transactionId: capture.id,
+          completedAt: new Date().toISOString()
+        });
+
+        // Get payment intent details
+        const paymentIntent = await databaseService.getPaymentIntent(orderId);
+        if (paymentIntent) {
+          // Update user plan
+          await databaseService.updateUserPlan(paymentIntent.userId, {
+            plan: paymentIntent.planId,
+            interval: paymentIntent.interval,
+            subscriptionId: capture.id,
+            subscriptionStatus: 'active',
+            subscriptionStartDate: new Date().toISOString(),
+            subscriptionEndDate: paymentIntent.interval === 'year' 
+              ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+              : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          });
+        }
+
+        return {
+          success: true,
+          transactionId: capture.id,
+          amount: capture.amount.value
+        };
+      } else {
+        throw new Error('Payment capture failed');
+      }
     } catch (error) {
       console.error('PayPal payment capture error:', error);
       throw new Error('Failed to capture payment');

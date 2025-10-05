@@ -31,6 +31,7 @@ interface DashboardProps {
   onNavigateToProject: (projectId: string) => void;
   onViewProjectDetails: (project: Project) => void;
   onNavigateToHome: () => void;
+  onNavigateToUpgrade?: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
@@ -38,7 +39,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   onLogout, 
   onNavigateToProject, 
   onViewProjectDetails,
-  onNavigateToHome 
+  onNavigateToHome,
+  onNavigateToUpgrade
 }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -149,20 +151,28 @@ const Dashboard: React.FC<DashboardProps> = ({
               <h1 className="text-xl font-bold text-slate-900">AI FAQ Generator</h1>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-slate-600">Welcome, {user.name}</span>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPlanColor(user.plan)}`}>
-                  {getPlanDisplayName(user.plan)}
-                </span>
-              </div>
-              <button
-                onClick={onLogout}
-                className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-slate-600">Welcome, {user.name}</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPlanColor(user.plan)}`}>
+                      {getPlanDisplayName(user.plan)}
+                    </span>
+                  </div>
+                  {onNavigateToUpgrade && user.plan === 'free' && (
+                    <button
+                      onClick={onNavigateToUpgrade}
+                      className="bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Upgrade
+                    </button>
+                  )}
+                  <button
+                    onClick={onLogout}
+                    className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
           </div>
         </div>
       </header>

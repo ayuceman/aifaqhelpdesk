@@ -17,9 +17,12 @@ import SignupPage from './components/SignupPage';
 import Dashboard from './components/Dashboard';
 import ProjectDetails from './components/ProjectDetails';
 import TrialStatus from './components/TrialStatus';
+import UpgradePage from './components/UpgradePage';
+import PaymentSuccess from './components/PaymentSuccess';
+import PaymentCancel from './components/PaymentCancel';
 
 type Step = 'upload' | 'generate' | 'review' | 'embed';
-type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo' | 'pricing' | 'login' | 'signup' | 'dashboard' | 'project-details';
+type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo' | 'pricing' | 'login' | 'signup' | 'dashboard' | 'project-details' | 'upgrade' | 'payment-success' | 'payment-cancel';
 
 interface FAQ {
   id?: string;
@@ -72,6 +75,38 @@ function App() {
 
   const handleNavigateToSignup = () => {
     setCurrentPage('signup');
+  };
+
+  const handleNavigateToUpgrade = () => {
+    setCurrentPage('upgrade');
+  };
+
+  const handleUpgrade = async (planId: string, interval: 'month' | 'year') => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost:3001/api/payment/create-payment', {
+        planId,
+        interval
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data.success) {
+        // Redirect to PayPal
+        window.location.href = response.data.approvalUrl;
+      }
+    } catch (error: any) {
+      console.error('Upgrade error:', error);
+      error('Failed to start upgrade process. Please try again.');
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setCurrentPage('payment-success');
+  };
+
+  const handlePaymentCancel = () => {
+    setCurrentPage('payment-cancel');
   };
 
   const handleLogin = (userData: User, token: string) => {
@@ -268,6 +303,7 @@ function App() {
             onNavigateToProject={handleNavigateToProject}
             onViewProjectDetails={handleViewProjectDetails}
             onNavigateToHome={() => setCurrentPage('landing')}
+            onNavigateToUpgrade={handleNavigateToUpgrade}
           />
         );
       }
@@ -282,6 +318,36 @@ function App() {
             projectId={selectedProject.id}
             onBack={handleBackToDashboard}
             onEditProject={handleProjectUpdated}
+          />
+        );
+      }
+
+      if (currentPage === 'upgrade') {
+        if (!user) {
+          setCurrentPage('landing');
+          return null;
+        }
+        return (
+          <UpgradePage
+            onBack={() => setCurrentPage('dashboard')}
+            onUpgrade={handleUpgrade}
+          />
+        );
+      }
+
+      if (currentPage === 'payment-success') {
+        return (
+          <PaymentSuccess
+            onBack={() => setCurrentPage('dashboard')}
+          />
+        );
+      }
+
+      if (currentPage === 'payment-cancel') {
+        return (
+          <PaymentCancel
+            onBack={() => setCurrentPage('dashboard')}
+            onRetry={() => setCurrentPage('upgrade')}
           />
         );
       }
