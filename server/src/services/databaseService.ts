@@ -117,6 +117,22 @@ export class DatabaseService {
       )
     `);
 
+    // Payment intents table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS payment_intents (
+        id TEXT PRIMARY KEY,
+        userId TEXT NOT NULL,
+        planId TEXT NOT NULL,
+        interval TEXT NOT NULL,
+        amount REAL NOT NULL,
+        status TEXT DEFAULT 'pending',
+        transactionId TEXT,
+        completedAt TEXT,
+        createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+      )
+    `);
+
     // Create indexes for better performance
     this.db.exec(`
       CREATE INDEX IF NOT EXISTS idx_projects_user_id ON projects(user_id);
@@ -146,6 +162,12 @@ export class DatabaseService {
       }
       if (!columnNames.includes('interval')) {
         this.db.exec('ALTER TABLE users ADD COLUMN interval TEXT DEFAULT "month"');
+      }
+      if (!columnNames.includes('trialStartDate')) {
+        this.db.exec('ALTER TABLE users ADD COLUMN trialStartDate TEXT');
+      }
+      if (!columnNames.includes('trialEndDate')) {
+        this.db.exec('ALTER TABLE users ADD COLUMN trialEndDate TEXT');
       }
     } catch (error) {
       console.log('Migration completed or no migration needed:', error);
@@ -396,24 +418,7 @@ export class DatabaseService {
   // Payment methods
   createPaymentIntent(paymentData: any) {
     const stmt = this.db.prepare(`
-      INSERT INTO payment_intents (id, userId, planId, interval, amount, status, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-    
-    return stmt.run(
-      paymentData.id,
-      paymentData.userId,
-      paymentData.planId,
-      paymentData.interval,
-      paymentData.amount,
-      paymentData.status,
-      paymentData.createdAt
-    );
-  }
-
-  createPaymentIntent(paymentData: any) {
-    const stmt = this.db.prepare(`
-      INSERT INTO payment_intents (id, userId, planId, interval, amount, status, createdAt)
+      INSERT INTO payment_intents (id, user_id, plan_id, interval, amount, status, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
     
@@ -431,7 +436,7 @@ export class DatabaseService {
   updatePaymentIntent(orderId: string, updateData: any) {
     const stmt = this.db.prepare(`
       UPDATE payment_intents 
-      SET status = ?, transactionId = ?, completedAt = ?
+      SET status = ?, transaction_id = ?, completed_at = ?
       WHERE id = ?
     `);
     
@@ -451,10 +456,10 @@ export class DatabaseService {
   updateUserPlan(userId: string, planData: any) {
     const stmt = this.db.prepare(`
       UPDATE users 
-      SET plan = ?, trialStartDate = ?, trialEndDate = ?, 
-          subscriptionId = ?, subscriptionStatus = ?, 
-          subscriptionStartDate = ?, subscriptionEndDate = ?,
-          interval = ?, updatedAt = ?
+      SET plan = ?, trial_start_date = ?, trial_end_date = ?, 
+          subscription_id = ?, subscription_status = ?, 
+          subscription_start_date = ?, subscription_end_date = ?,
+          interval = ?, updated_at = ?
       WHERE id = ?
     `);
     

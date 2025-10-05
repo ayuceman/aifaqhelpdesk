@@ -26,7 +26,7 @@ router.get('/subscription', authenticateToken, async (req, res) => {
   }
 });
 
-// Create payment intent
+// Create payment intent for PayPal SDK
 router.post('/create-payment', authenticateToken, async (req, res) => {
   try {
     const { planId, interval } = req.body;
@@ -35,7 +35,8 @@ router.post('/create-payment', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Plan ID is required' });
     }
 
-    const paymentIntent = await paymentService.createPaymentIntent(
+    // Create PayPal order for SDK integration
+    const result = await paymentService.createPaymentIntent(
       req.user!.id,
       planId,
       interval || 'month'
@@ -43,8 +44,8 @@ router.post('/create-payment', authenticateToken, async (req, res) => {
 
     res.json({ 
       success: true, 
-      orderId: paymentIntent.orderId,
-      approvalUrl: paymentIntent.approvalUrl
+      paypalOrderId: result.orderId,
+      approvalUrl: result.approvalUrl
     });
   } catch (error) {
     console.error('Create payment error:', error);
@@ -52,16 +53,26 @@ router.post('/create-payment', authenticateToken, async (req, res) => {
   }
 });
 
-// Capture payment (called after PayPal approval)
+// Capture payment (called after PayPal SDK approval)
 router.post('/capture-payment', authenticateToken, async (req, res) => {
   try {
-    const { orderId } = req.body;
+    const { orderId, planId, interval } = req.body;
     
     if (!orderId) {
       return res.status(400).json({ error: 'Order ID is required' });
     }
 
     const result = await paymentService.capturePayment(orderId);
+    
+    if (result.success) {
+      // Update user subscription after successful payment
+      await paymentService.updateUserSubscription(
+        req.user!.id,
+        planId,
+        interval || 'month'
+      );
+    }
+    
     res.json({ success: true, ...result });
   } catch (error) {
     console.error('Capture payment error:', error);
@@ -80,21 +91,27 @@ router.post('/cancel-subscription', authenticateToken, async (req, res) => {
   }
 });
 
-// Handle PayPal success redirect
+// Handle PayPal success redirect (server-side)
 router.get('/success', async (req, res) => {
   try {
     const { token, PayerID } = req.query;
     
+    console.log('PayPal success redirect received:', { token, PayerID });
+    
     if (!token) {
+      console.error('No token provided in success redirect');
       return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/payment/cancel?error=missing_token`);
     }
 
     // Capture the payment
+    console.log('Capturing payment for order:', token);
     const result = await paymentService.capturePayment(token as string);
     
     if (result.success) {
+      console.log('Payment captured successfully:', result);
       res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/payment/success?orderId=${token}`);
     } else {
+      console.error('Payment capture failed:', result);
       res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/payment/cancel?error=capture_failed`);
     }
   } catch (error) {
@@ -103,8 +120,9 @@ router.get('/success', async (req, res) => {
   }
 });
 
-// Handle PayPal cancel redirect
+// Handle PayPal cancel redirect (server-side)
 router.get('/cancel', async (req, res) => {
+  console.log('PayPal cancel redirect received');
   res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/payment/cancel`);
 });
 

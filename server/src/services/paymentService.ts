@@ -1,11 +1,21 @@
 import { databaseService } from './databaseService';
+import dotenv from 'dotenv';
+
+// Load environment variables first
+dotenv.config({ path: './.env' });
 
 // PayPal configuration - using direct API calls instead of SDK
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || 'your-paypal-client-id';
-const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || 'your-paypal-client-secret';
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || 'AeRf10ifzd8JVqLFd58rBo2cclgoeRsJ0fWYkqJhnYER7kvTtXznb_6SffvsJtZbKr3elNij829RkIT4';
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || 'EFqo1ESbzpqB2XUW5laqGIHIZWNvnovGk0cnJhD6GcKbav-jg5uylJSvuvbRM_T3d9fEfeGr25pajYvt';
 const PAYPAL_BASE_URL = process.env.NODE_ENV === 'production' 
   ? 'https://api-m.paypal.com' 
-  : 'https://api-m.sandbox.paypal.com';
+  : 'https://api.sandbox.paypal.com';
+
+// Debug environment variables
+console.log('PayPal service environment variables:');
+console.log('PAYPAL_CLIENT_ID:', PAYPAL_CLIENT_ID);
+console.log('PAYPAL_CLIENT_SECRET:', PAYPAL_CLIENT_SECRET);
+console.log('NODE_ENV:', process.env.NODE_ENV);
 
 export interface PricingPlan {
   id: string;
@@ -114,6 +124,8 @@ export class PaymentService {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('PayPal API error:', response.status, response.statusText, errorText);
         throw new Error(`PayPal API error: ${response.status} ${response.statusText}`);
       }
 
@@ -125,7 +137,7 @@ export class PaymentService {
     }
   }
 
-  async createPaymentIntent(userId: string, planId: string, interval: 'month' | 'year' = 'month') {
+  async createPaymentIntent(userId: string, planId: string, interval: 'month' | 'year' = 'month', cardDetails?: any) {
     const plan = pricingPlans.find(p => p.id === planId);
     if (!plan) {
       throw new Error('Invalid plan selected');
@@ -137,12 +149,22 @@ export class PaymentService {
       price = plan.price * 12 * 0.8; // 20% discount for yearly
     }
 
+    // Debug PayPal credentials
+    console.log('PayPal Client ID:', PAYPAL_CLIENT_ID ? 'SET' : 'NOT SET');
+    console.log('PayPal Client Secret:', PAYPAL_CLIENT_SECRET ? 'SET' : 'NOT SET');
+    console.log('PayPal Base URL:', PAYPAL_BASE_URL);
+    console.log('Client ID value:', PAYPAL_CLIENT_ID);
+    console.log('Client Secret value:', PAYPAL_CLIENT_SECRET);
+    
     // Validate PayPal credentials
     if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET || 
         PAYPAL_CLIENT_ID === 'your-paypal-client-id' || 
         PAYPAL_CLIENT_SECRET === 'your-paypal-client-secret') {
+      console.log('PayPal validation failed - credentials not properly configured');
       throw new Error('PayPal credentials not configured. Please set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET environment variables.');
     }
+    
+    console.log('PayPal credentials validated successfully');
 
     try {
       const accessToken = await this.getPayPalAccessToken();
@@ -206,6 +228,100 @@ export class PaymentService {
     }
   }
 
+  async processDirectPayment(userId: string, planId: string, interval: 'month' | 'year', cardDetails: any) {
+    const plan = pricingPlans.find(p => p.id === planId);
+    if (!plan) {
+      throw new Error('Invalid plan selected');
+    }
+
+    // Calculate price based on interval
+    let price = plan.price;
+    if (interval === 'year') {
+      price = plan.price * 12 * 0.8; // 20% discount for yearly
+    }
+
+    try {
+      console.log('Creating PayPal standard payment for:', {
+        userId,
+        planId,
+        interval,
+        amount: price
+      });
+
+      const accessToken = await this.getPayPalAccessToken();
+      
+      // Create PayPal order using standard flow
+      const orderData = {
+        intent: 'CAPTURE',
+        purchase_units: [{
+          amount: {
+            currency_code: 'USD',
+            value: price.toFixed(2)
+          },
+          description: `${plan.name} Plan - ${interval === 'year' ? 'Yearly' : 'Monthly'} subscription`,
+          custom_id: `user_${userId}_plan_${planId}_${interval}`,
+          soft_descriptor: 'AI FAQ Generator'
+        }],
+        application_context: {
+          brand_name: 'AI FAQ Generator',
+          landing_page: 'NO_PREFERENCE',
+          user_action: 'PAY_NOW',
+          return_url: `http://localhost:3001/api/payment/success`,
+          cancel_url: `http://localhost:3001/api/payment/cancel`
+        }
+      };
+
+      const response = await fetch(`${PAYPAL_BASE_URL}/v2/checkout/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+          'PayPal-Request-Id': Math.random().toString(36).substring(2, 15)
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      const result = await response.json();
+      console.log('PayPal order creation response:', result);
+      
+      if (result.id) {
+        // Store payment intent in database
+        await databaseService.createPaymentIntent({
+          id: result.id,
+          userId,
+          planId,
+          interval,
+          amount: price,
+          status: 'pending',
+          createdAt: new Date().toISOString()
+        });
+
+        const approvalUrl = result.links.find((link: any) => link.rel === 'approve')?.href;
+        
+        return {
+          success: true,
+          orderId: result.id,
+          approvalUrl,
+          message: 'Redirect to PayPal for payment'
+        };
+      } else {
+        throw new Error('Failed to create PayPal order');
+      }
+    } catch (error) {
+      console.error('PayPal payment creation error:', error);
+      throw new Error('Failed to process payment');
+    }
+  }
+
+  private getCardType(cardNumber: string): string {
+    const number = cardNumber.replace(/\s/g, '');
+    if (number.startsWith('4')) return 'visa';
+    if (number.startsWith('5') || number.startsWith('2')) return 'mastercard';
+    if (number.startsWith('3')) return 'amex';
+    if (number.startsWith('6')) return 'discover';
+    return 'visa'; // default
+  }
+
   async capturePayment(orderId: string) {
     try {
       const accessToken = await this.getPayPalAccessToken();
@@ -234,9 +350,13 @@ export class PaymentService {
 
         // Get payment intent details
         const paymentIntent = await databaseService.getPaymentIntent(orderId);
+        console.log('Payment intent found:', paymentIntent);
+        
         if (paymentIntent) {
+          console.log('Updating user plan for user:', paymentIntent.userId, 'to plan:', paymentIntent.planId);
+          
           // Update user plan
-          await databaseService.updateUserPlan(paymentIntent.userId, {
+          const updateResult = await databaseService.updateUserPlan(paymentIntent.userId, {
             plan: paymentIntent.planId,
             interval: paymentIntent.interval,
             subscriptionId: capture.id,
@@ -246,6 +366,10 @@ export class PaymentService {
               ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
               : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
           });
+          
+          console.log('User plan update result:', updateResult);
+        } else {
+          console.error('No payment intent found for orderId:', orderId);
         }
 
         return {
@@ -284,20 +408,25 @@ export class PaymentService {
 
   async getUserSubscription(userId: string) {
     const user = await databaseService.getUserById(userId);
+    console.log('User data from database:', user);
+    
     if (!user) {
       throw new Error('User not found');
     }
 
     const plan = pricingPlans.find(p => p.id === user.plan);
-    return {
+    const subscription = {
       plan: user.plan,
       interval: user.interval || 'month',
-      status: user.subscriptionStatus || 'inactive',
-      startDate: user.subscriptionStartDate,
-      endDate: user.subscriptionEndDate,
+      status: user.subscription_status || 'inactive',
+      startDate: user.subscription_start_date,
+      endDate: user.subscription_end_date,
       features: plan?.features || [],
       limits: plan?.limits || pricingPlans[0].limits
     };
+    
+    console.log('Returning subscription data:', subscription);
+    return subscription;
   }
 }
 

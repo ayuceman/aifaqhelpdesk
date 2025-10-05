@@ -18,11 +18,13 @@ import Dashboard from './components/Dashboard';
 import ProjectDetails from './components/ProjectDetails';
 import TrialStatus from './components/TrialStatus';
 import UpgradePage from './components/UpgradePage';
+import CheckoutPage from './components/CheckoutPage';
 import PaymentSuccess from './components/PaymentSuccess';
 import PaymentCancel from './components/PaymentCancel';
+import SubscriptionManagement from './components/SubscriptionManagement';
 
 type Step = 'upload' | 'generate' | 'review' | 'embed';
-type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo' | 'pricing' | 'login' | 'signup' | 'dashboard' | 'project-details' | 'upgrade' | 'payment-success' | 'payment-cancel';
+type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo' | 'pricing' | 'login' | 'signup' | 'dashboard' | 'project-details' | 'upgrade' | 'checkout' | 'payment-success' | 'payment-cancel' | 'subscription-management';
 
 interface FAQ {
   id?: string;
@@ -49,6 +51,8 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [currentProject, setCurrentProject] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [checkoutPlan, setCheckoutPlan] = useState<any>(null);
+  const [checkoutInterval, setCheckoutInterval] = useState<'month' | 'year'>('month');
   const { toasts, removeToast, success, error, info } = useToast();
 
   const steps: { id: Step; label: string; number: number }[] = [
@@ -81,31 +85,13 @@ function App() {
     setCurrentPage('upgrade');
   };
 
-  const handleUpgrade = async (planId: string, interval: 'month' | 'year') => {
-    console.log('App handleUpgrade called with:', planId, interval);
-    try {
-      const token = localStorage.getItem('token');
-      console.log('Token exists:', !!token);
-      
-      console.log('Making payment request...');
-      const response = await axios.post('http://localhost:3001/api/payment/create-payment', {
-        planId,
-        interval
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      console.log('Payment response:', response.data);
-      if (response.data.success) {
-        console.log('Redirecting to PayPal:', response.data.approvalUrl);
-        // Redirect to PayPal
-        window.location.href = response.data.approvalUrl;
-      }
-    } catch (err: any) {
-      console.error('Upgrade error:', err);
-      // Show error message to user
-      alert('Failed to start upgrade process. Please try again.');
-    }
+  const handleUpgrade = async (plan: any, interval: 'month' | 'year') => {
+    console.log('App handleUpgrade called with:', plan, interval);
+    
+    // Use the plan object directly
+    setCheckoutPlan(plan);
+    setCheckoutInterval(interval);
+    setCurrentPage('checkout');
   };
 
   const handlePaymentSuccess = () => {
@@ -114,6 +100,10 @@ function App() {
 
   const handlePaymentCancel = () => {
     setCurrentPage('payment-cancel');
+  };
+
+  const handleBackToUpgrade = () => {
+    setCurrentPage('upgrade');
   };
 
   const handleLogin = (userData: User, token: string) => {
@@ -132,6 +122,31 @@ function App() {
     setUser(null);
     setCurrentProject(null);
     setCurrentPage('landing');
+  };
+
+  const refreshUserData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:3001/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setUser(data.user);
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing user data:', error);
+    }
+  };
+
+  const handleNavigateToSubscriptionManagement = () => {
+    setCurrentPage('subscription-management');
   };
 
   const handleNavigateToProject = (projectId: string) => {
@@ -213,6 +228,14 @@ function App() {
 
   // Handle navigation
   React.useEffect(() => {
+    // Only handle specific routes that need URL-based navigation
+    const initialPath = window.location.pathname;
+    if (initialPath === '/payment/success') {
+      setCurrentPage('payment-success');
+    } else if (initialPath === '/payment/cancel') {
+      setCurrentPage('payment-cancel');
+    }
+
     const handleNavigation = (e: PopStateEvent) => {
       e.preventDefault();
       const path = window.location.pathname;
@@ -220,6 +243,14 @@ function App() {
       else if (path === '/terms') setCurrentPage('terms');
       else if (path === '/contact') setCurrentPage('contact');
       else if (path === '/demo') setCurrentPage('demo');
+      else if (path === '/payment/success') setCurrentPage('payment-success');
+      else if (path === '/payment/cancel') setCurrentPage('payment-cancel');
+      else if (path === '/pricing') setCurrentPage('pricing');
+      else if (path === '/login') setCurrentPage('login');
+      else if (path === '/signup') setCurrentPage('signup');
+      else if (path === '/dashboard') setCurrentPage('dashboard');
+      else if (path === '/upgrade') setCurrentPage('upgrade');
+      else if (path === '/checkout') setCurrentPage('checkout');
       else setCurrentPage('landing');
     };
 
@@ -311,6 +342,7 @@ function App() {
             onViewProjectDetails={handleViewProjectDetails}
             onNavigateToHome={() => setCurrentPage('landing')}
             onNavigateToUpgrade={handleNavigateToUpgrade}
+            onNavigateToSubscriptionManagement={handleNavigateToSubscriptionManagement}
           />
         );
       }
@@ -342,10 +374,27 @@ function App() {
         );
       }
 
+      if (currentPage === 'checkout') {
+        if (!user || !checkoutPlan) {
+          setCurrentPage('upgrade');
+          return null;
+        }
+        return (
+          <CheckoutPage
+            plan={checkoutPlan}
+            interval={checkoutInterval}
+            onBack={handleBackToUpgrade}
+            onPaymentSuccess={handlePaymentSuccess}
+            onPaymentCancel={handlePaymentCancel}
+          />
+        );
+      }
+
       if (currentPage === 'payment-success') {
         return (
           <PaymentSuccess
             onBack={() => setCurrentPage('dashboard')}
+            onRefreshUser={refreshUserData}
           />
         );
       }
@@ -355,6 +404,19 @@ function App() {
           <PaymentCancel
             onBack={() => setCurrentPage('dashboard')}
             onRetry={() => setCurrentPage('upgrade')}
+          />
+        );
+      }
+
+      if (currentPage === 'subscription-management') {
+        if (!user) {
+          setCurrentPage('login');
+          return null;
+        }
+        return (
+          <SubscriptionManagement
+            onBack={() => setCurrentPage('dashboard')}
+            onUpgrade={handleUpgrade}
           />
         );
       }

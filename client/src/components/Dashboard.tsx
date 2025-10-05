@@ -21,6 +21,10 @@ interface User {
   plan: string;
   trialStartDate?: string;
   trialEndDate?: string;
+  subscriptionStatus?: string;
+  subscriptionStartDate?: string;
+  subscriptionEndDate?: string;
+  interval?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,6 +36,7 @@ interface DashboardProps {
   onViewProjectDetails: (project: Project) => void;
   onNavigateToHome: () => void;
   onNavigateToUpgrade?: () => void;
+  onNavigateToSubscriptionManagement?: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
@@ -40,7 +45,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   onNavigateToProject, 
   onViewProjectDetails,
   onNavigateToHome,
-  onNavigateToUpgrade
+  onNavigateToUpgrade,
+  onNavigateToSubscriptionManagement
 }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -130,6 +136,26 @@ const Dashboard: React.FC<DashboardProps> = ({
     return colors[plan] || 'bg-slate-100 text-slate-800';
   };
 
+  const getSubscriptionStatusDisplay = (status: string) => {
+    const statusNames: { [key: string]: string } = {
+      active: 'Active',
+      inactive: 'Inactive',
+      cancelled: 'Cancelled',
+      expired: 'Expired'
+    };
+    return statusNames[status] || status;
+  };
+
+  const getSubscriptionStatusColor = (status: string) => {
+    const colors: { [key: string]: string } = {
+      active: 'bg-green-100 text-green-800',
+      inactive: 'bg-red-100 text-red-800',
+      cancelled: 'bg-orange-100 text-orange-800',
+      expired: 'bg-gray-100 text-gray-800'
+    };
+    return colors[status] || 'bg-slate-100 text-slate-800';
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -157,6 +183,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPlanColor(user.plan)}`}>
                       {getPlanDisplayName(user.plan)}
                     </span>
+                    {user.subscriptionStatus && (
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSubscriptionStatusColor(user.subscriptionStatus)}`}>
+                        {getSubscriptionStatusDisplay(user.subscriptionStatus)}
+                      </span>
+                    )}
                   </div>
                   {onNavigateToUpgrade && user.plan === 'free' && (
                     <button
@@ -164,6 +195,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                       className="bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
                     >
                       Upgrade
+                    </button>
+                  )}
+                  {onNavigateToSubscriptionManagement && user.plan !== 'free' && (
+                    <button
+                      onClick={onNavigateToSubscriptionManagement}
+                      className="bg-slate-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-slate-700 transition-colors"
+                    >
+                      Manage Subscription
                     </button>
                   )}
                   <button

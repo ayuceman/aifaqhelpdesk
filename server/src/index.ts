@@ -10,7 +10,12 @@ import { authRoutes } from './routes/auth';
 import { projectRoutes } from './routes/projects';
 import paymentRoutes from './routes/payment';
 
-dotenv.config();
+// Load environment variables
+dotenv.config({ path: './.env' });
+console.log('Environment variables loaded:');
+console.log('PAYPAL_CLIENT_ID:', process.env.PAYPAL_CLIENT_ID);
+console.log('PAYPAL_CLIENT_SECRET:', process.env.PAYPAL_CLIENT_SECRET);
+console.log('NODE_ENV:', process.env.NODE_ENV);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
