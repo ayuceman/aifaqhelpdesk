@@ -101,9 +101,10 @@ function App() {
         // Redirect to PayPal
         window.location.href = response.data.approvalUrl;
       }
-    } catch (error: any) {
-      console.error('Upgrade error:', error);
-      error('Failed to start upgrade process. Please try again.');
+    } catch (err: any) {
+      console.error('Upgrade error:', err);
+      // Show error message to user
+      alert('Failed to start upgrade process. Please try again.');
     }
   };
 

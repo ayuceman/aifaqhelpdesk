@@ -102,18 +102,27 @@ export const pricingPlans: PricingPlan[] = [
 
 export class PaymentService {
   private async getPayPalAccessToken() {
-    const response = await fetch(`${PAYPAL_BASE_URL}/v1/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Language': 'en_US',
-        'Authorization': `Basic ${Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64')}`
-      },
-      body: 'grant_type=client_credentials'
-    });
+    try {
+      const response = await fetch(`${PAYPAL_BASE_URL}/v1/oauth2/token`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Accept-Language': 'en_US',
+          'Authorization': `Basic ${Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64')}`
+        },
+        body: 'grant_type=client_credentials'
+      });
 
-    const data = await response.json();
-    return data.access_token;
+      if (!response.ok) {
+        throw new Error(`PayPal API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.access_token;
+    } catch (error) {
+      console.error('PayPal access token error:', error);
+      throw new Error('Failed to get PayPal access token');
+    }
   }
 
   async createPaymentIntent(userId: string, planId: string, interval: 'month' | 'year' = 'month') {
@@ -126,6 +135,15 @@ export class PaymentService {
     let price = plan.price;
     if (interval === 'year') {
       price = plan.price * 12 * 0.8; // 20% discount for yearly
+    }
+
+    // Check if PayPal credentials are configured
+    if (PAYPAL_CLIENT_ID === 'your-paypal-client-id' || PAYPAL_CLIENT_SECRET === 'your-paypal-client-secret') {
+      console.log('PayPal credentials not configured, returning mock payment URL');
+      return {
+        orderId: `mock-order-${Date.now()}`,
+        approvalUrl: `${process.env.CLIENT_URL || 'http://localhost:5175'}/payment/success?mock=true`
+      };
     }
 
     try {
