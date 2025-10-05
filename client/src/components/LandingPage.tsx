@@ -251,6 +251,139 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
         </div>
       </div>
 
+      {/* Embed Code Section */}
+      <div className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">
+              Get Your Embed Code
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              Copy and paste this code into your website to deploy your AI FAQ widget instantly
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Code Preview */}
+            <div className="card-elevated p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-slate-900">Embed Code</h3>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`<iframe 
+  src="http://localhost:3000/widget?project=demo" 
+  width="400" 
+  height="600" 
+  frameborder="0"
+  title="AI FAQ Assistant">
+</iframe>`);
+                    // You could add a toast notification here
+                  }}
+                  className="btn-ghost text-sm px-4 py-2"
+                >
+                  📋 Copy Code
+                </button>
+              </div>
+              
+              <div className="bg-slate-900 rounded-lg p-6 overflow-x-auto">
+                <pre className="text-green-400 text-sm font-mono leading-relaxed">
+{`<iframe 
+  src="http://localhost:3000/widget?project=demo" 
+  width="400" 
+  height="600" 
+  frameborder="0"
+  title="AI FAQ Assistant">
+</iframe>`}
+                </pre>
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-800">
+                      <strong>Pro Tip:</strong> Replace "demo" with your project slug to use your custom FAQ data.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Preview */}
+            <div className="card-elevated p-8">
+              <h3 className="text-lg font-semibold text-slate-900 mb-6">Live Preview</h3>
+              
+              <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
+                <div className="w-full max-w-sm mx-auto">
+                  <iframe 
+                    src="http://localhost:3000/widget?project=demo" 
+                    width="100%" 
+                    height="400" 
+                    frameBorder="0"
+                    title="AI FAQ Assistant Preview"
+                    className="rounded-lg shadow-sm"
+                  />
+                </div>
+              </div>
+              
+              <div className="mt-6 text-center">
+                <p className="text-sm text-slate-600 mb-4">
+                  Try asking: "What are your business hours?" or "How do I contact support?"
+                </p>
+                <button
+                  onClick={onLoadDemo}
+                  className="btn-primary text-sm px-6 py-2"
+                >
+                  Try Full Demo
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Quick Start Steps */}
+          <div className="mt-16">
+            <h3 className="text-2xl font-bold text-slate-900 text-center mb-8">
+              Quick Start Guide
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <span className="text-blue-600 font-bold text-lg">1</span>
+                </div>
+                <h4 className="font-semibold text-slate-900 mb-2">Create Your FAQs</h4>
+                <p className="text-slate-600 text-sm">
+                  Upload documents or crawl websites to generate intelligent FAQ content
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <span className="text-green-600 font-bold text-lg">2</span>
+                </div>
+                <h4 className="font-semibold text-slate-900 mb-2">Customize & Deploy</h4>
+                <p className="text-slate-600 text-sm">
+                  Review, edit, and publish your FAQs to get your embed code
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <span className="text-purple-600 font-bold text-lg">3</span>
+                </div>
+                <h4 className="font-semibold text-slate-900 mb-2">Embed & Go Live</h4>
+                <p className="text-slate-600 text-sm">
+                  Copy the embed code to your website and start helping customers instantly
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* CTA Section */}
       <div className="py-24 bg-gradient-to-r from-slate-900 to-slate-800">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
