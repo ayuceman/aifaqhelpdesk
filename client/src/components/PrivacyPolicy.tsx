@@ -17,10 +17,11 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onBack }) => {
               </div>
               <span className="text-xl font-bold text-slate-900">FAQ Generator</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <a href="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</a>
               <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
               <a href="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</a>
+              <a href="/terms" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Terms</a>
               <button
                 onClick={onBack}
                 className="btn-ghost"

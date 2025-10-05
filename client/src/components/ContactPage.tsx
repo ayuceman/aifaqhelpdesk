@@ -73,9 +73,11 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               </div>
               <span className="text-xl font-bold text-slate-900">FAQ Generator</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <a href="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</a>
               <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
+              <a href="/privacy" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Privacy</a>
+              <a href="/terms" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Terms</a>
               <button
                 onClick={onBack}
                 className="btn-ghost"
@@ -331,9 +333,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-slate-400">
                 <li><a href="/demo" className="hover:text-white transition-colors">Demo</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
+                <li><a href="/" className="hover:text-white transition-colors">Get Started</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
               </ul>
             </div>
             
@@ -343,17 +344,15 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                 <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
                 <li><a href="/privacy" className="hover:text-white transition-colors">Privacy</a></li>
                 <li><a href="/terms" className="hover:text-white transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact Support</a></li>
+                <li><a href="/demo" className="hover:text-white transition-colors">Live Demo</a></li>
+                <li><a href="/" className="hover:text-white transition-colors">Get Started</a></li>
               </ul>
             </div>
           </div>

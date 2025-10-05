@@ -18,9 +18,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               </div>
               <span className="text-xl font-bold text-slate-900">AI FAQ Generator</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
               <a href="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</a>
+              <a href="/privacy" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Privacy</a>
+              <a href="/terms" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Terms</a>
               <button
                 onClick={onGetStarted}
                 className="btn-primary"
@@ -431,9 +433,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <h4 className="font-semibold text-slate-900 mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-slate-600">
                 <li><a href="/demo" className="hover:text-slate-900 transition-colors">Demo</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">API</a></li>
+                <li><button onClick={onGetStarted} className="text-left hover:text-slate-900 transition-colors">Get Started</button></li>
+                <li><button onClick={onLoadDemo} className="text-left hover:text-slate-900 transition-colors">Try Demo</button></li>
               </ul>
             </div>
             
@@ -443,17 +444,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
                 <li><a href="/contact" className="hover:text-slate-900 transition-colors">Contact</a></li>
                 <li><a href="/privacy" className="hover:text-slate-900 transition-colors">Privacy</a></li>
                 <li><a href="/terms" className="hover:text-slate-900 transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Blog</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold text-slate-900 mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-slate-600">
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Status</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Community</a></li>
+                <li><a href="/contact" className="hover:text-slate-900 transition-colors">Contact Support</a></li>
+                <li><a href="/demo" className="hover:text-slate-900 transition-colors">Live Demo</a></li>
+                <li><button onClick={onGetStarted} className="text-left hover:text-slate-900 transition-colors">Get Started</button></li>
               </ul>
             </div>
           </div>
