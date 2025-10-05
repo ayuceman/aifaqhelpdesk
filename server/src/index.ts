@@ -6,6 +6,8 @@ import { fileUploadRoutes } from './routes/fileUpload';
 import { faqRoutes } from './routes/faq';
 import { publicRoutes } from './routes/public';
 import { widgetRoutes } from './routes/widget';
+import { authRoutes } from './routes/auth';
+import { projectRoutes } from './routes/projects';
 
 dotenv.config();
 
@@ -73,6 +75,8 @@ const chatLimiter = rateLimit({
 });
 
 // Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
 app.use('/api/upload', fileUploadRoutes);
 app.use('/api/faq', faqRoutes);
 app.use('/api/public', publicRoutes);

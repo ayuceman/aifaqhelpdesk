@@ -1,16 +1,35 @@
 import express from 'express';
-import { storageService } from '../services/storageService';
+import { faqService } from '../services/faqService';
+import { databaseService } from '../services/databaseService';
 import { llmService } from '../services/llmService';
-import { trialService } from '../services/trialService';
-import { checkChatLimit } from '../middleware/trialMiddleware';
 
 const router = express.Router();
 
 // Get all FAQs for public access (with project support)
 router.get('/faq', async (req, res) => {
   try {
-    const project = (req.query.project as string) || 'default';
-    const faqs = await storageService.getFAQs(project);
+    const project = req.query.project as string || 'default';
+    
+    // For demo project, use the old system
+    if (project === 'demo') {
+      const fs = require('fs');
+      const path = require('path');
+      const demoPath = path.join(process.cwd(), 'data', 'projects', 'demo', 'faq.json');
+      
+      if (fs.existsSync(demoPath)) {
+        const data = fs.readFileSync(demoPath, 'utf8');
+        const faqs = JSON.parse(data);
+        return res.json({ success: true, faqs, project });
+      }
+    }
+    
+    // For other projects, find by slug
+    const projectData = databaseService.getProjectBySlug('', project);
+    if (!projectData) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    
+    const faqs = await faqService.getFAQs(projectData.id);
     res.json({ success: true, faqs, project });
   } catch (error) {
     console.error('Get public FAQs error:', error);
@@ -19,7 +38,7 @@ router.get('/faq', async (req, res) => {
 });
 
 // Chat endpoint for widget (with project support)
-router.post('/chat', checkChatLimit, async (req, res) => {
+router.post('/chat', async (req, res) => {
   try {
     const { question, project = 'default', threshold = 0.5, topK = 5 } = req.body;
     
@@ -30,165 +49,162 @@ router.post('/chat', checkChatLimit, async (req, res) => {
     const startTime = Date.now();
     console.log(`[CHAT] Request: "${question}" | Project: ${project} | IP: ${req.ip}`);
 
-    // Increment chat count for trial
-    await trialService.incrementChatCount(project);
-
     // Generate embedding for the question
     const queryEmbedding = await llmService.generateEmbedding(question);
     console.log(`[CHAT] Embedding generated (length: ${queryEmbedding.embedding.length}) in ${Date.now() - startTime}ms`);
-    
-    // Find similar FAQs with lower threshold for better matching
-    const matches = await storageService.findSimilarEmbeddings(
-      queryEmbedding.embedding, 
-      topK, 
-      threshold,
-      project
-    );
 
-    console.log(`[CHAT] Found ${matches.length} matches:`, matches.map(m => ({ q: m.faq.question.substring(0, 40), score: m.score.toFixed(3) })));
+    let embeddings = [];
+    let faqs = [];
 
-    // Fallback: if no embedding matches, try intelligent keyword search
-    if (matches.length === 0) {
-      console.log('[CHAT] No embedding matches, trying keyword search...');
-      const allFAQs = await storageService.getFAQs(project);
+    // Handle demo project
+    if (project === 'demo') {
+      const fs = require('fs');
+      const path = require('path');
+      const demoFaqPath = path.join(process.cwd(), 'data', 'projects', 'demo', 'faq.json');
+      const demoEmbedPath = path.join(process.cwd(), 'data', 'projects', 'demo', 'embeddings.json');
       
-      // Extract meaningful keywords (filter out common words)
-      const stopWords = new Set(['what', 'when', 'where', 'who', 'how', 'why', 'which', 'the', 'is', 'are', 'was', 'were', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'about', 'this', 'that', 'these', 'those']);
-      const keywords = question.toLowerCase()
-        .split(/\s+/)
-        .filter(w => w.length > 2 && !stopWords.has(w));
-      
-      console.log('Keywords extracted:', keywords);
-      
-      const keywordMatches = allFAQs
-        .map(faq => {
-          const questionText = faq.question.toLowerCase();
-          const answerText = faq.answer.toLowerCase();
-          
-          // Score based on keyword presence in question (higher weight) and answer
-          let score = 0;
-          keywords.forEach(kw => {
-            if (questionText.includes(kw)) score += 2; // Higher weight for question matches
-            if (answerText.includes(kw)) score += 1;   // Lower weight for answer matches
-          });
-          
-          // Normalize by number of keywords
-          score = keywords.length > 0 ? score / (keywords.length * 3) : 0;
-          
-          return { faq, score };
-        })
-        .filter(m => m.score > 0.15) // Lower threshold for more results
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5); // Get top 5 matches
-      
-      console.log(`[CHAT] Keyword matches: ${keywordMatches.length}`, keywordMatches.map(m => ({ q: m.faq.question.substring(0, 40), score: m.score.toFixed(2) })));
-      
-      if (keywordMatches.length > 0) {
-        // Always use LLM to generate contextual answer from matches
-        try {
-          const context = keywordMatches.map(m => 
-            `Q: ${m.faq.question}\nA: ${m.faq.answer}`
-          ).join('\n\n');
-          
-          console.log(`[CHAT] Generating answer from ${keywordMatches.length} keyword matches using LLM`);
-          const generatedAnswer = await llmService.generateAnswer(question, [context]);
-          
-          const totalTime = Date.now() - startTime;
-          console.log(`[CHAT] Response: keyword_llm | Confidence: ${keywordMatches[0].score.toFixed(2)} | Time: ${totalTime}ms`);
-          
-          return res.json({
-            success: true,
-            answer: generatedAnswer,
-            source: 'keyword_llm',
-            confidence: keywordMatches[0].score,
-            relatedFAQs: keywordMatches.map(m => ({
-              question: m.faq.question,
-              answer: m.faq.answer,
-              score: m.score
-            }))
-          });
-        } catch (error) {
-          console.error('LLM generation failed, returning best match:', error);
-          return res.json({
-            success: true,
-            answer: keywordMatches[0].faq.answer,
-            source: 'keyword_direct',
-            confidence: keywordMatches[0].score
-          });
-        }
+      if (fs.existsSync(demoFaqPath) && fs.existsSync(demoEmbedPath)) {
+        const faqData = fs.readFileSync(demoFaqPath, 'utf8');
+        const embedData = fs.readFileSync(demoEmbedPath, 'utf8');
+        faqs = JSON.parse(faqData);
+        embeddings = JSON.parse(embedData);
       }
-      
+    } else {
+      // Handle database projects
+      const projectData = databaseService.getProjectBySlug('', project);
+      if (projectData) {
+        faqs = await faqService.getFAQs(projectData.id);
+        const embedData = await faqService.getEmbeddings(projectData.id);
+        embeddings = embedData.map(emb => ({
+          id: emb.id,
+          text: emb.text,
+          embedding: emb.embedding,
+          faqId: emb.faqId
+        }));
+      }
+    }
+
+    if (embeddings.length === 0) {
+      console.log(`[CHAT] No embeddings found for project ${project}`);
       return res.json({
         success: true,
-        answer: "I couldn't find a relevant answer to your question. Please try rephrasing your question or contact support for more specific help.",
-        source: 'no_match',
-        confidence: 0
+        answer: "I couldn't find any relevant information to answer your question. Please try rephrasing your question or contact support for more specific help.",
+        source: 'no_data',
+        confidence: 0,
+        processingTime: Date.now() - startTime
       });
     }
 
-    // If we have good matches, return the best one
-    const bestMatch = matches[0];
+    // Calculate similarities
+    const similarities = embeddings.map(emb => {
+      const similarity = cosineSimilarity(queryEmbedding.embedding, emb.embedding);
+      return {
+        ...emb,
+        similarity
+      };
+    });
+
+    // Sort by similarity and get top results
+    const topResults = similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, topK);
+
+    console.log(`[CHAT] Top ${topResults.length} results found`);
+
+    // Check if we have a good match
+    const bestMatch = topResults[0];
+    if (bestMatch && bestMatch.similarity >= threshold) {
+      console.log(`[CHAT] Found good match with similarity ${bestMatch.similarity.toFixed(3)}`);
+      
+      // Find the FAQ for this match
+      const matchedFAQ = faqs.find(faq => faq.id === bestMatch.faqId);
+      if (matchedFAQ) {
+        return res.json({
+          success: true,
+          answer: matchedFAQ.answer,
+          question: matchedFAQ.question,
+          source: 'faq_match',
+          confidence: bestMatch.similarity,
+          processingTime: Date.now() - startTime
+        });
+      }
+    }
+
+    // If no good match, use LLM to generate answer from context
+    console.log(`[CHAT] No good match found, using LLM with context`);
     
-    // Lower threshold for direct match (was 0.9, now 0.75)
-    if (bestMatch.score >= 0.75) {
-      const totalTime = Date.now() - startTime;
-      console.log(`[CHAT] Response: faq_match | Confidence: ${bestMatch.score.toFixed(2)} | Time: ${totalTime}ms`);
-      
-      return res.json({
-        success: true,
-        answer: bestMatch.faq.answer,
-        source: 'faq_match',
-        confidence: bestMatch.score,
-        faq: {
-          question: bestMatch.faq.question,
-          answer: bestMatch.faq.answer
-        }
-      });
+    const contextFAQs = topResults
+      .filter(result => result.similarity > 0.3) // Lower threshold for context
+      .map(result => {
+        const faq = faqs.find(f => f.id === result.faqId);
+        return faq ? `Q: ${faq.question}\nA: ${faq.answer}` : null;
+      })
+      .filter(Boolean)
+      .slice(0, 3);
+
+    if (contextFAQs.length > 0) {
+      const context = contextFAQs.join('\n\n');
+      const prompt = `Based on the following FAQ context, please provide a helpful answer to the user's question. If the question isn't directly covered, provide the most relevant information available.
+
+Context:
+${context}
+
+User Question: ${question}
+
+Please provide a concise and helpful answer:`;
+
+      try {
+        const llmResponse = await llmService.generateChatCompletion([
+          { role: 'user', content: prompt }
+        ]);
+
+        return res.json({
+          success: true,
+          answer: llmResponse.content,
+          source: 'llm_generated',
+          confidence: 0.7,
+          processingTime: Date.now() - startTime
+        });
+      } catch (llmError) {
+        console.error('[CHAT] LLM generation failed:', llmError);
+      }
     }
 
-    // If confidence is moderate, try to generate a better answer using context
-    try {
-      console.log(`[CHAT] Generating contextual answer from ${matches.length} embedding matches`);
-      const context = matches.map(match => 
-        `Q: ${match.faq.question}\nA: ${match.faq.answer}`
-      ).join('\n\n');
-      
-      const generatedAnswer = await llmService.generateAnswer(question, [context]);
-      
-      const totalTime = Date.now() - startTime;
-      console.log(`[CHAT] Response: generated | Confidence: ${bestMatch.score.toFixed(2)} | Time: ${totalTime}ms`);
-      
-      return res.json({
-        success: true,
-        answer: generatedAnswer,
-        source: 'generated',
-        confidence: bestMatch.score,
-        relatedFAQs: matches.map(match => ({
-          question: match.faq.question,
-          answer: match.faq.answer,
-          score: match.score
-        }))
-      });
-    } catch (llmError) {
-      // Fallback to best match if LLM generation fails
-      return res.json({
-        success: true,
-        answer: bestMatch.faq.answer,
-        source: 'faq_match_fallback',
-        confidence: bestMatch.score,
-        faq: {
-          question: bestMatch.faq.question,
-          answer: bestMatch.faq.answer
-        }
-      });
-    }
+    // Fallback response
+    return res.json({
+      success: true,
+      answer: "I couldn't find a relevant answer to your question. Please try rephrasing your question or contact support for more specific help.",
+      source: 'no_match',
+      confidence: 0,
+      processingTime: Date.now() - startTime
+    });
+
   } catch (error) {
     console.error('[CHAT] Error:', error);
     res.status(500).json({ 
-      error: 'Failed to process your question. Please try again.',
-      supportEmail: process.env.SUPPORT_EMAIL || 'support@yourcompany.com'
+      error: 'Failed to process your question. Please try again later.',
+      processingTime: Date.now() - Date.now()
     });
   }
 });
+
+// Helper function for cosine similarity
+function cosineSimilarity(a: number[], b: number[]): number {
+  if (a.length !== b.length) return 0;
+  
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+  
+  for (let i = 0; i < a.length; i++) {
+    dotProduct += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  
+  if (normA === 0 || normB === 0) return 0;
+  
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
 
 export { router as publicRoutes };
