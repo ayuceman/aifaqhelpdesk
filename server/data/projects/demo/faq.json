@@ -68,5 +68,26 @@
     "answer": "If you need help, you can contact us at support@yourcompany.com. We're here to assist with any questions about setup, usage, or troubleshooting. You can also check our documentation for detailed guides and tips.",
     "createdAt": "2025-01-01T00:00:00.000Z",
     "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-11",
+    "question": "What are your business hours?",
+    "answer": "Our support team is available Monday through Friday from 9:00 AM to 6:00 PM EST. For urgent issues, you can reach us at support@yourcompany.com and we'll respond within 24 hours.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-12",
+    "question": "How do I contact support?",
+    "answer": "You can contact our support team by emailing support@yourcompany.com. We typically respond within 24 hours during business days. For immediate assistance, you can also use our live chat widget on this page.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-13",
+    "question": "Do you offer customer support?",
+    "answer": "Yes! We provide comprehensive customer support through multiple channels. You can reach us via email at support@yourcompany.com, use our live chat widget, or check our documentation for self-service options.",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
   }
 ]
