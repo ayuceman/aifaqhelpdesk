@@ -33,7 +33,15 @@ const TrialStatus: React.FC<TrialStatusProps> = ({ project = 'default', onUpgrad
 
   const fetchTrialStatus = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/faq/trial-status?project=${project}`);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.get(`http://localhost:3001/api/faq/${project}/trial-status`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setTrialStatus(response.data.trialStatus);
     } catch (error) {
       console.error('Error fetching trial status:', error);

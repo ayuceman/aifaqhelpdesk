@@ -12,10 +12,14 @@ import TermsOfService from './components/TermsOfService';
 import ContactPage from './components/ContactPage';
 import DemoPage from './components/DemoPage';
 import PricingPage from './components/PricingPage';
+import LoginPage from './components/LoginPage';
+import SignupPage from './components/SignupPage';
+import Dashboard from './components/Dashboard';
+import ProjectDetails from './components/ProjectDetails';
 import TrialStatus from './components/TrialStatus';
 
 type Step = 'upload' | 'generate' | 'review' | 'embed';
-type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo' | 'pricing';
+type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo' | 'pricing' | 'login' | 'signup' | 'dashboard' | 'project-details';
 
 interface FAQ {
   id?: string;
@@ -23,11 +27,25 @@ interface FAQ {
   answer: string;
 }
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  plan: string;
+  trialStartDate?: string;
+  trialEndDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('landing');
   const [currentStep, setCurrentStep] = useState<Step>('upload');
   const [extractedContent, setExtractedContent] = useState('');
   const [generatedFAQs, setGeneratedFAQs] = useState<FAQ[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [currentProject, setCurrentProject] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<any>(null);
   const { toasts, removeToast, success, error, info } = useToast();
 
   const steps: { id: Step; label: string; number: number }[] = [
@@ -47,6 +65,70 @@ function App() {
   const handleNavigateToPricing = () => {
     setCurrentPage('pricing');
   };
+
+  const handleNavigateToLogin = () => {
+    setCurrentPage('login');
+  };
+
+  const handleNavigateToSignup = () => {
+    setCurrentPage('signup');
+  };
+
+  const handleLogin = (userData: User, token: string) => {
+    setUser(userData);
+    setCurrentPage('dashboard');
+  };
+
+  const handleSignup = (userData: User, token: string) => {
+    setUser(userData);
+    setCurrentPage('dashboard');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setCurrentProject(null);
+    setCurrentPage('landing');
+  };
+
+  const handleNavigateToProject = (projectId: string) => {
+    setCurrentProject(projectId);
+    setCurrentPage('app');
+    setCurrentStep('upload');
+  };
+
+  const handleViewProjectDetails = (project: any) => {
+    setSelectedProject(project);
+    setCurrentPage('project-details');
+  };
+
+  const handleBackToDashboard = () => {
+    setSelectedProject(null);
+    setCurrentPage('dashboard');
+  };
+
+  const handleProjectUpdated = (updatedProject: any) => {
+    setSelectedProject(updatedProject);
+  };
+
+  // Check for existing user on app load
+  React.useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (token && userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        setCurrentPage('dashboard');
+      } catch (error) {
+        // Invalid user data, clear it
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
 
   const handleLoadDemo = async () => {
     try {
@@ -154,11 +236,66 @@ function App() {
     return <PricingPage onNavigateToApp={handleGetStarted} />;
   }
 
+  if (currentPage === 'login') {
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onNavigateToSignup={handleNavigateToSignup}
+        onNavigateToHome={() => setCurrentPage('landing')}
+      />
+    );
+  }
+
+  if (currentPage === 'signup') {
+    return (
+      <SignupPage
+        onSignup={handleSignup}
+        onNavigateToLogin={handleNavigateToLogin}
+        onNavigateToHome={() => setCurrentPage('landing')}
+      />
+    );
+  }
+
+      if (currentPage === 'dashboard') {
+        if (!user) {
+          setCurrentPage('landing');
+          return null;
+        }
+        return (
+          <Dashboard
+            user={user}
+            onLogout={handleLogout}
+            onNavigateToProject={handleNavigateToProject}
+            onViewProjectDetails={handleViewProjectDetails}
+            onNavigateToHome={() => setCurrentPage('landing')}
+          />
+        );
+      }
+
+      if (currentPage === 'project-details') {
+        if (!user || !selectedProject) {
+          setCurrentPage('dashboard');
+          return null;
+        }
+        return (
+          <ProjectDetails
+            projectId={selectedProject.id}
+            onBack={handleBackToDashboard}
+            onEditProject={handleProjectUpdated}
+          />
+        );
+      }
+
   // Render landing page
   if (currentPage === 'landing') {
     return (
       <>
-        <LandingPage onGetStarted={handleGetStarted} onLoadDemo={handleLoadDemo} />
+        <LandingPage 
+          onGetStarted={handleGetStarted} 
+          onLoadDemo={handleLoadDemo}
+          onNavigateToLogin={handleNavigateToLogin}
+          onNavigateToSignup={handleNavigateToSignup}
+        />
         <ToastContainer toasts={toasts} onRemove={removeToast} />
       </>
     );
@@ -255,6 +392,7 @@ function App() {
                 <FAQEditor
                   initialFAQs={generatedFAQs}
                   onPublish={handleFAQsPublished}
+                  projectId={currentProject}
                   toast={{ success, error, info }}
                 />
               )}
@@ -264,7 +402,7 @@ function App() {
             </div>
             <div className="lg:col-span-1">
               <TrialStatus 
-                project="default" 
+                project={currentProject || "default"} 
                 onUpgrade={() => {
                   // TODO: Implement upgrade flow
                   info('Upgrade functionality coming soon!');

@@ -3,9 +3,11 @@ import React from 'react';
 interface LandingPageProps {
   onGetStarted: () => void;
   onLoadDemo: () => void;
+  onNavigateToLogin?: () => void;
+  onNavigateToSignup?: () => void;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo, onNavigateToLogin, onNavigateToSignup }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {/* Navigation */}
@@ -24,6 +26,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <a href="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</a>
               <a href="/privacy" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Privacy</a>
               <a href="/terms" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Terms</a>
+              {onNavigateToLogin && (
+                <button
+                  onClick={onNavigateToLogin}
+                  className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
+                >
+                  Sign In
+                </button>
+              )}
+              {onNavigateToSignup && (
+                <button
+                  onClick={onNavigateToSignup}
+                  className="btn-secondary"
+                >
+                  Sign Up
+                </button>
+              )}
               <button
                 onClick={onGetStarted}
                 className="btn-primary"

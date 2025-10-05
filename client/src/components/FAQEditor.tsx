@@ -10,6 +10,7 @@ interface FAQ {
 interface FAQEditorProps {
   initialFAQs: FAQ[];
   onPublish: () => void;
+  projectId?: string;
   toast: {
     success: (msg: string) => void;
     error: (msg: string) => void;
@@ -17,7 +18,7 @@ interface FAQEditorProps {
   };
 }
 
-export const FAQEditor: React.FC<FAQEditorProps> = ({ initialFAQs, onPublish, toast }) => {
+export const FAQEditor: React.FC<FAQEditorProps> = ({ initialFAQs, onPublish, projectId, toast }) => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -84,9 +85,23 @@ export const FAQEditor: React.FC<FAQEditorProps> = ({ initialFAQs, onPublish, to
 
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3001/api/faq/bulk', { 
-        faqs,
-        project: 'default'
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Please log in to publish FAQs');
+        setLoading(false);
+        return;
+      }
+
+      if (!projectId) {
+        toast.error('No project selected');
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(`http://localhost:3001/api/faq/${projectId}/bulk`, { 
+        faqs
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       
       if (response.data.success) {
