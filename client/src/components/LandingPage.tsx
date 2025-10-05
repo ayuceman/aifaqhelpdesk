@@ -16,7 +16,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <div className="w-8 h-8 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">AI</span>
               </div>
-              <span className="text-xl font-bold text-slate-900">AI Helpdesk</span>
+              <span className="text-xl font-bold text-slate-900">AI FAQ Generator</span>
             </div>
             <div className="flex items-center space-x-4">
               <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
@@ -43,12 +43,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
             
             <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 mb-8 leading-tight animate-fade-in">
               Transform Content Into
-              <span className="block text-gradient-primary">Smart Helpdesk Assistants</span>
+              <span className="block text-gradient-primary">Intelligent FAQ Systems</span>
             </h1>
             
             <p className="text-xl lg:text-2xl text-slate-600 mb-12 max-w-4xl mx-auto leading-relaxed animate-fade-in">
-              Enterprise-ready AI helpdesk platform. Transform documents and websites into 
-              intelligent chatbot assistants that provide instant, accurate customer support.
+              Enterprise-ready AI FAQ generation platform. Transform documents and websites into 
+              intelligent FAQ systems and chatbot assistants for instant customer support.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-scale-in">
@@ -105,7 +105,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               How It Works
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Four simple steps to deploy intelligent helpdesk assistants across your organization
+              Four simple steps to deploy intelligent FAQ systems and chatbot assistants across your organization
             </p>
           </div>
           
@@ -125,10 +125,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mb-6 mx-auto">
                 2
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">AI Processing</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">AI Generation</h3>
               <p className="text-slate-600 leading-relaxed">
-                Advanced AI analyzes your content and generates intelligent responses 
-                with customizable tone and conversational style.
+                Advanced AI analyzes your content and generates contextually relevant 
+                FAQ pairs and intelligent responses with customizable tone.
               </p>
             </div>
 
@@ -136,10 +136,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mb-6 mx-auto">
                 3
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Review & Customize</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">Review & Edit</h3>
               <p className="text-slate-600 leading-relaxed">
-                Fine-tune generated content with our intuitive editor. Customize responses 
-                and knowledge base to match your brand voice and requirements.
+                Fine-tune generated FAQs and responses with our intuitive editor. Add, edit, or 
+                remove questions to match your brand voice and requirements.
               </p>
             </div>
 
@@ -147,9 +147,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mb-6 mx-auto">
                 4
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Deploy Assistant</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">Deploy Widget</h3>
               <p className="text-slate-600 leading-relaxed">
-                Deploy intelligent chatbot assistants across your websites, apps, and 
+                Deploy intelligent FAQ widgets and chatbot assistants across your websites, apps, and 
                 platforms with simple embed codes and API integration.
               </p>
             </div>
@@ -258,8 +258,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
             Ready to Transform Your Support?
           </h2>
           <p className="text-xl text-slate-300 mb-12">
-            Join thousands of enterprises already using AI Helpdesk to deliver 
-            exceptional customer experiences with intelligent chatbot assistants.
+            Join thousands of enterprises already using AI FAQ Generator to deliver 
+            exceptional customer experiences with intelligent FAQ systems and chatbot assistants.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
@@ -287,7 +287,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
                 <div className="w-8 h-8 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">AI</span>
                 </div>
-                <span className="text-xl font-bold text-slate-900">AI Helpdesk</span>
+                <span className="text-xl font-bold text-slate-900">AI FAQ Generator</span>
               </div>
               <p className="text-slate-600 text-sm">
                 Enterprise-grade AI FAQ generation platform for modern organizations.
