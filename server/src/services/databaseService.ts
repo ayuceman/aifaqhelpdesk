@@ -76,6 +76,8 @@ export class DatabaseService {
         project_id TEXT NOT NULL,
         question TEXT NOT NULL,
         answer TEXT NOT NULL,
+        category TEXT,
+        view_count INTEGER DEFAULT 0,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE
