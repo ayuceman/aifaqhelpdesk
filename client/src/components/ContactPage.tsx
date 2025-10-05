@@ -1,134 +1,370 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface ContactPageProps {
   onBack: () => void;
 }
 
 const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
-  return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <button
-          onClick={onBack}
-          className="mb-8 text-blue-600 hover:text-blue-800 flex items-center gap-2"
-        >
-          ← Back to Home
-        </button>
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    company: '',
+    subject: '',
+    message: '',
+    inquiryType: 'general'
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
-          <p className="text-lg text-gray-600 mb-8">
-            We're here to help! Get in touch with any questions, issues, or feedback.
-          </p>
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-          <div className="space-y-8">
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Support</h2>
-              <p className="text-gray-700 mb-4">
-                For technical support, bug reports, or questions about using the service:
-              </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <p className="text-sm text-gray-600 mb-2">Email:</p>
-                <a 
-                  href="mailto:support@yourcompany.com" 
-                  className="text-2xl font-semibold text-blue-600 hover:text-blue-800"
-                >
-                  support@yourcompany.com
-                </a>
-              </div>
-              <p className="text-sm text-gray-500 mt-4">
-                We typically respond within 24-48 hours during business days.
-              </p>
-            </section>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    
+    // Simulate form submission
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setSubmitted(true);
+    setSubmitting(false);
+  };
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Common Questions</h2>
-              <div className="space-y-4">
-                <div className="border-l-4 border-blue-500 pl-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">How do I get started?</h3>
-                  <p className="text-gray-600">
-                    Click "Get Started" on the home page, upload your content, and follow the 4-step process.
-                  </p>
-                </div>
-
-                <div className="border-l-4 border-purple-500 pl-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">What file formats are supported?</h3>
-                  <p className="text-gray-600">
-                    We support PDF, DOCX, TXT, Markdown files (up to 10MB), and website URLs.
-                  </p>
-                </div>
-
-                <div className="border-l-4 border-green-500 pl-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">Is my data secure?</h3>
-                  <p className="text-gray-600">
-                    Yes! Data is stored locally by default. We don't share or sell your information.
-                  </p>
-                </div>
-
-                <div className="border-l-4 border-orange-500 pl-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">How do I delete my data?</h3>
-                  <p className="text-gray-600">
-                    Email us at support@yourcompany.com with your project details, and we'll handle it promptly.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Feature Requests</h2>
-              <p className="text-gray-700 mb-4">
-                Have an idea for a new feature or improvement? We'd love to hear from you!
-              </p>
-              <p className="text-gray-600">
-                Send your suggestions to{' '}
-                <a href="mailto:support@yourcompany.com" className="text-blue-600 hover:underline">
-                  support@yourcompany.com
-                </a>{' '}
-                with the subject line "Feature Request".
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Business Inquiries</h2>
-              <p className="text-gray-700 mb-4">
-                Interested in enterprise plans, custom solutions, or partnerships?
-              </p>
-              <p className="text-gray-600">
-                Contact us at{' '}
-                <a href="mailto:support@yourcompany.com" className="text-blue-600 hover:underline">
-                  support@yourcompany.com
-                </a>{' '}
-                with "Business Inquiry" in the subject line.
-              </p>
-            </section>
-
-            <section className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-3">Quick Links</h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Documentation</h3>
-                  <ul className="space-y-1 text-sm text-gray-600">
-                    <li>• Getting Started Guide</li>
-                    <li>• API Documentation</li>
-                    <li>• Deployment Guide</li>
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Resources</h3>
-                  <ul className="space-y-1 text-sm text-gray-600">
-                    <li>• <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a></li>
-                    <li>• <a href="/terms" className="text-blue-600 hover:underline">Terms of Service</a></li>
-                    <li>• Performance Tips</li>
-                  </ul>
-                </div>
-              </div>
-            </section>
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center">
+          <div className="card p-8">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Message Sent Successfully!</h2>
+            <p className="text-slate-600 mb-8">
+              Thank you for reaching out. We'll get back to you within 24 hours.
+            </p>
+            <button
+              onClick={onBack}
+              className="btn-primary"
+            >
+              Back to Home
+            </button>
           </div>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Navigation */}
+      <nav className="relative z-10 border-b border-slate-200 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">AI</span>
+              </div>
+              <span className="text-xl font-bold text-slate-900">FAQ Generator</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <a href="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</a>
+              <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
+              <button
+                onClick={onBack}
+                className="btn-ghost"
+              >
+                ← Back to Home
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="py-20 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 mb-8 leading-tight">
+              Get in
+              <span className="block text-gradient-primary">Touch</span>
+            </h1>
+            <p className="text-xl lg:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Ready to transform your customer support? Let's discuss how AI FAQ Generator 
+              can help your organization deliver exceptional experiences.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Contact Form */}
+      <div className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            {/* Contact Information */}
+            <div>
+              <h2 className="text-3xl font-bold text-slate-900 mb-8">Let's Start a Conversation</h2>
+              <p className="text-lg text-slate-600 mb-8">
+                Whether you're looking for enterprise solutions, have technical questions, 
+                or want to see a custom demo, we're here to help.
+              </p>
+              
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">Email Us</h3>
+                    <p className="text-slate-600">support@aifaqgenerator.com</p>
+                    <p className="text-sm text-slate-500">We'll respond within 24 hours</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">Response Time</h3>
+                    <p className="text-slate-600">24 hours for general inquiries</p>
+                    <p className="text-sm text-slate-500">4 hours for enterprise support</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">Live Chat</h3>
+                    <p className="text-slate-600">Available during business hours</p>
+                    <p className="text-sm text-slate-500">Monday - Friday, 9 AM - 6 PM EST</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Form */}
+            <div className="card p-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="input-field"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="input-field"
+                      placeholder="john@company.com"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Company
+                    </label>
+                    <input
+                      type="text"
+                      name="company"
+                      value={formData.company}
+                      onChange={handleInputChange}
+                      className="input-field"
+                      placeholder="Your Company"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Inquiry Type
+                    </label>
+                    <select
+                      name="inquiryType"
+                      value={formData.inquiryType}
+                      onChange={handleInputChange}
+                      className="input-field"
+                    >
+                      <option value="general">General Inquiry</option>
+                      <option value="enterprise">Enterprise Sales</option>
+                      <option value="technical">Technical Support</option>
+                      <option value="partnership">Partnership</option>
+                      <option value="demo">Request Demo</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Subject *
+                  </label>
+                  <input
+                    type="text"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                    required
+                    className="input-field"
+                    placeholder="How can we help you?"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Message *
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    rows={6}
+                    className="input-field resize-none"
+                    placeholder="Tell us about your project, requirements, or any questions you have..."
+                  />
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn-primary w-full text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'Sending Message...' : 'Send Message'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="py-24 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
+            <p className="text-xl text-slate-600">
+              Quick answers to common questions about our platform
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">How quickly can I get started?</h3>
+              <p className="text-slate-600">
+                You can have your first FAQ widget live within 30 minutes. Our platform is designed for rapid deployment.
+              </p>
+            </div>
+            
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">Do you offer enterprise support?</h3>
+              <p className="text-slate-600">
+                Yes, we provide dedicated enterprise support with SLA guarantees and dedicated account managers.
+              </p>
+            </div>
+            
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">Can I customize the chat widget?</h3>
+              <p className="text-slate-600">
+                Absolutely. Our widgets are fully customizable with your branding, colors, and styling preferences.
+              </p>
+            </div>
+            
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">What about data security?</h3>
+              <p className="text-slate-600">
+                We're SOC 2 compliant with end-to-end encryption. Your data is secure and never shared with third parties.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                  <span className="text-slate-900 font-bold text-sm">AI</span>
+                </div>
+                <span className="text-xl font-bold">FAQ Generator</span>
+              </div>
+              <p className="text-slate-400 text-sm">
+                Enterprise-grade AI FAQ generation platform for modern organizations.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="/demo" className="hover:text-white transition-colors">Demo</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm text-slate-400">
+            <p>&copy; {new Date().getFullYear()} AI FAQ Generator. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
 
 export default ContactPage;
-

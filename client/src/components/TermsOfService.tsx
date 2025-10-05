@@ -6,163 +6,196 @@ interface TermsOfServiceProps {
 
 const TermsOfService: React.FC<TermsOfServiceProps> = ({ onBack }) => {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <button
-          onClick={onBack}
-          className="mb-8 text-blue-600 hover:text-blue-800 flex items-center gap-2"
-        >
-          ← Back to Home
-        </button>
+    <div className="min-h-screen bg-slate-50">
+      {/* Navigation */}
+      <nav className="relative z-10 border-b border-slate-200 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">AI</span>
+              </div>
+              <span className="text-xl font-bold text-slate-900">FAQ Generator</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <a href="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</a>
+              <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
+              <a href="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</a>
+              <button
+                onClick={onBack}
+                className="btn-ghost"
+              >
+                ← Back to Home
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Terms of Service</h1>
-          <p className="text-sm text-gray-500 mb-8">Last updated: {new Date().toLocaleDateString()}</p>
-
-          <div className="space-y-6 text-gray-700 leading-relaxed">
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Acceptance of Terms</h2>
-              <p>
-                By accessing or using AI FAQ Generator, you agree to be bound by these Terms of Service. 
-                If you do not agree with any part of these terms, you may not use our service.
+      {/* Content */}
+      <div className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="card p-8 lg:p-12">
+            <h1 className="text-4xl font-bold text-slate-900 mb-8">Terms of Service</h1>
+            <p className="text-slate-600 mb-8">Last updated: {new Date().toLocaleDateString()}</p>
+            
+            <div className="prose prose-slate max-w-none">
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">1. Acceptance of Terms</h2>
+              <p className="text-slate-600 mb-8">
+                By accessing and using AI FAQ Generator ("Service"), you accept and agree to be bound by the 
+                terms and provision of this agreement. If you do not agree to abide by the above, please 
+                do not use this service.
               </p>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Service Description</h2>
-              <p>
-                AI FAQ Generator provides tools to:
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">2. Description of Service</h2>
+              <p className="text-slate-600 mb-6">
+                AI FAQ Generator is an enterprise-grade platform that uses artificial intelligence to:
               </p>
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Generate FAQ content from uploaded documents or website URLs</li>
-                <li>Edit and manage FAQ entries</li>
-                <li>Deploy an embeddable chat widget for FAQ assistance</li>
+              <ul className="list-disc list-inside text-slate-600 mb-8 space-y-2">
+                <li>Generate intelligent FAQ content from your documents</li>
+                <li>Create embeddable chat widgets for your websites</li>
+                <li>Provide AI-powered customer support solutions</li>
+                <li>Analyze and optimize your content for better user experience</li>
               </ul>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">As-Is Service</h2>
-              <p>
-                The service is provided <strong>"as is"</strong> without warranties of any kind, either express or implied. 
-                We do not guarantee:
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">3. User Accounts and Registration</h2>
+              <p className="text-slate-600 mb-6">
+                To access certain features of the Service, you may be required to register for an account. 
+                You agree to:
               </p>
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Uninterrupted or error-free operation</li>
-                <li>100% accuracy of AI-generated content</li>
-                <li>Compatibility with all browsers or devices</li>
-                <li>Specific uptime or availability</li>
+              <ul className="list-disc list-inside text-slate-600 mb-8 space-y-2">
+                <li>Provide accurate, current, and complete information</li>
+                <li>Maintain and update your account information</li>
+                <li>Keep your password secure and confidential</li>
+                <li>Accept responsibility for all activities under your account</li>
+                <li>Notify us immediately of any unauthorized use</li>
               </ul>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">User Responsibilities</h2>
-              <p>You agree to:</p>
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Review and verify all AI-generated content before publishing</li>
-                <li>Not upload illegal, harmful, or copyrighted content without permission</li>
-                <li>Not abuse the service through excessive requests or malicious activity</li>
-                <li>Comply with all applicable laws and regulations</li>
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">4. Acceptable Use Policy</h2>
+              <p className="text-slate-600 mb-6">
+                You agree not to use the Service for any unlawful purpose or any purpose prohibited under this clause. 
+                You may not use the Service in any manner that:
+              </p>
+              <ul className="list-disc list-inside text-slate-600 mb-8 space-y-2">
+                <li>Violates any applicable laws or regulations</li>
+                <li>Infringes on the rights of others</li>
+                <li>Contains harmful, threatening, or offensive content</li>
+                <li>Attempts to gain unauthorized access to our systems</li>
+                <li>Interferes with the proper functioning of the Service</li>
+                <li>Uses automated systems to access the Service without permission</li>
               </ul>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Acceptable Use</h2>
-              <p>You may not use this service to:</p>
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Generate content that is illegal, defamatory, or harmful</li>
-                <li>Violate intellectual property rights</li>
-                <li>Distribute malware or engage in phishing</li>
-                <li>Circumvent rate limits or security measures</li>
-                <li>Reverse engineer or attempt to extract proprietary algorithms</li>
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">5. Content and Intellectual Property</h2>
+              <p className="text-slate-600 mb-6">
+                You retain ownership of all content you upload to the Service. By using the Service, you grant us:
+              </p>
+              <ul className="list-disc list-inside text-slate-600 mb-8 space-y-2">
+                <li>A license to process your content for FAQ generation</li>
+                <li>Permission to use anonymized data to improve our AI models</li>
+                <li>The right to store and backup your content securely</li>
+                <li>Authorization to display your content in generated FAQs</li>
               </ul>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Content Ownership</h2>
-              <p>
-                You retain ownership of all content you upload. By using the service, you grant us a license to:
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">6. AI-Generated Content</h2>
+              <p className="text-slate-600 mb-8">
+                Our AI generates content based on your input. While we strive for accuracy, AI-generated content 
+                may not always be perfect. You are responsible for reviewing and editing generated content before 
+                publishing. We do not guarantee the accuracy, completeness, or suitability of AI-generated content.
               </p>
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Process your content to generate FAQs</li>
-                <li>Store and display your FAQs as part of the service</li>
-                <li>Use anonymized data to improve the service</li>
+
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">7. Payment and Billing</h2>
+              <p className="text-slate-600 mb-6">
+                If you subscribe to a paid plan:
+              </p>
+              <ul className="list-disc list-inside text-slate-600 mb-8 space-y-2">
+                <li>Fees are billed in advance on a recurring basis</li>
+                <li>All fees are non-refundable unless otherwise stated</li>
+                <li>We may change our pricing with 30 days' notice</li>
+                <li>You may cancel your subscription at any time</li>
+                <li>Access to paid features continues until the end of your billing period</li>
               </ul>
-              <p className="mt-3">
-                AI-generated content is provided to you without additional restrictions.
-              </p>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Limitation of Liability</h2>
-              <p>
-                To the fullest extent permitted by law, we shall not be liable for:
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">8. Service Availability</h2>
+              <p className="text-slate-600 mb-8">
+                We strive to maintain high service availability but cannot guarantee uninterrupted access. 
+                We may temporarily suspend the Service for maintenance, updates, or other operational reasons. 
+                We will provide reasonable notice when possible.
               </p>
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Indirect, incidental, or consequential damages</li>
-                <li>Loss of profits, data, or business opportunities</li>
-                <li>Damages arising from service interruptions or errors</li>
-                <li>Inaccuracies in AI-generated content</li>
-              </ul>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Rate Limits</h2>
-              <p>
-                To ensure fair usage, we implement rate limiting:
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">9. Data Security and Privacy</h2>
+              <p className="text-slate-600 mb-8">
+                We implement industry-standard security measures to protect your data. However, no system is 
+                completely secure. You acknowledge that you use the Service at your own risk and that we 
+                cannot guarantee absolute security of your data.
               </p>
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Chat endpoint: 60 requests per 5 minutes per IP address</li>
-                <li>File upload: 10MB maximum file size</li>
-                <li>Website crawl: 250,000 character limit</li>
-              </ul>
-              <p className="mt-3">
-                Excessive usage may result in temporary or permanent suspension.
-              </p>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Termination</h2>
-              <p>
-                We reserve the right to suspend or terminate access to the service at any time for:
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">10. Limitation of Liability</h2>
+              <p className="text-slate-600 mb-8">
+                To the maximum extent permitted by law, AI FAQ Generator shall not be liable for any indirect, 
+                incidental, special, consequential, or punitive damages, including but not limited to loss of 
+                profits, data, or business opportunities, arising from your use of the Service.
               </p>
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Violation of these terms</li>
+
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">11. Indemnification</h2>
+              <p className="text-slate-600 mb-8">
+                You agree to indemnify and hold harmless AI FAQ Generator from any claims, damages, or expenses 
+                arising from your use of the Service, violation of these Terms, or infringement of any rights 
+                of another party.
+              </p>
+
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">12. Termination</h2>
+              <p className="text-slate-600 mb-6">
+                We may terminate or suspend your account and access to the Service immediately, without prior 
+                notice, for any reason, including:
+              </p>
+              <ul className="list-disc list-inside text-slate-600 mb-8 space-y-2">
+                <li>Violation of these Terms of Service</li>
                 <li>Fraudulent or illegal activity</li>
-                <li>Abuse of the service</li>
+                <li>Non-payment of fees</li>
+                <li>At our sole discretion</li>
               </ul>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Changes to Terms</h2>
-              <p>
-                We may modify these terms at any time. Significant changes will be communicated by updating 
-                the "Last updated" date. Continued use of the service after changes constitutes acceptance.
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">13. Changes to Terms</h2>
+              <p className="text-slate-600 mb-8">
+                We reserve the right to modify these Terms at any time. We will notify users of material 
+                changes via email or through the Service. Your continued use of the Service after changes 
+                constitutes acceptance of the new Terms.
               </p>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Contact</h2>
-              <p>
-                For questions about these terms, contact:{' '}
-                <a href="mailto:support@yourcompany.com" className="text-blue-600 hover:underline">
-                  support@yourcompany.com
-                </a>
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">14. Governing Law</h2>
+              <p className="text-slate-600 mb-8">
+                These Terms shall be governed by and construed in accordance with the laws of the jurisdiction 
+                where AI FAQ Generator is incorporated, without regard to conflict of law principles.
               </p>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Governing Law</h2>
-              <p>
-                These terms are governed by applicable local laws. Any disputes shall be resolved through 
-                good faith negotiation or, if necessary, binding arbitration.
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">15. Contact Information</h2>
+              <p className="text-slate-600 mb-8">
+                If you have any questions about these Terms of Service, please contact us at:
               </p>
-            </section>
+              <div className="bg-slate-50 rounded-lg p-6">
+                <p className="text-slate-700">
+                  <strong>Email:</strong> legal@aifaqgenerator.com<br />
+                  <strong>Address:</strong> AI FAQ Generator, Legal Team<br />
+                  <strong>Response Time:</strong> We will respond to your inquiry within 5 business days
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <p className="text-slate-500 text-sm">
+              &copy; {new Date().getFullYear()} AI FAQ Generator. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
 
 export default TermsOfService;
-
