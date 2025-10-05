@@ -271,7 +271,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(`<iframe 
-  src="http://localhost:3000/widget?project=demo" 
+  src="http://localhost:3001/widget?project=demo" 
   width="400" 
   height="600" 
   frameborder="0"
@@ -288,7 +288,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <div className="bg-slate-900 rounded-lg p-6 overflow-x-auto">
                 <pre className="text-green-400 text-sm font-mono leading-relaxed">
 {`<iframe 
-  src="http://localhost:3000/widget?project=demo" 
+  src="http://localhost:3001/widget?project=demo" 
   width="400" 
   height="600" 
   frameborder="0"
@@ -320,7 +320,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
                 <div className="w-full max-w-sm mx-auto">
                   <iframe 
-                    src="http://localhost:3000/widget?project=demo" 
+                    src="http://localhost:3001/widget?project=demo" 
                     width="100%" 
                     height="400" 
                     frameBorder="0"
