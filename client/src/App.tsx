@@ -138,7 +138,7 @@ function App() {
   }
 
   if (currentPage === 'demo') {
-    return <DemoPage />;
+    return <DemoPage onNavigateToApp={handleGetStarted} />;
   }
 
   // Render landing page

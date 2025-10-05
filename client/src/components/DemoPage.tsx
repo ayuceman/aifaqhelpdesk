@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+interface DemoPageProps {
+  onNavigateToApp?: () => void;
+}
+
 interface FAQ {
   id: string;
   question: string;
   answer: string;
 }
 
-const DemoPage: React.FC = () => {
+const DemoPage: React.FC<DemoPageProps> = ({ onNavigateToApp }) => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFaq, setSelectedFaq] = useState<FAQ | null>(null);
@@ -40,12 +44,12 @@ const DemoPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
               AI FAQ Generator - Demo
             </h1>
-            <a 
-              href="/"
+            <button 
+              onClick={onNavigateToApp}
               className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
             >
               Try It Yourself
-            </a>
+            </button>
           </div>
         </div>
       </header>
@@ -238,12 +242,12 @@ const DemoPage: React.FC = () => {
               Start generating intelligent FAQs for your business in minutes.
             </p>
             <div className="flex gap-4 justify-center">
-              <a
-                href="/"
+              <button
+                onClick={onNavigateToApp}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
               >
                 Get Started Free
-              </a>
+              </button>
               <a
                 href="/contact"
                 className="px-8 py-4 bg-white text-gray-900 font-semibold rounded-lg border-2 border-gray-300 hover:border-blue-600 transition-all"

@@ -418,5 +418,75 @@
     "answer": "You should easily locate the Invoice Details section in your account history where previous transactions and payment summaries are listed. If you cannot find it, contact customer support who can guide you further.",
     "createdAt": "2025-10-03T10:07:39.764Z",
     "updatedAt": "2025-10-03T10:07:39.764Z"
+  },
+  {
+    "id": "1759638287480",
+    "question": "Q: How do I connect my nopCommerce store to Facebook?",
+    "answer": "A: You can use our Facebook Catalog Feed Plugin, which syncs products, prices, images, and inventory in real-time between your nopCommerce store and Facebook. This ensures that your Facebook Shop is always accurate and ready for sales.",
+    "createdAt": "2025-10-05T04:24:47.480Z",
+    "updatedAt": "2025-10-05T04:24:47.480Z"
+  },
+  {
+    "id": "1759638288406",
+    "question": "Q: What are the benefits of using MegaStore Theme?",
+    "answer": "A: The MegaStore theme offers a clean design, user-friendly interface, and modern styling. It’s fully compatible with nopCommerce versions 4.6, 4.7, and 4.8, giving you a sleek shopping experience and easy navigation.",
+    "createdAt": "2025-10-05T04:24:48.406Z",
+    "updatedAt": "2025-10-05T04:24:48.406Z"
+  },
+  {
+    "id": "1759638288490",
+    "question": "Q: How much does the Facebook Catalog Feed Plugin cost?",
+    "answer": "A: The current price for the Facebook Catalog Feed Plugin is $99.00.",
+    "createdAt": "2025-10-05T04:24:48.490Z",
+    "updatedAt": "2025-10-05T04:24:48.490Z"
+  },
+  {
+    "id": "1759638288619",
+    "question": "Q: Is there a discount available on MegaStore Themes right now?",
+    "answer": "A: Yes, it’s currently 50% off with a total of 5 reviews and a discounted price of $350.00.",
+    "createdAt": "2025-10-05T04:24:48.619Z",
+    "updatedAt": "2025-10-05T04:24:48.619Z"
+  },
+  {
+    "id": "1759638288677",
+    "question": "Q: Can I use the plugin for all versions of nopCommerce?",
+    "answer": "A: Absolutely! The Facebook Catalog Feed Plugin is compatible with nopCommerce versions 4.6, 4.7, and 4.8.",
+    "createdAt": "2025-10-05T04:24:48.677Z",
+    "updatedAt": "2025-10-05T04:24:48.677Z"
+  },
+  {
+    "id": "1759638288743",
+    "question": "Q: Where can I find more information about MegaStore Themes?",
+    "answer": "A: You can visit the link provided in our catalog to explore more details and reviews of MegaStore Themes.",
+    "createdAt": "2025-10-05T04:24:48.743Z",
+    "updatedAt": "2025-10-05T04:24:48.743Z"
+  },
+  {
+    "id": "1759638288794",
+    "question": "Q: Is there a way to get support if I have issues with these products?",
+    "answer": "A: We recommend checking out our 'Support' section on our website for troubleshooting guides, user forums, and contact information for further assistance.",
+    "createdAt": "2025-10-05T04:24:48.794Z",
+    "updatedAt": "2025-10-05T04:24:48.794Z"
+  },
+  {
+    "id": "1759638288851",
+    "question": "Q: How can I find the best promotion or discount code for nopCommerce plugins and themes?",
+    "answer": "A: You might want to check out our ‘Special Offers’ page or keep an eye on our newsletters where we often announce discounts and promotions for our products.",
+    "createdAt": "2025-10-05T04:24:48.851Z",
+    "updatedAt": "2025-10-05T04:24:48.851Z"
+  },
+  {
+    "id": "1759638288920",
+    "question": "Q: What are some features of the MegaStore Theme that make it stand out from others?",
+    "answer": "A: The MegaStore theme stands out with its modern design, user-friendly interface, and compatibility with multiple nopCommerce versions. It also comes packed with cutting-edge features for a seamless shopping experience.",
+    "createdAt": "2025-10-05T04:24:48.920Z",
+    "updatedAt": "2025-10-05T04:24:48.920Z"
+  },
+  {
+    "id": "1759638288995",
+    "question": "Q: Is there any training or documentation provided with the plugins and themes?",
+    "answer": "A: Yes, we offer comprehensive documentation and sometimes tutorials to help you get started with our products. You can find more details in the Help section of our website.",
+    "createdAt": "2025-10-05T04:24:48.995Z",
+    "updatedAt": "2025-10-05T04:24:48.995Z"
   }
 ]
