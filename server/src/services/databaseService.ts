@@ -288,6 +288,7 @@ export class DatabaseService {
     return stmt.run(
       embeddingData.id,
       embeddingData.projectId,
+      embeddingData.text,
       JSON.stringify(embeddingData.embedding),
       embeddingData.faqId || null
     );
