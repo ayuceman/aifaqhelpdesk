@@ -68,7 +68,9 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ onContentExtracted, to
       const combinedContent = parsed.map(p => p.content).join('\n\n');
       onContentExtracted(combinedContent);
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Failed to upload files');
+      console.error('File upload error:', err);
+      const errorMessage = err.response?.data?.error || err.message || 'Failed to upload files';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -100,7 +102,9 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ onContentExtracted, to
         toast.success(`Successfully crawled ${metadata?.pagesCrawled || 1} page(s) with ${content.length.toLocaleString()} characters`);
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Failed to fetch URL');
+      console.error('URL fetch error:', err);
+      const errorMessage = err.response?.data?.error || err.message || 'Failed to fetch URL';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
