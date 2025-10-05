@@ -214,4 +214,19 @@ router.get('/trial-status', async (req, res) => {
   }
 });
 
+// Initialize free plan for a project
+router.post('/initialize-free-plan', async (req, res) => {
+  try {
+    const project = req.body.project || 'default';
+    
+    const trialData = await trialService.initializeFreePlan(project);
+    const status = await trialService.getTrialStatus(project);
+    
+    res.json({ success: true, trialData, trialStatus: status });
+  } catch (error) {
+    console.error('Initialize free plan error:', error);
+    res.status(500).json({ error: 'Failed to initialize free plan' });
+  }
+});
+
 export { router as faqRoutes };

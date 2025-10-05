@@ -7,6 +7,28 @@ interface PricingPageProps {
 const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
   const plans = [
     {
+      name: 'Free',
+      price: 0,
+      period: 'forever',
+      description: 'Perfect for trying out the platform',
+      features: [
+        '100 FAQs maximum',
+        '500 chat questions per month',
+        'Basic analytics',
+        'Community support',
+        'Standard templates',
+        'Mobile responsive widget'
+      ],
+      limitations: [
+        'Limited to 1 project',
+        'Basic customization only',
+        'AI FAQ Generator branding'
+      ],
+      popular: false,
+      cta: 'Get Started Free',
+      ctaVariant: 'secondary' as const
+    },
+    {
       name: 'Starter',
       price: 19,
       period: 'month',
@@ -74,6 +96,10 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
 
   const faqs = [
     {
+      question: 'Is there really a free plan?',
+      answer: 'Yes! Our free plan includes 100 FAQs and 500 chat questions per month, perfect for trying out the platform or small projects. No credit card required.'
+    },
+    {
       question: 'What happens after my 14-day trial ends?',
       answer: 'After your trial ends, you can choose any of our paid plans to continue using the service. Your data and settings will be preserved when you upgrade.'
     },
@@ -135,7 +161,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
             Simple, Transparent Pricing
           </h1>
           <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
-            Choose the perfect plan for your business. Start with a 14-day free trial, 
+            Choose the perfect plan for your business. Start with our free plan or a 14-day free trial, 
             no credit card required.
           </p>
           <div className="flex items-center justify-center space-x-4 text-sm text-slate-500">
@@ -143,7 +169,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
               <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
-              14-day free trial
+              Free plan available
             </span>
             <span className="flex items-center">
               <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -164,7 +190,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
       {/* Pricing Cards */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {plans.map((plan, index) => (
               <div
                 key={plan.name}
@@ -255,6 +281,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
               <thead>
                 <tr className="border-b border-slate-200">
                   <th className="text-left py-4 px-6 font-semibold text-slate-900">Features</th>
+                  <th className="text-center py-4 px-6 font-semibold text-slate-900">Free</th>
                   <th className="text-center py-4 px-6 font-semibold text-slate-900">Starter</th>
                   <th className="text-center py-4 px-6 font-semibold text-slate-900">Professional</th>
                   <th className="text-center py-4 px-6 font-semibold text-slate-900">Enterprise</th>
@@ -263,12 +290,14 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
               <tbody>
                 <tr className="border-b border-slate-100">
                   <td className="py-4 px-6 font-medium text-slate-900">FAQs</td>
+                  <td className="text-center py-4 px-6 text-slate-600">100</td>
                   <td className="text-center py-4 px-6 text-slate-600">1,000</td>
                   <td className="text-center py-4 px-6 text-slate-600">5,000</td>
                   <td className="text-center py-4 px-6 text-slate-600">Unlimited</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="py-4 px-6 font-medium text-slate-900">Chat Questions/Month</td>
+                  <td className="text-center py-4 px-6 text-slate-600">500</td>
                   <td className="text-center py-4 px-6 text-slate-600">2,000</td>
                   <td className="text-center py-4 px-6 text-slate-600">10,000</td>
                   <td className="text-center py-4 px-6 text-slate-600">Unlimited</td>
@@ -276,11 +305,13 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
                 <tr className="border-b border-slate-100">
                   <td className="py-4 px-6 font-medium text-slate-900">Projects</td>
                   <td className="text-center py-4 px-6 text-slate-600">1</td>
+                  <td className="text-center py-4 px-6 text-slate-600">1</td>
                   <td className="text-center py-4 px-6 text-slate-600">5</td>
                   <td className="text-center py-4 px-6 text-slate-600">Unlimited</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="py-4 px-6 font-medium text-slate-900">Analytics</td>
+                  <td className="text-center py-4 px-6 text-slate-600">Basic</td>
                   <td className="text-center py-4 px-6 text-slate-600">Basic</td>
                   <td className="text-center py-4 px-6 text-slate-600">Advanced</td>
                   <td className="text-center py-4 px-6 text-slate-600">Advanced</td>
@@ -288,17 +319,20 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
                 <tr className="border-b border-slate-100">
                   <td className="py-4 px-6 font-medium text-slate-900">API Access</td>
                   <td className="text-center py-4 px-6 text-slate-600">-</td>
+                  <td className="text-center py-4 px-6 text-slate-600">-</td>
                   <td className="text-center py-4 px-6 text-slate-600">✓</td>
                   <td className="text-center py-4 px-6 text-slate-600">Full Access</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="py-4 px-6 font-medium text-slate-900">Custom Branding</td>
                   <td className="text-center py-4 px-6 text-slate-600">-</td>
+                  <td className="text-center py-4 px-6 text-slate-600">-</td>
                   <td className="text-center py-4 px-6 text-slate-600">✓</td>
                   <td className="text-center py-4 px-6 text-slate-600">White-label</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="py-4 px-6 font-medium text-slate-900">Support</td>
+                  <td className="text-center py-4 px-6 text-slate-600">Community</td>
                   <td className="text-center py-4 px-6 text-slate-600">Email</td>
                   <td className="text-center py-4 px-6 text-slate-600">Priority</td>
                   <td className="text-center py-4 px-6 text-slate-600">24/7 Phone</td>

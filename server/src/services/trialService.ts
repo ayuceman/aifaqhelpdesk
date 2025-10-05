@@ -27,6 +27,13 @@ const TRIAL_LIMITS: TrialLimits = {
   trialDays: 14
 };
 
+const FREE_PLAN_LIMITS: TrialLimits = {
+  maxFAQs: 100,
+  maxChatQuestionsPerDay: 50,
+  maxChatQuestionsTotal: 500,
+  trialDays: 0 // No expiration for free plan
+};
+
 export class TrialService {
   private getTrialDataPath(projectId: string): string {
     return path.join(process.cwd(), 'data', 'projects', projectId, 'trial.json');
@@ -94,6 +101,7 @@ export class TrialService {
     limits: TrialLimits;
     isExpired: boolean;
     isOverLimit: boolean;
+    plan: string;
   }> {
     const trialData = this.getTrialData(projectId);
     
@@ -106,7 +114,8 @@ export class TrialService {
         dailyChatCount: 0,
         limits: TRIAL_LIMITS,
         isExpired: true,
-        isOverLimit: false
+        isOverLimit: false,
+        plan: 'none'
       };
     }
 
@@ -114,19 +123,23 @@ export class TrialService {
     const endDate = new Date(trialData.endDate);
     const daysRemaining = Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     const isExpired = now > endDate;
-    const isOverLimit = trialData.faqCount >= TRIAL_LIMITS.maxFAQs || 
-                       trialData.chatCount >= TRIAL_LIMITS.maxChatQuestionsTotal ||
-                       trialData.dailyChatCount >= TRIAL_LIMITS.maxChatQuestionsPerDay;
+    
+    // Use different limits based on plan type
+    const limits = trialData.plan === 'free' ? FREE_PLAN_LIMITS : TRIAL_LIMITS;
+    const isOverLimit = trialData.faqCount >= limits.maxFAQs || 
+                       trialData.chatCount >= limits.maxChatQuestionsTotal ||
+                       trialData.dailyChatCount >= limits.maxChatQuestionsPerDay;
 
     return {
       isActive: trialData.isActive && !isExpired && !isOverLimit,
-      daysRemaining,
+      daysRemaining: trialData.plan === 'free' ? 999 : daysRemaining, // Free plan shows as never expiring
       faqCount: trialData.faqCount,
       chatCount: trialData.chatCount,
       dailyChatCount: trialData.dailyChatCount,
-      limits: TRIAL_LIMITS,
-      isExpired,
-      isOverLimit
+      limits,
+      isExpired: trialData.plan === 'free' ? false : isExpired,
+      isOverLimit,
+      plan: trialData.plan
     };
   }
 
@@ -188,6 +201,37 @@ export class TrialService {
       trialData.lastChatDate = new Date().toISOString();
       this.saveTrialData(projectId, trialData);
     }
+  }
+
+  async initializeFreePlan(projectId: string): Promise<TrialData> {
+    const existingTrial = this.getTrialData(projectId);
+    
+    if (existingTrial && existingTrial.plan === 'free') {
+      return existingTrial;
+    }
+
+    const startDate = new Date().toISOString();
+    // Free plan never expires
+    const endDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(); // 1 year from now
+
+    const trialData: TrialData = {
+      projectId,
+      startDate,
+      endDate,
+      faqCount: 0,
+      chatCount: 0,
+      dailyChatCount: 0,
+      lastChatDate: startDate,
+      isActive: true,
+      plan: 'free'
+    };
+
+    this.saveTrialData(projectId, trialData);
+    return trialData;
+  }
+
+  async getFreePlanLimits(): Promise<TrialLimits> {
+    return FREE_PLAN_LIMITS;
   }
 }
 

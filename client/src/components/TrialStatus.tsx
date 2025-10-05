@@ -15,6 +15,7 @@ interface TrialStatus {
   };
   isExpired: boolean;
   isOverLimit: boolean;
+  plan: string;
 }
 
 interface TrialStatusProps {
@@ -64,11 +65,17 @@ const TrialStatus: React.FC<TrialStatusProps> = ({ project = 'default', onUpgrad
     <div className="card p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-slate-900">
-          {trialStatus.isActive ? 'Trial Status' : 'Trial Expired'}
+          {trialStatus.plan === 'free' ? 'Free Plan' : 
+           trialStatus.isActive ? 'Trial Status' : 'Trial Expired'}
         </h3>
-        {trialStatus.isActive && (
+        {trialStatus.isActive && trialStatus.plan !== 'free' && (
           <span className="text-sm text-slate-600">
             {trialStatus.daysRemaining} days remaining
+          </span>
+        )}
+        {trialStatus.plan === 'free' && (
+          <span className="text-sm text-green-600 font-medium">
+            Forever Free
           </span>
         )}
       </div>
