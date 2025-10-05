@@ -72,9 +72,11 @@ router.post('/file', upload.single('file'), async (req, res) => {
 // Crawl URL and extract content
 router.post('/url', async (req, res) => {
   try {
+    console.log('[CRAWL] Request received:', req.body);
     const { url, depth = 1 } = req.body;
     
     if (!url) {
+      console.log('[CRAWL] No URL provided');
       return res.status(400).json({ error: 'URL is required' });
     }
 
@@ -82,6 +84,7 @@ router.post('/url', async (req, res) => {
     try {
       new URL(url);
     } catch {
+      console.log('[CRAWL] Invalid URL format:', url);
       return res.status(400).json({ error: 'Invalid URL format' });
     }
 
@@ -92,6 +95,7 @@ router.post('/url', async (req, res) => {
     
     const parsedContent = await FileParser.parseURL(url, crawlDepth);
 
+    console.log(`[CRAWL] Success: ${parsedContent.text.length} chars extracted`);
     res.json({
       success: true,
       content: parsedContent.text,

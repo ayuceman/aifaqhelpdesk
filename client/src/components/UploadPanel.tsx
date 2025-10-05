@@ -84,11 +84,23 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ onContentExtracted, to
 
     setLoading(true);
     try {
+      console.log('Starting URL crawl:', { url, depth: crawlDepth });
       toast.info(`Crawling website with depth ${crawlDepth}...`);
-      const response = await axios.post('http://localhost:3001/api/upload/url', { 
-        url, 
+      
+      const requestData = { 
+        url: url.trim(), 
         depth: crawlDepth 
+      };
+      console.log('Request data:', requestData);
+      
+      const response = await axios.post('http://localhost:3001/api/upload/url', requestData, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        timeout: 60000 // 60 second timeout for crawling
       });
+      
+      console.log('Response received:', response.data);
       
       if (response.data.success) {
         const content = response.data.content;
@@ -100,6 +112,8 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ onContentExtracted, to
         });
         onContentExtracted(content);
         toast.success(`Successfully crawled ${metadata?.pagesCrawled || 1} page(s) with ${content.length.toLocaleString()} characters`);
+      } else {
+        toast.error('Crawling failed: ' + (response.data.error || 'Unknown error'));
       }
     } catch (err: any) {
       console.error('URL fetch error:', err);
