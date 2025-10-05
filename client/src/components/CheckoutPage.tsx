@@ -41,7 +41,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
   const paypalRef = useRef<HTMLDivElement>(null);
-  const { success, error } = useToast();
+  const { success, error, toasts, removeToast } = useToast();
 
   const price = interval === 'year' ? plan.price * 12 * 0.8 : plan.price;
   const savings = interval === 'year' ? plan.price * 12 * 0.2 : 0;
@@ -368,7 +368,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
           </div>
         </div>
       </main>
-      <ToastContainer />
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 };
