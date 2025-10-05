@@ -163,7 +163,7 @@ router.get('/', (req, res) => {
     </div>
 
     <script>
-        const API_BASE = window.location.origin.replace(/\\d+$/, '3001') + '/api/public';
+        const API_BASE = 'http://localhost:3001/api/public';
         const PROJECT = '${project}';
         const SUPPORT_EMAIL = '${supportEmail}';
         
