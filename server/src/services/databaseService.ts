@@ -311,12 +311,34 @@ export class DatabaseService {
     dailyChatCount: number;
     lastChatDate: string;
   }>) {
-    const fields = Object.keys(updates).map(key => `${key} = ?`).join(', ');
+    // Ensure usage record exists
+    this.ensureProjectUsage(projectId);
+
+    // Map camelCase to snake_case for database
+    const fieldMapping: { [key: string]: string } = {
+      faqCount: 'faq_count',
+      chatCount: 'chat_count',
+      dailyChatCount: 'daily_chat_count',
+      lastChatDate: 'last_chat_date'
+    };
+
+    const fields = Object.keys(updates).map(key => `${fieldMapping[key]} = ?`).join(', ');
     const values = Object.values(updates);
     values.push(projectId);
 
     const stmt = this.db.prepare(`UPDATE project_usage SET ${fields}, updated_at = CURRENT_TIMESTAMP WHERE project_id = ?`);
     return stmt.run(...values);
+  }
+
+  ensureProjectUsage(projectId: string) {
+    const existing = this.getProjectUsage(projectId);
+    if (!existing) {
+      const stmt = this.db.prepare(`
+        INSERT INTO project_usage (id, project_id, faq_count, chat_count, daily_chat_count, last_chat_date)
+        VALUES (?, ?, 0, 0, 0, ?)
+      `);
+      stmt.run(this.generateId(), projectId, new Date().toISOString());
+    }
   }
 
   getProjectUsage(projectId: string) {
