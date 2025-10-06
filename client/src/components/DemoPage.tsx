@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Header from './Header';
+import Footer from './Footer';
 
 interface DemoPageProps {
   onNavigateToApp?: () => void;
@@ -69,31 +71,8 @@ const DemoPage: React.FC<DemoPageProps> = ({ onNavigateToApp }) => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Navigation */}
-      <nav className="relative z-10 border-b border-slate-200 bg-white/80 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">AI</span>
-              </div>
-              <span className="text-xl font-bold text-slate-900">FAQ Generator</span>
-            </div>
-            <div className="flex items-center space-x-6">
-              <Link to="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</Link>
-              <Link to="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</Link>
-              <Link to="/privacy" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Privacy</Link>
-              <Link to="/terms" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Terms</Link>
-              <button
-                onClick={onNavigateToApp}
-                className="btn-primary"
-              >
-                Try It Yourself
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Header */}
+      <Header variant="landing" />
 
       {/* Hero Section */}
       <div className="relative overflow-hidden">
@@ -366,54 +345,7 @@ const DemoPage: React.FC<DemoPageProps> = ({ onNavigateToApp }) => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">AI</span>
-                </div>
-                <span className="text-xl font-bold text-slate-900">FAQ Generator</span>
-              </div>
-              <p className="text-slate-600 text-sm">
-                Enterprise-grade AI FAQ generation platform for modern organizations.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-slate-900 mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-slate-600">
-                <li><Link to="/demo" className="hover:text-slate-900 transition-colors">Demo</Link></li>
-                <li><Link to="/" className="hover:text-slate-900 transition-colors">Get Started</Link></li>
-                <li><Link to="/contact" className="hover:text-slate-900 transition-colors">Contact</Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-slate-900 mb-4">Company</h4>
-              <ul className="space-y-2 text-sm text-slate-600">
-                <li><Link to="/contact" className="hover:text-slate-900 transition-colors">Contact</Link></li>
-                <li><Link to="/privacy" className="hover:text-slate-900 transition-colors">Privacy</Link></li>
-                <li><Link to="/terms" className="hover:text-slate-900 transition-colors">Terms</Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-slate-900 mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-slate-600">
-                <li><Link to="/contact" className="hover:text-slate-900 transition-colors">Contact Support</Link></li>
-                <li><Link to="/demo" className="hover:text-slate-900 transition-colors">Live Demo</Link></li>
-                <li><Link to="/" className="hover:text-slate-900 transition-colors">Get Started</Link></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-slate-200 mt-12 pt-8 text-center text-sm text-slate-500">
-            <p>&copy; {new Date().getFullYear()} AI FAQ Generator. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

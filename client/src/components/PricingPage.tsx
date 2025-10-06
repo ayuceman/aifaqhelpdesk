@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Header from './Header';
+import Footer from './Footer';
 
 interface PricingPageProps {
   onNavigateToApp?: () => void;
@@ -158,31 +160,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp, onUpgrade: _
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-slate-900">AI FAQ Generator</h1>
-              </div>
-            </div>
-            <nav className="hidden md:flex space-x-8">
-              <button
-                onClick={onNavigateToApp}
-                className="text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                Get Started
-              </button>
-              <Link to="/demo" className="text-slate-600 hover:text-slate-900 transition-colors">
-                Demo
-              </Link>
-              <Link to="/contact" className="text-slate-600 hover:text-slate-900 transition-colors">
-                Contact
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Header variant="landing" />
 
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -426,44 +404,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp, onUpgrade: _
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">AI FAQ Generator</h3>
-              <p className="text-slate-400">
-                Transform your content into intelligent FAQ systems and chatbot assistants.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><Link to="/demo" className="hover:text-white transition-colors">Demo</Link></li>
-                <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link to="/features" className="hover:text-white transition-colors">Features</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><Link to="/help" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link to="/docs" className="hover:text-white transition-colors">Documentation</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
-            <p>&copy; 2024 AI FAQ Generator. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

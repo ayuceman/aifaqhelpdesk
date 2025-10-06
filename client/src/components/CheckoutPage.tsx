@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeftIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import DashboardLayout from './DashboardLayout';
+import { ShieldCheckIcon, CheckCircleIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from './Toast';
 
@@ -77,7 +78,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
           color: 'blue',
           shape: 'rect',
           label: 'pay',
-          height: 45,
+          height: 50,
           layout: 'vertical'
         },
         createOrder: async (_data: any, _actions: any) => {
@@ -150,7 +151,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
         onCancel: () => {
           console.log('PayPal payment cancelled');
           setIsProcessing(false);
-          // Show info message instead of error
           success('Payment cancelled. You can try again when ready.');
         }
       }).render(paypalRef.current);
@@ -158,117 +158,145 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
   }, [paypalLoaded, plan.id, interval, onPaymentSuccess, onPaymentCancel]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <DashboardLayout>
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-              <div className="flex items-center space-x-4">
-                <button onClick={onBack} className="text-slate-600 hover:text-slate-900">
-                  <ArrowLeftIcon className="w-6 h-6" />
-                </button>
-                <h1 className="text-xl font-bold text-slate-900">Checkout</h1>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-slate-600">
-                <span>Secured by</span>
-                <div className="flex items-center space-x-1 bg-blue-600 text-white px-3 py-1 rounded-md">
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.44-.66c-.84-1.01-2.24-1.41-3.73-1.41H8.5c-.524 0-.968.382-1.05.9L5.3 19.106h4.6c.524 0 .968-.382 1.05-.9l1.12-7.106h2.19c.524 0 .968-.382 1.05-.9l1.12-7.106h2.19c.524 0 .968-.382 1.05-.9l1.12-7.106z"/>
-                  </svg>
-                  <span className="font-bold text-xs">PayPal</span>
-                </div>
-              </div>
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Secure Checkout</h1>
+              <p className="text-slate-600 text-sm mt-1">Complete your subscription</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <ShieldCheckIcon className="w-5 h-5 text-green-600" />
+              <span className="text-sm font-medium text-slate-700">SSL Secured</span>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Order Summary */}
           <div className="space-y-6">
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Order Summary</h2>
+            {/* Plan Details Card */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+                <h2 className="text-xl font-bold text-white">Order Summary</h2>
+              </div>
               
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Plan:</span>
-                  <span className="font-medium">{plan.name}</span>
+              <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                  <span className="text-slate-600">Selected Plan</span>
+                  <span className="text-xl font-bold text-slate-900">{plan.name}</span>
                 </div>
                 
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Billing:</span>
-                  <span className="font-medium">{interval === 'year' ? 'Annually' : 'Monthly'}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600">Billing Cycle</span>
+                  <span className="font-semibold text-slate-900 capitalize">
+                    {interval === 'year' ? 'Annually' : 'Monthly'}
+                  </span>
                 </div>
                 
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Price:</span>
-                  <span className="font-medium">${plan.price.toFixed(2)}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600">Base Price</span>
+                  <span className="font-semibold text-slate-900">${plan.price.toFixed(2)}/mo</span>
                 </div>
                 
                 {interval === 'year' && (
-                  <div className="flex justify-between items-center text-green-600">
-                    <span>Annual Discount (20%):</span>
-                    <span>-${savings.toFixed(2)}</span>
-                  </div>
+                  <>
+                    <div className="flex items-center justify-between text-green-600">
+                      <span className="flex items-center">
+                        <CheckCircleIcon className="w-4 h-4 mr-1" />
+                        Annual Discount (20%)
+                      </span>
+                      <span className="font-semibold">-${savings.toFixed(2)}</span>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <p className="text-sm text-green-700 text-center font-medium">
+                        💰 You're saving ${savings.toFixed(2)} with yearly billing!
+                      </p>
+                    </div>
+                  </>
                 )}
                 
-                <div className="border-t border-slate-200 pt-4">
-                  <div className="flex justify-between items-center text-lg font-semibold">
-                    <span>Total:</span>
-                    <span>${price.toFixed(2)}</span>
+                <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold text-slate-900">Total Today</span>
+                    <span className="text-3xl font-bold text-blue-600">${price.toFixed(2)}</span>
                   </div>
+                  <p className="text-xs text-slate-600 mt-2">
+                    {interval === 'year' ? 'Billed annually' : 'Billed monthly'}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Plan Features */}
-            <div className="card p-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">What's Included</h3>
-              <ul className="space-y-2">
+            {/* Features Card */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center">
+                <CheckCircleIcon className="w-6 h-6 text-green-500 mr-2" />
+                What's Included
+              </h3>
+              <ul className="space-y-3">
                 {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-center text-sm text-slate-600">
-                    <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {feature}
+                  <li key={index} className="flex items-start text-sm">
+                    <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-700">{feature}</span>
                   </li>
                 ))}
               </ul>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border-2 border-blue-200 p-6">
+              <h4 className="text-sm font-bold text-slate-900 mb-4 text-center">Why Choose Us?</h4>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <ShieldCheckIcon className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-slate-700">SSL Secured</p>
+                </div>
+                <div>
+                  <CheckCircleIcon className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-slate-700">GDPR Compliant</p>
+                </div>
+                <div>
+                  <CreditCardIcon className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-slate-700">Secure Payment</p>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Payment Section */}
           <div className="space-y-6">
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Payment Information</h2>
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+                <h2 className="text-xl font-bold text-white">Payment Method</h2>
+              </div>
               
-              {/* PayPal Payment Section */}
-              <div className="space-y-6">
+              <div className="p-6 space-y-6">
                 {/* PayPal Security Notice */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                        <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.44-.66c-.84-1.01-2.24-1.41-3.73-1.41H8.5c-.524 0-.968.382-1.05.9L5.3 19.106h4.6c.524 0 .968-.382 1.05-.9l1.12-7.106h2.19c.524 0 .968-.382 1.05-.9l1.12-7.106h2.19c.524 0 .968-.382 1.05-.9l1.12-7.106z"/>
-                        </svg>
-                      </div>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.44-.66c-.84-1.01-2.24-1.41-3.73-1.41H8.5c-.524 0-.968.382-1.05.9L5.3 19.106h4.6c.524 0 .968-.382 1.05-.9l1.12-7.106h2.19c.524 0 .968-.382 1.05-.9l1.12-7.106h2.19c.524 0 .968-.382 1.05-.9l1.12-7.106z"/>
+                      </svg>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-semibold text-blue-800">PayPal Secure Payment</p>
-                      <p className="text-sm text-blue-600 mt-1">
-                        Your payment information is encrypted and protected by PayPal's security measures.
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-blue-900">Secured by PayPal</p>
+                      <p className="text-xs text-blue-700 mt-1">
+                        Your payment is processed securely through PayPal. We never store your card details.
                       </p>
-                      <div className="flex items-center mt-2 space-x-4 text-xs text-blue-700">
+                      <div className="flex items-center mt-2 space-x-4 text-xs text-blue-700 font-medium">
                         <span className="flex items-center">
                           <ShieldCheckIcon className="w-4 h-4 mr-1" />
-                          SSL Encrypted
+                          Encrypted
                         </span>
                         <span className="flex items-center">
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
+                          <CheckCircleIcon className="w-4 h-4 mr-1" />
                           Protected
                         </span>
                       </div>
@@ -276,92 +304,63 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   </div>
                 </div>
 
-                {/* Payment Summary */}
-                <div className="bg-slate-50 rounded-lg p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-slate-600">Plan:</span>
-                    <span className="font-medium">{plan.name}</span>
+                {/* Quick Summary */}
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                  <div className="flex justify-between items-center mb-2 text-sm">
+                    <span className="text-slate-600">{plan.name} Plan</span>
+                    <span className="font-semibold text-slate-900">${plan.price}/mo</span>
                   </div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-slate-600">Billing:</span>
-                    <span className="font-medium">{interval === 'year' ? 'Annually' : 'Monthly'}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-lg font-semibold border-t border-slate-200 pt-2">
-                    <span>Total:</span>
-                    <span>${price.toFixed(2)}</span>
+                  <div className="flex justify-between items-center mb-2 text-sm">
+                    <span className="text-slate-600">Billing</span>
+                    <span className="font-semibold text-slate-900 capitalize">{interval}ly</span>
                   </div>
                   {savings > 0 && (
-                    <div className="flex justify-between items-center text-green-600 text-sm mt-1">
-                      <span>You save:</span>
-                      <span>${savings.toFixed(2)}</span>
+                    <div className="flex justify-between items-center mb-2 text-sm text-green-600">
+                      <span>Savings</span>
+                      <span className="font-semibold">-${savings.toFixed(2)}</span>
                     </div>
                   )}
+                  <div className="flex justify-between items-center pt-2 border-t border-slate-300">
+                    <span className="font-bold text-slate-900">Total</span>
+                    <span className="text-2xl font-bold text-blue-600">${price.toFixed(2)}</span>
+                  </div>
                 </div>
 
-                {/* Official PayPal Buttons */}
+                {/* PayPal Buttons */}
                 <div className="space-y-4">
-                  {/* PayPal SDK Container */}
-                  <div className="w-full">
-                    {!paypalLoaded ? (
-                      <div className="flex items-center justify-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        <span className="ml-3 text-slate-600">Loading PayPal...</span>
-                      </div>
-                    ) : (
-                      <div ref={paypalRef} className="w-full"></div>
-                    )}
-                  </div>
+                  {!paypalLoaded ? (
+                    <div className="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mb-4"></div>
+                      <span className="text-slate-600 font-medium">Loading secure payment...</span>
+                    </div>
+                  ) : (
+                    <div ref={paypalRef} className="w-full"></div>
+                  )}
                   
-                  <p className="text-xs text-slate-500 text-center">
-                    Secure payment powered by PayPal
+                  <p className="text-xs text-center text-slate-500">
+                    🔒 256-bit SSL encryption • Your data is safe with us
                   </p>
                   
                   <button
                     type="button"
                     onClick={onBack}
-                    className="w-full bg-slate-100 text-slate-700 py-3 px-6 rounded-lg font-medium hover:bg-slate-200 transition-colors"
+                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 px-6 rounded-xl font-semibold transition-all"
                   >
-                    Back to Plans
+                    ← Back to Plans
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* PayPal Official Trust Indicators */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6">
-              <div className="flex items-center justify-center mb-4">
-                <div className="flex items-center space-x-2">
-                  <svg className="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.44-.66c-.84-1.01-2.24-1.41-3.73-1.41H8.5c-.524 0-.968.382-1.05.9L5.3 19.106h4.6c.524 0 .968-.382 1.05-.9l1.12-7.106h2.19c.524 0 .968-.382 1.05-.9l1.12-7.106h2.19c.524 0 .968-.382 1.05-.9l1.12-7.106z"/>
-                  </svg>
-                  <span className="text-lg font-bold text-blue-800">PayPal</span>
+            {/* Money Back Guarantee */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <CheckCircleIcon className="w-10 h-10 text-white" />
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="flex items-center justify-center text-blue-700">
-                  <ShieldCheckIcon className="w-5 h-5 mr-2" />
-                  <span className="font-semibold">SSL Secured</span>
-                </div>
-                <div className="flex items-center justify-center text-blue-700">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="font-semibold">Protected</span>
-                </div>
-                <div className="flex items-center justify-center text-blue-700">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
-                  <span className="font-semibold">Money Back</span>
-                </div>
-              </div>
-              
-              <div className="mt-4 pt-4 border-t border-blue-200">
-                <p className="text-xs text-blue-600 text-center">
-                  <span className="font-semibold">Your payment is processed securely by PayPal</span>
-                  <br />
-                  <span className="text-blue-500">Sandbox Environment • 30-day money-back guarantee</span>
+                <h4 className="text-lg font-bold text-slate-900 mb-2">30-Day Money-Back Guarantee</h4>
+                <p className="text-sm text-slate-700">
+                  Not satisfied? Get a full refund within 30 days, no questions asked.
                 </p>
               </div>
             </div>
@@ -369,7 +368,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
         </div>
       </main>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
-    </div>
+    </DashboardLayout>
   );
 };
 

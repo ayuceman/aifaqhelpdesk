@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UploadPanel } from './components/UploadPanel';
 import { GeneratorPanel } from './components/GeneratorPanel';
@@ -84,8 +84,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
-// Main App Component with Router
-function App() {
+// Inner App Component with Navigation
+function AppContent() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [checkoutPlan, setCheckoutPlan] = useState<any>(null);
   const [checkoutInterval, setCheckoutInterval] = useState<'month' | 'year'>('month');
@@ -104,6 +105,18 @@ function App() {
         } catch (error) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+        }
+      }
+
+      // Check for checkout plan in localStorage
+      const storedPlan = localStorage.getItem('checkoutPlan');
+      const storedInterval = localStorage.getItem('checkoutInterval');
+      if (storedPlan && storedInterval) {
+        try {
+          setCheckoutPlan(JSON.parse(storedPlan));
+          setCheckoutInterval(storedInterval as 'month' | 'year');
+        } catch (error) {
+          console.error('Error parsing stored checkout data:', error);
         }
       }
     };
@@ -126,12 +139,18 @@ function App() {
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('checkoutPlan');
+    localStorage.removeItem('checkoutInterval');
+    // Navigate to home page after logout
+    navigate('/');
   };
 
   const handleUpgrade = async (plan: any, interval: 'month' | 'year') => {
     console.log('App handleUpgrade called with:', plan, interval);
     setCheckoutPlan(plan);
     setCheckoutInterval(interval);
+    // Navigate to checkout page
+    navigate('/checkout');
   };
 
   const handleStartTrial = async (plan: any) => {
@@ -141,7 +160,7 @@ function App() {
       const token = localStorage.getItem('token');
       if (!token) {
         // User not logged in, redirect to signup
-        window.location.href = '/signup';
+        navigate('/signup');
         return;
       }
 
@@ -172,18 +191,18 @@ function App() {
         }
         
         // Navigate to dashboard
-        window.location.href = '/dashboard';
+        navigate('/dashboard');
       } else {
         console.error('Failed to start trial:', result.error);
         // Fallback to upgrade flow
         handleUpgrade(plan, 'month');
-        window.location.href = '/checkout';
+        navigate('/checkout');
       }
     } catch (error) {
       console.error('Error starting trial:', error);
       // Fallback to upgrade flow
       handleUpgrade(plan, 'month');
-      window.location.href = '/checkout';
+      navigate('/checkout');
     }
   };
 
@@ -209,25 +228,24 @@ function App() {
   };
 
   return (
-    <Router>
       <div className="min-h-screen bg-slate-50">
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={
             <LandingPage 
-              onGetStarted={() => window.location.href = '/app'}
-              onLoadDemo={() => window.location.href = '/demo'}
-              onNavigateToLogin={() => window.location.href = '/login'}
-              onNavigateToSignup={() => window.location.href = '/signup'}
+              onGetStarted={() => navigate('/app')}
+              onLoadDemo={() => navigate('/demo')}
+              onNavigateToLogin={() => navigate('/login')}
+              onNavigateToSignup={() => navigate('/signup')}
             />
           } />
-          <Route path="/privacy" element={<PrivacyPolicy onBack={() => window.location.href = '/'} />} />
-          <Route path="/terms" element={<TermsOfService onBack={() => window.location.href = '/'} />} />
-          <Route path="/contact" element={<ContactPage onBack={() => window.location.href = '/'} />} />
-          <Route path="/demo" element={<DemoPage onNavigateToApp={() => window.location.href = '/app'} />} />
+          <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} />} />
+          <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} />} />
+          <Route path="/contact" element={<ContactPage onBack={() => navigate('/')} />} />
+          <Route path="/demo" element={<DemoPage onNavigateToApp={() => navigate('/app')} />} />
           <Route path="/pricing" element={
             <PricingPage 
-              onNavigateToApp={() => window.location.href = '/app'}
+              onNavigateToApp={() => navigate('/app')}
               onUpgrade={handleUpgrade} 
               onStartTrial={handleStartTrial} 
             />
@@ -235,15 +253,15 @@ function App() {
           <Route path="/login" element={
             <LoginPage 
               onLogin={handleLogin}
-              onNavigateToSignup={() => window.location.href = '/signup'}
-              onNavigateToHome={() => window.location.href = '/'}
+              onNavigateToSignup={() => navigate('/signup')}
+              onNavigateToHome={() => navigate('/')}
             />
           } />
           <Route path="/signup" element={
             <SignupPage 
               onSignup={handleSignup}
-              onNavigateToLogin={() => window.location.href = '/login'}
-              onNavigateToHome={() => window.location.href = '/'}
+              onNavigateToLogin={() => navigate('/login')}
+              onNavigateToHome={() => navigate('/')}
             />
           } />
 
@@ -253,11 +271,11 @@ function App() {
               <Dashboard 
                 user={user!}
                 onLogout={handleLogout}
-                onNavigateToProject={(projectId: string) => window.location.href = `/projects/${projectId}`}
-                onViewProjectDetails={(project: any) => window.location.href = `/projects/${project.id}`}
-                onNavigateToHome={() => window.location.href = '/'}
-                onNavigateToUpgrade={() => window.location.href = '/upgrade'}
-                onNavigateToSubscriptionManagement={() => window.location.href = '/subscription'}
+                onNavigateToProject={(projectId: string) => navigate(`/projects/${projectId}`)}
+                onViewProjectDetails={(project: any) => navigate(`/projects/${project.id}`)}
+                onNavigateToHome={() => navigate('/')}
+                onNavigateToUpgrade={() => navigate('/upgrade')}
+                onNavigateToSubscriptionManagement={() => navigate('/subscription')}
               />
             </ProtectedRoute>
           } />
@@ -266,7 +284,7 @@ function App() {
             <ProtectedRoute>
               <ProjectDetails 
                 projectId={window.location.pathname.split('/')[2]}
-                onBack={() => window.location.href = '/dashboard'}
+                onBack={() => navigate('/dashboard')}
                 onEditProject={(updatedProject: any) => {
                   // Handle project update
                   console.log('Project updated:', updatedProject);
@@ -278,7 +296,7 @@ function App() {
           <Route path="/upgrade" element={
             <ProtectedRoute>
               <UpgradePage 
-                onBack={() => window.location.href = '/dashboard'}
+                onBack={() => navigate('/dashboard')}
                 onUpgrade={handleUpgrade}
               />
             </ProtectedRoute>
@@ -290,9 +308,9 @@ function App() {
                 <CheckoutPage 
                   plan={checkoutPlan}
                   interval={checkoutInterval}
-                  onBack={() => window.location.href = '/upgrade'}
-                  onPaymentSuccess={() => window.location.href = '/payment/success'}
-                  onPaymentCancel={() => window.location.href = '/payment/cancel'}
+                  onBack={() => navigate('/upgrade')}
+                  onPaymentSuccess={() => navigate('/payment/success')}
+                  onPaymentCancel={() => navigate('/payment/cancel')}
                 />
               ) : (
                 <Navigate to="/upgrade" replace />
@@ -302,22 +320,32 @@ function App() {
 
           <Route path="/payment/success" element={
             <PaymentSuccess 
-              onBack={() => window.location.href = '/dashboard'}
+              onBack={() => {
+                // Clear checkout data from localStorage
+                localStorage.removeItem('checkoutPlan');
+                localStorage.removeItem('checkoutInterval');
+                navigate('/dashboard');
+              }}
               onRefreshUser={refreshUserData}
             />
           } />
 
           <Route path="/payment/cancel" element={
             <PaymentCancel 
-              onBack={() => window.location.href = '/dashboard'}
-              onRetry={() => window.location.href = '/upgrade'}
+              onBack={() => {
+                // Clear checkout data from localStorage
+                localStorage.removeItem('checkoutPlan');
+                localStorage.removeItem('checkoutInterval');
+                navigate('/dashboard');
+              }}
+              onRetry={() => navigate('/upgrade')}
             />
           } />
 
           <Route path="/subscription" element={
             <ProtectedRoute>
               <SubscriptionManagement 
-                onBack={() => window.location.href = '/dashboard'}
+                onBack={() => navigate('/dashboard')}
                 onUpgrade={handleUpgrade}
               />
             </ProtectedRoute>
@@ -382,6 +410,14 @@ function App() {
         
         <ToastContainer toasts={toasts} onRemove={removeToast} />
       </div>
+  );
+}
+
+// Main App Component with Router
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

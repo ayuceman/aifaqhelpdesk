@@ -185,14 +185,25 @@ export class AuthService {
     databaseService.updateUser(userId, { plan });
   }
 
-  async startTrial(userId: string): Promise<void> {
+  async startTrial(userId: string, planId: string): Promise<void> {
     const startDate = new Date().toISOString();
     const endDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(); // 14 days
+
+    // Get the plan details to set appropriate trial limits
+    const { paymentService } = await import('./paymentService');
+    const plans = await paymentService.getPricingPlans();
+    const selectedPlan = plans.find(p => p.id === planId);
+    
+    if (!selectedPlan) {
+      throw new Error('Invalid plan selected for trial');
+    }
 
     databaseService.updateUser(userId, {
       plan: 'trial',
       trialStartDate: startDate,
-      trialEndDate: endDate
+      trialEndDate: endDate,
+      // Store the trial plan ID for reference
+      trialPlanId: planId
     });
   }
 

@@ -34,6 +34,7 @@ export class DatabaseService {
         plan TEXT DEFAULT 'free' CHECK(plan IN ('free', 'trial', 'starter', 'professional', 'enterprise')),
         trial_start_date TEXT,
         trial_end_date TEXT,
+        trial_plan_id TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
@@ -168,6 +169,9 @@ export class DatabaseService {
       }
       if (!columnNames.includes('trialEndDate')) {
         this.db.exec('ALTER TABLE users ADD COLUMN trialEndDate TEXT');
+      }
+      if (!columnNames.includes('trial_plan_id')) {
+        this.db.exec('ALTER TABLE users ADD COLUMN trial_plan_id TEXT');
       }
     } catch (error) {
       console.log('Migration completed or no migration needed:', error);
