@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { UploadPanel } from './components/UploadPanel';
 import { GeneratorPanel } from './components/GeneratorPanel';
@@ -24,7 +25,6 @@ import PaymentCancel from './components/PaymentCancel';
 import SubscriptionManagement from './components/SubscriptionManagement';
 
 type Step = 'upload' | 'generate' | 'review' | 'embed';
-type Page = 'landing' | 'app' | 'privacy' | 'terms' | 'contact' | 'demo' | 'pricing' | 'login' | 'signup' | 'dashboard' | 'project-details' | 'upgrade' | 'checkout' | 'payment-success' | 'payment-cancel' | 'subscription-management';
 
 interface FAQ {
   id?: string;
@@ -39,89 +39,152 @@ interface User {
   plan: string;
   trialStartDate?: string;
   trialEndDate?: string;
+  trialPlanId?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('landing');
-  const [currentStep, setCurrentStep] = useState<Step>('upload');
-  const [extractedContent, setExtractedContent] = useState('');
-  const [generatedFAQs, setGeneratedFAQs] = useState<FAQ[]>([]);
+// Protected Route Component
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [currentProject, setCurrentProject] = useState<string | null>(null);
-  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await axios.get('http://localhost:3001/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUser(response.data.user);
+        } catch (error) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      }
+      setLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Main App Component with Router
+function App() {
+  const [user, setUser] = useState<User | null>(null);
   const [checkoutPlan, setCheckoutPlan] = useState<any>(null);
   const [checkoutInterval, setCheckoutInterval] = useState<'month' | 'year'>('month');
-  const { toasts, removeToast, success, error, info } = useToast();
+  const { toasts, removeToast } = useToast();
 
-  const steps: { id: Step; label: string; number: number }[] = [
-    { id: 'upload', label: 'Add Sources', number: 1 },
-    { id: 'generate', label: 'Generate', number: 2 },
-    { id: 'review', label: 'Review & Publish', number: 3 },
-    { id: 'embed', label: 'Embed', number: 4 },
-  ];
-
-  const currentStepIndex = steps.findIndex(s => s.id === currentStep);
-
-  const handleGetStarted = () => {
-    setCurrentPage('app');
-    setCurrentStep('upload');
-  };
-
-  const handleNavigateToPricing = () => {
-    setCurrentPage('pricing');
-  };
-
-  const handleNavigateToLogin = () => {
-    setCurrentPage('login');
-  };
-
-  const handleNavigateToSignup = () => {
-    setCurrentPage('signup');
-  };
-
-  const handleNavigateToUpgrade = () => {
-    setCurrentPage('upgrade');
-  };
-
-  const handleUpgrade = async (plan: any, interval: 'month' | 'year') => {
-    console.log('App handleUpgrade called with:', plan, interval);
-    
-    // Use the plan object directly
-    setCheckoutPlan(plan);
-    setCheckoutInterval(interval);
-    setCurrentPage('checkout');
-  };
-
-  const handlePaymentSuccess = () => {
-    setCurrentPage('payment-success');
-  };
-
-  const handlePaymentCancel = () => {
-    setCurrentPage('payment-cancel');
-  };
-
-  const handleBackToUpgrade = () => {
-    setCurrentPage('upgrade');
-  };
+  // Check authentication on app load
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (token && userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+        } catch (error) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      }
+    };
+    checkAuth();
+  }, []);
 
   const handleLogin = (userData: User, token: string) => {
     setUser(userData);
-    setCurrentPage('dashboard');
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const handleSignup = (userData: User, token: string) => {
     setUser(userData);
-    setCurrentPage('dashboard');
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const handleLogout = () => {
+    setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    setUser(null);
-    setCurrentProject(null);
-    setCurrentPage('landing');
+  };
+
+  const handleUpgrade = async (plan: any, interval: 'month' | 'year') => {
+    console.log('App handleUpgrade called with:', plan, interval);
+    setCheckoutPlan(plan);
+    setCheckoutInterval(interval);
+  };
+
+  const handleStartTrial = async (plan: any) => {
+    console.log('App handleStartTrial called with:', plan);
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // User not logged in, redirect to signup
+        window.location.href = '/signup';
+        return;
+      }
+
+      // Start trial for the selected plan
+      const response = await fetch('http://localhost:3001/api/auth/start-trial', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ planId: plan.id })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Refresh user data to get updated trial info
+        const userResponse = await fetch('http://localhost:3001/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setUser(userData.user);
+          localStorage.setItem('user', JSON.stringify(userData.user));
+        }
+        
+        // Navigate to dashboard
+        window.location.href = '/dashboard';
+      } else {
+        console.error('Failed to start trial:', result.error);
+        // Fallback to upgrade flow
+        handleUpgrade(plan, 'month');
+        window.location.href = '/checkout';
+      }
+    } catch (error) {
+      console.error('Error starting trial:', error);
+      // Fallback to upgrade flow
+      handleUpgrade(plan, 'month');
+      window.location.href = '/checkout';
+    }
   };
 
   const refreshUserData = async () => {
@@ -145,302 +208,233 @@ function App() {
     }
   };
 
-  const handleNavigateToSubscriptionManagement = () => {
-    setCurrentPage('subscription-management');
-  };
+  return (
+    <Router>
+      <div className="min-h-screen bg-slate-50">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={
+            <LandingPage 
+              onGetStarted={() => window.location.href = '/app'}
+              onLoadDemo={() => window.location.href = '/demo'}
+              onNavigateToLogin={() => window.location.href = '/login'}
+              onNavigateToSignup={() => window.location.href = '/signup'}
+            />
+          } />
+          <Route path="/privacy" element={<PrivacyPolicy onBack={() => window.location.href = '/'} />} />
+          <Route path="/terms" element={<TermsOfService onBack={() => window.location.href = '/'} />} />
+          <Route path="/contact" element={<ContactPage onBack={() => window.location.href = '/'} />} />
+          <Route path="/demo" element={<DemoPage onNavigateToApp={() => window.location.href = '/app'} />} />
+          <Route path="/pricing" element={
+            <PricingPage 
+              onNavigateToApp={() => window.location.href = '/app'}
+              onUpgrade={handleUpgrade} 
+              onStartTrial={handleStartTrial} 
+            />
+          } />
+          <Route path="/login" element={
+            <LoginPage 
+              onLogin={handleLogin}
+              onNavigateToSignup={() => window.location.href = '/signup'}
+              onNavigateToHome={() => window.location.href = '/'}
+            />
+          } />
+          <Route path="/signup" element={
+            <SignupPage 
+              onSignup={handleSignup}
+              onNavigateToLogin={() => window.location.href = '/login'}
+              onNavigateToHome={() => window.location.href = '/'}
+            />
+          } />
 
-  const handleNavigateToProject = (projectId: string) => {
-    setCurrentProject(projectId);
-    setCurrentPage('app');
-    setCurrentStep('upload');
-  };
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard 
+                user={user!}
+                onLogout={handleLogout}
+                onNavigateToProject={(projectId: string) => window.location.href = `/projects/${projectId}`}
+                onViewProjectDetails={(project: any) => window.location.href = `/projects/${project.id}`}
+                onNavigateToHome={() => window.location.href = '/'}
+                onNavigateToUpgrade={() => window.location.href = '/upgrade'}
+                onNavigateToSubscriptionManagement={() => window.location.href = '/subscription'}
+              />
+            </ProtectedRoute>
+          } />
 
-  const handleViewProjectDetails = (project: any) => {
-    setSelectedProject(project);
-    setCurrentPage('project-details');
-  };
+          <Route path="/projects/:projectId" element={
+            <ProtectedRoute>
+              <ProjectDetails 
+                projectId={window.location.pathname.split('/')[2]}
+                onBack={() => window.location.href = '/dashboard'}
+                onEditProject={(updatedProject: any) => {
+                  // Handle project update
+                  console.log('Project updated:', updatedProject);
+                }}
+              />
+            </ProtectedRoute>
+          } />
 
-  const handleBackToDashboard = () => {
-    setSelectedProject(null);
-    setCurrentPage('dashboard');
-  };
+          <Route path="/upgrade" element={
+            <ProtectedRoute>
+              <UpgradePage 
+                onBack={() => window.location.href = '/dashboard'}
+                onUpgrade={handleUpgrade}
+              />
+            </ProtectedRoute>
+          } />
 
-  const handleProjectUpdated = (updatedProject: any) => {
-    setSelectedProject(updatedProject);
-  };
+          <Route path="/checkout" element={
+            <ProtectedRoute>
+              {checkoutPlan ? (
+                <CheckoutPage 
+                  plan={checkoutPlan}
+                  interval={checkoutInterval}
+                  onBack={() => window.location.href = '/upgrade'}
+                  onPaymentSuccess={() => window.location.href = '/payment/success'}
+                  onPaymentCancel={() => window.location.href = '/payment/cancel'}
+                />
+              ) : (
+                <Navigate to="/upgrade" replace />
+              )}
+            </ProtectedRoute>
+          } />
 
-  // Check for existing user on app load
-  React.useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        setCurrentPage('dashboard');
-      } catch (error) {
-        // Invalid user data, clear it
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
-    }
-  }, []);
+          <Route path="/payment/success" element={
+            <PaymentSuccess 
+              onBack={() => window.location.href = '/dashboard'}
+              onRefreshUser={refreshUserData}
+            />
+          } />
 
-  const handleLoadDemo = async () => {
-    try {
-      info('Loading demo FAQs...');
-      const response = await axios.get('http://localhost:3001/api/public/faq?project=demo');
-      if (response.data.success && response.data.faqs.length > 0) {
-        setGeneratedFAQs(response.data.faqs);
-        success('Demo FAQs loaded! You can now review and edit them.');
-        setCurrentPage('app');
-        setCurrentStep('review');
-      } else {
-        error('No demo FAQs found. Please generate your own.');
-      }
-    } catch (err) {
-      console.error('Load demo error:', err);
-      error('Failed to load demo FAQs');
-    }
-  };
+          <Route path="/payment/cancel" element={
+            <PaymentCancel 
+              onBack={() => window.location.href = '/dashboard'}
+              onRetry={() => window.location.href = '/upgrade'}
+            />
+          } />
 
-  const handleBackToHome = () => {
-    setCurrentPage('landing');
-  };
+          <Route path="/subscription" element={
+            <ProtectedRoute>
+              <SubscriptionManagement 
+                onBack={() => window.location.href = '/dashboard'}
+                onUpgrade={handleUpgrade}
+              />
+            </ProtectedRoute>
+          } />
+
+          {/* App Routes (Multi-step Process) */}
+          <Route path="/app" element={
+            <ProtectedRoute>
+              <AppMain 
+                user={user!}
+                onLogout={handleLogout}
+              />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/app/upload" element={
+            <ProtectedRoute>
+              <AppMain 
+                user={user!}
+                onLogout={handleLogout}
+                initialStep="upload"
+              />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/app/generate" element={
+            <ProtectedRoute>
+              <AppMain 
+                user={user!}
+                onLogout={handleLogout}
+                initialStep="generate"
+              />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/app/review" element={
+            <ProtectedRoute>
+              <AppMain 
+                user={user!}
+                onLogout={handleLogout}
+                initialStep="review"
+              />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/app/embed" element={
+            <ProtectedRoute>
+              <AppMain 
+                user={user!}
+                onLogout={handleLogout}
+                initialStep="embed"
+              />
+            </ProtectedRoute>
+          } />
+
+          {/* Widget Routes */}
+          <Route path="/widget" element={<WidgetPage />} />
+
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+        
+        <ToastContainer toasts={toasts} onRemove={removeToast} />
+      </div>
+    </Router>
+  );
+}
+
+// App Main Component (Multi-step Process)
+interface AppMainProps {
+  user: User;
+  onLogout: () => void;
+  initialStep?: Step;
+}
+
+const AppMain: React.FC<AppMainProps> = ({ initialStep = 'upload' }) => {
+  const [currentStep, setCurrentStep] = useState<Step>(initialStep);
+  const [extractedContent, setExtractedContent] = useState('');
+  const [generatedFAQs, setGeneratedFAQs] = useState<FAQ[]>([]);
+  const [currentProject] = useState<string | null>(null);
+  const { success, error, info } = useToast();
+
+  const steps: { id: Step; label: string; number: number }[] = [
+    { id: 'upload', label: 'Add Sources', number: 1 },
+    { id: 'generate', label: 'Generate', number: 2 },
+    { id: 'review', label: 'Review & Publish', number: 3 },
+    { id: 'embed', label: 'Embed', number: 4 },
+  ];
+
+  const currentStepIndex = steps.findIndex(s => s.id === currentStep);
 
   const handleContentExtracted = (content: string) => {
     setExtractedContent(content);
     success('Content extracted successfully!');
     setCurrentStep('generate');
+    window.history.pushState({}, '', '/app/generate');
   };
 
   const handleFAQsGenerated = (faqs: FAQ[]) => {
     setGeneratedFAQs(faqs);
     success(`Generated ${faqs.length} FAQs successfully!`);
     setCurrentStep('review');
+    window.history.pushState({}, '', '/app/review');
   };
 
   const handleFAQsPublished = () => {
     success('FAQs published successfully!');
     setCurrentStep('embed');
+    window.history.pushState({}, '', '/app/embed');
   };
 
-  // Handle navigation
-  React.useEffect(() => {
-    // Only handle specific routes that need URL-based navigation
-    const initialPath = window.location.pathname;
-    if (initialPath === '/payment/success') {
-      setCurrentPage('payment-success');
-    } else if (initialPath === '/payment/cancel') {
-      setCurrentPage('payment-cancel');
-    }
+  const handleBackToHome = () => {
+    window.location.href = '/';
+  };
 
-    const handleNavigation = (e: PopStateEvent) => {
-      e.preventDefault();
-      const path = window.location.pathname;
-      if (path === '/privacy') setCurrentPage('privacy');
-      else if (path === '/terms') setCurrentPage('terms');
-      else if (path === '/contact') setCurrentPage('contact');
-      else if (path === '/demo') setCurrentPage('demo');
-      else if (path === '/payment/success') setCurrentPage('payment-success');
-      else if (path === '/payment/cancel') setCurrentPage('payment-cancel');
-      else if (path === '/pricing') setCurrentPage('pricing');
-      else if (path === '/login') setCurrentPage('login');
-      else if (path === '/signup') setCurrentPage('signup');
-      else if (path === '/dashboard') setCurrentPage('dashboard');
-      else if (path === '/upgrade') setCurrentPage('upgrade');
-      else if (path === '/checkout') setCurrentPage('checkout');
-      else setCurrentPage('landing');
-    };
-
-    window.addEventListener('popstate', handleNavigation);
-    return () => window.removeEventListener('popstate', handleNavigation);
-  }, []);
-
-  // Handle link clicks for legal pages
-  React.useEffect(() => {
-    const handleLinkClick = (e: MouseEvent) => {
-      const target = e.target as HTMLAnchorElement;
-      if (target.tagName === 'A' && target.hostname === window.location.hostname) {
-        e.preventDefault();
-        const path = target.pathname;
-        if (path === '/privacy') {
-          setCurrentPage('privacy');
-          window.history.pushState({}, '', '/privacy');
-        } else if (path === '/terms') {
-          setCurrentPage('terms');
-          window.history.pushState({}, '', '/terms');
-        } else if (path === '/contact') {
-          setCurrentPage('contact');
-          window.history.pushState({}, '', '/contact');
-        } else if (path === '/demo') {
-          setCurrentPage('demo');
-          window.history.pushState({}, '', '/demo');
-        } else if (path === '/pricing') {
-          setCurrentPage('pricing');
-          window.history.pushState({}, '', '/pricing');
-        }
-      }
-    };
-
-    document.addEventListener('click', handleLinkClick);
-    return () => document.removeEventListener('click', handleLinkClick);
-  }, []);
-
-  // Render pages
-  if (currentPage === 'privacy') {
-    return <PrivacyPolicy onBack={handleBackToHome} />;
-  }
-
-  if (currentPage === 'terms') {
-    return <TermsOfService onBack={handleBackToHome} />;
-  }
-
-  if (currentPage === 'contact') {
-    return <ContactPage onBack={handleBackToHome} />;
-  }
-
-  if (currentPage === 'demo') {
-    return <DemoPage onNavigateToApp={handleGetStarted} />;
-  }
-
-  if (currentPage === 'pricing') {
-    return <PricingPage onNavigateToApp={handleGetStarted} />;
-  }
-
-  if (currentPage === 'login') {
-    return (
-      <LoginPage
-        onLogin={handleLogin}
-        onNavigateToSignup={handleNavigateToSignup}
-        onNavigateToHome={() => setCurrentPage('landing')}
-      />
-    );
-  }
-
-  if (currentPage === 'signup') {
-    return (
-      <SignupPage
-        onSignup={handleSignup}
-        onNavigateToLogin={handleNavigateToLogin}
-        onNavigateToHome={() => setCurrentPage('landing')}
-      />
-    );
-  }
-
-      if (currentPage === 'dashboard') {
-        if (!user) {
-          setCurrentPage('landing');
-          return null;
-        }
-        return (
-          <Dashboard
-            user={user}
-            onLogout={handleLogout}
-            onNavigateToProject={handleNavigateToProject}
-            onViewProjectDetails={handleViewProjectDetails}
-            onNavigateToHome={() => setCurrentPage('landing')}
-            onNavigateToUpgrade={handleNavigateToUpgrade}
-            onNavigateToSubscriptionManagement={handleNavigateToSubscriptionManagement}
-          />
-        );
-      }
-
-      if (currentPage === 'project-details') {
-        if (!user || !selectedProject) {
-          setCurrentPage('dashboard');
-          return null;
-        }
-        return (
-          <ProjectDetails
-            projectId={selectedProject.id}
-            onBack={handleBackToDashboard}
-            onEditProject={handleProjectUpdated}
-          />
-        );
-      }
-
-      if (currentPage === 'upgrade') {
-        if (!user) {
-          setCurrentPage('landing');
-          return null;
-        }
-        return (
-          <UpgradePage
-            onBack={() => setCurrentPage('dashboard')}
-            onUpgrade={handleUpgrade}
-          />
-        );
-      }
-
-      if (currentPage === 'checkout') {
-        if (!user || !checkoutPlan) {
-          setCurrentPage('upgrade');
-          return null;
-        }
-        return (
-          <CheckoutPage
-            plan={checkoutPlan}
-            interval={checkoutInterval}
-            onBack={handleBackToUpgrade}
-            onPaymentSuccess={handlePaymentSuccess}
-            onPaymentCancel={handlePaymentCancel}
-          />
-        );
-      }
-
-      if (currentPage === 'payment-success') {
-        return (
-          <PaymentSuccess
-            onBack={() => setCurrentPage('dashboard')}
-            onRefreshUser={refreshUserData}
-          />
-        );
-      }
-
-      if (currentPage === 'payment-cancel') {
-        return (
-          <PaymentCancel
-            onBack={() => setCurrentPage('dashboard')}
-            onRetry={() => setCurrentPage('upgrade')}
-          />
-        );
-      }
-
-      if (currentPage === 'subscription-management') {
-        if (!user) {
-          setCurrentPage('login');
-          return null;
-        }
-        return (
-          <SubscriptionManagement
-            onBack={() => setCurrentPage('dashboard')}
-            onUpgrade={handleUpgrade}
-          />
-        );
-      }
-
-  // Render landing page
-  if (currentPage === 'landing') {
-    return (
-      <>
-        <LandingPage 
-          onGetStarted={handleGetStarted} 
-          onLoadDemo={handleLoadDemo}
-          onNavigateToLogin={handleNavigateToLogin}
-          onNavigateToSignup={handleNavigateToSignup}
-        />
-        <ToastContainer toasts={toasts} onRemove={removeToast} />
-      </>
-    );
-  }
-
-  // Render main app
   return (
     <div className="min-h-screen bg-slate-50">
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
-      
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -520,14 +514,13 @@ function App() {
                 <GeneratorPanel
                   content={extractedContent}
                   onFAQsGenerated={handleFAQsGenerated}
-                  toast={{ success, error, info }}
                 />
               )}
               {currentStep === 'review' && (
                 <FAQEditor
                   initialFAQs={generatedFAQs}
                   onPublish={handleFAQsPublished}
-                  projectId={currentProject}
+                  projectId={currentProject || undefined}
                   toast={{ success, error, info }}
                 />
               )}
@@ -539,8 +532,7 @@ function App() {
               <TrialStatus 
                 project={currentProject || "default"} 
                 onUpgrade={() => {
-                  // TODO: Implement upgrade flow
-                  info('Upgrade functionality coming soon!');
+                  window.location.href = '/upgrade';
                 }}
               />
             </div>
@@ -549,6 +541,27 @@ function App() {
       </main>
     </div>
   );
-}
+};
+
+// Widget Page Component
+const WidgetPage: React.FC = () => {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-3xl font-bold text-slate-900 mb-8">FAQ Widget Demo</h1>
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <iframe
+            src={`${window.location.origin}/widget?project=demo`}
+            width="100%"
+            height="600"
+            frameBorder="0"
+            title="FAQ Widget Demo"
+            className="rounded-lg"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default App;

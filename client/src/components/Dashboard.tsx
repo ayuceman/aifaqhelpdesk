@@ -21,6 +21,7 @@ interface User {
   plan: string;
   trialStartDate?: string;
   trialEndDate?: string;
+  trialPlanId?: string;
   subscriptionStatus?: string;
   subscriptionStartDate?: string;
   subscriptionEndDate?: string;
@@ -44,7 +45,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   onLogout, 
   onNavigateToProject, 
   onViewProjectDetails,
-  onNavigateToHome,
+  onNavigateToHome: _onNavigateToHome,
   onNavigateToUpgrade,
   onNavigateToSubscriptionManagement
 }) => {
@@ -188,13 +189,18 @@ const Dashboard: React.FC<DashboardProps> = ({
                         {getSubscriptionStatusDisplay(user.subscriptionStatus)}
                       </span>
                     )}
+                    {user.plan === 'trial' && user.trialEndDate && (
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                        Trial: {Math.ceil((new Date(user.trialEndDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days left
+                      </span>
+                    )}
                   </div>
-                  {onNavigateToUpgrade && user.plan === 'free' && (
+                  {onNavigateToUpgrade && (user.plan === 'free' || user.plan === 'trial') && (
                     <button
                       onClick={onNavigateToUpgrade}
                       className="bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
                     >
-                      Upgrade
+                      {user.plan === 'trial' ? 'Upgrade Now' : 'Upgrade'}
                     </button>
                   )}
                   {onNavigateToSubscriptionManagement && user.plan !== 'free' && (

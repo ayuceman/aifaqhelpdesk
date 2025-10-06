@@ -6,6 +6,7 @@ interface FAQ {
   question: string;
   answer: string;
   created_at: string;
+  category?: string;
 }
 
 interface Project {

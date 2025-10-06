@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface TermsOfServiceProps {
   onBack: () => void;
@@ -18,10 +19,10 @@ const TermsOfService: React.FC<TermsOfServiceProps> = ({ onBack }) => {
               <span className="text-xl font-bold text-slate-900">FAQ Generator</span>
             </div>
             <div className="flex items-center space-x-6">
-              <a href="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</a>
-              <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
-              <a href="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</a>
-              <a href="/privacy" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Privacy</a>
+              <Link to="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</Link>
+              <Link to="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</Link>
+              <Link to="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</Link>
+              <Link to="/privacy" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Privacy</Link>
               <button
                 onClick={onBack}
                 className="btn-ghost"

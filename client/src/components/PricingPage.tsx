@@ -1,12 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 interface PricingPageProps {
   onNavigateToApp?: () => void;
+  onUpgrade?: (plan: any, interval: 'month' | 'year') => void;
+  onStartTrial?: (plan: any) => void;
 }
 
-const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
-  const plans = [
+const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp, onUpgrade: _onUpgrade, onStartTrial }) => {
+  const [plans, setPlans] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/payment/plans');
+        const data = await response.json();
+        if (data.success) {
+          setPlans(data.plans);
+        }
+      } catch (error) {
+        console.error('Failed to fetch plans:', error);
+        // Fallback to default plans if API fails
+        setPlans(defaultPlans);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  const defaultPlans = [
     {
+      id: 'free',
       name: 'Free',
       price: 0,
       period: 'forever',
@@ -29,6 +56,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
       ctaVariant: 'secondary' as const
     },
     {
+      id: 'starter',
       name: 'Starter',
       price: 19,
       period: 'month',
@@ -50,6 +78,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
       ctaVariant: 'secondary' as const
     },
     {
+      id: 'professional',
       name: 'Professional',
       price: 49,
       period: 'month',
@@ -71,6 +100,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
       ctaVariant: 'primary' as const
     },
     {
+      id: 'enterprise',
       name: 'Enterprise',
       price: 149,
       period: 'month',
@@ -143,12 +173,12 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
               >
                 Get Started
               </button>
-              <a href="/demo" className="text-slate-600 hover:text-slate-900 transition-colors">
+              <Link to="/demo" className="text-slate-600 hover:text-slate-900 transition-colors">
                 Demo
-              </a>
-              <a href="/contact" className="text-slate-600 hover:text-slate-900 transition-colors">
+              </Link>
+              <Link to="/contact" className="text-slate-600 hover:text-slate-900 transition-colors">
                 Contact
-              </a>
+              </Link>
             </nav>
           </div>
         </div>
@@ -190,17 +220,23 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
       {/* Pricing Cards */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {plans.map((plan, index) => (
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-slate-600">Loading plans...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+             {plans.map((plan) => (
               <div
                 key={plan.name}
                 className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl ${
-                  plan.popular
+                  plan.id === 'professional'
                     ? 'border-blue-500 transform scale-105'
                     : 'border-slate-200 hover:border-slate-300'
                 }`}
               >
-                {plan.popular && (
+                {plan.id === 'professional' && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
                       Most Popular
@@ -214,24 +250,31 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
                     <p className="text-slate-600 mb-6">{plan.description}</p>
                     <div className="mb-6">
                       <span className="text-5xl font-bold text-slate-900">${plan.price}</span>
-                      <span className="text-slate-600">/{plan.period}</span>
+                      <span className="text-slate-600">/{plan.interval || 'month'}</span>
                     </div>
                     <button
                       className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
-                        plan.ctaVariant === 'primary'
+                        plan.id === 'professional'
                           ? 'bg-blue-500 text-white hover:bg-blue-600'
                           : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
                       }`}
-                      onClick={onNavigateToApp}
+                      onClick={() => {
+                        if (plan.id === 'free') {
+                          onNavigateToApp?.();
+                        } else {
+                          // For paid plans, start a trial instead of going to checkout
+                          onStartTrial?.(plan);
+                        }
+                      }}
                     >
-                      {plan.cta}
+                      {plan.id === 'free' ? 'Get Started Free' : 'Start Free Trial'}
                     </button>
                   </div>
 
                   <div className="space-y-4">
                     <h4 className="font-semibold text-slate-900 mb-3">What's included:</h4>
                     <ul className="space-y-3">
-                      {plan.features.map((feature, featureIndex) => (
+                      {plan.features.map((feature: string, featureIndex: number) => (
                         <li key={featureIndex} className="flex items-start">
                           <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -242,25 +285,11 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
                     </ul>
                   </div>
 
-                  {plan.limitations.length > 0 && (
-                    <div className="mt-6 pt-6 border-t border-slate-200">
-                      <h4 className="font-semibold text-slate-900 mb-3">Limitations:</h4>
-                      <ul className="space-y-2">
-                        {plan.limitations.map((limitation, limitationIndex) => (
-                          <li key={limitationIndex} className="flex items-start">
-                            <svg className="w-4 h-4 text-slate-400 mr-3 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                            <span className="text-slate-500 text-sm">{limitation}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -386,12 +415,12 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
             >
               Start Free Trial
             </button>
-            <a
-              href="/contact"
+            <Link
+              to="/contact"
               className="btn-secondary border-white text-white hover:bg-white hover:text-blue-600"
             >
               Contact Sales
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -409,24 +438,24 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp }) => {
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-slate-400">
-                <li><a href="/demo" className="hover:text-white transition-colors">Demo</a></li>
-                <li><a href="/pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="/features" className="hover:text-white transition-colors">Features</a></li>
+                <li><Link to="/demo" className="hover:text-white transition-colors">Demo</Link></li>
+                <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link to="/features" className="hover:text-white transition-colors">Features</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-slate-400">
-                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="/help" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="/docs" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                <li><Link to="/help" className="hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link to="/docs" className="hover:text-white transition-colors">Documentation</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-slate-400">
-                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
               </ul>
             </div>
           </div>

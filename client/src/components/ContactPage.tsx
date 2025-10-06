@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface ContactPageProps {
   onBack: () => void;
@@ -74,10 +75,10 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               <span className="text-xl font-bold text-slate-900">FAQ Generator</span>
             </div>
             <div className="flex items-center space-x-6">
-              <a href="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</a>
-              <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
-              <a href="/privacy" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Privacy</a>
-              <a href="/terms" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Terms</a>
+              <Link to="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</Link>
+              <Link to="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</Link>
+              <Link to="/privacy" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Privacy</Link>
+              <Link to="/terms" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Terms</Link>
               <button
                 onClick={onBack}
                 className="btn-ghost"
@@ -332,27 +333,27 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="/demo" className="hover:text-white transition-colors">Demo</a></li>
-                <li><a href="/" className="hover:text-white transition-colors">Get Started</a></li>
-                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
+                <li><Link to="/demo" className="hover:text-white transition-colors">Demo</Link></li>
+                <li><Link to="/" className="hover:text-white transition-colors">Get Started</Link></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="/terms" className="hover:text-white transition-colors">Terms</a></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
+                <li><Link to="/terms" className="hover:text-white transition-colors">Terms</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="/contact" className="hover:text-white transition-colors">Contact Support</a></li>
-                <li><a href="/demo" className="hover:text-white transition-colors">Live Demo</a></li>
-                <li><a href="/" className="hover:text-white transition-colors">Get Started</a></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Contact Support</Link></li>
+                <li><Link to="/demo" className="hover:text-white transition-colors">Live Demo</Link></li>
+                <li><Link to="/" className="hover:text-white transition-colors">Get Started</Link></li>
               </ul>
             </div>
           </div>

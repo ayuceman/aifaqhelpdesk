@@ -2,14 +2,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   CreditCardIcon, 
-  CalendarIcon, 
   CheckCircleIcon, 
   XCircleIcon,
   ArrowPathIcon,
   ExclamationTriangleIcon,
   ShieldCheckIcon,
-  ChartBarIcon,
-  CogIcon
+  ChartBarIcon
 } from '@heroicons/react/24/outline';
 
 interface Subscription {

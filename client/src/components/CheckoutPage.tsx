@@ -38,7 +38,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
   onPaymentSuccess,
   onPaymentCancel
 }) => {
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [, setIsProcessing] = useState(false);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
   const paypalRef = useRef<HTMLDivElement>(null);
   const { success, error, toasts, removeToast } = useToast();
@@ -80,7 +80,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
           height: 45,
           layout: 'vertical'
         },
-        createOrder: async (data: any, actions: any) => {
+        createOrder: async (_data: any, _actions: any) => {
           try {
             setIsProcessing(true);
             const token = localStorage.getItem('token');
@@ -110,7 +110,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
             setIsProcessing(false);
           }
         },
-        onApprove: async (data: any, actions: any) => {
+        onApprove: async (_data: any, _actions: any) => {
           try {
             setIsProcessing(true);
             const token = localStorage.getItem('token');
@@ -121,7 +121,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 'Authorization': `Bearer ${token}`
               },
               body: JSON.stringify({
-                orderId: data.orderID,
+                orderId: _data.orderID,
                 planId: plan.id,
                 interval
               })

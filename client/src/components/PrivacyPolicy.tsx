@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface PrivacyPolicyProps {
   onBack: () => void;
@@ -18,10 +19,10 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onBack }) => {
               <span className="text-xl font-bold text-slate-900">FAQ Generator</span>
             </div>
             <div className="flex items-center space-x-6">
-              <a href="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</a>
-              <a href="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</a>
-              <a href="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</a>
-              <a href="/terms" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Terms</a>
+              <Link to="/" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Home</Link>
+              <Link to="/demo" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Demo</Link>
+              <Link to="/contact" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Contact</Link>
+              <Link to="/terms" className="text-slate-600 hover:text-slate-900 font-medium transition-colors">Terms</Link>
               <button
                 onClick={onBack}
                 className="btn-ghost"

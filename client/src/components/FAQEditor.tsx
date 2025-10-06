@@ -21,7 +21,7 @@ interface FAQEditorProps {
 export const FAQEditor: React.FC<FAQEditorProps> = ({ initialFAQs, onPublish, projectId, toast }) => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [, _setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialFAQs && initialFAQs.length > 0) {
