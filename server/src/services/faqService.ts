@@ -278,38 +278,79 @@ export class FAQService {
     return csvRows.join('\n');
   }
 
-  async createFAQ(projectId: string, question: string, answer: string) {
+  async createFAQ(faqData: { projectId: string; question: string; answer: string; category?: string }) {
     const faqId = databaseService.generateId();
     
     // Create FAQ
     databaseService.createFAQ({
       id: faqId,
-      projectId,
-      question,
-      answer
+      projectId: faqData.projectId,
+      question: faqData.question,
+      answer: faqData.answer
     });
 
     // Generate embedding
-    const combinedText = `${question} ${answer}`;
+    const combinedText = `${faqData.question} ${faqData.answer}`;
     const embeddingResponse = await llmService.generateEmbedding(combinedText);
     
     databaseService.createEmbedding({
       id: databaseService.generateId(),
-      projectId,
+      projectId: faqData.projectId,
       text: combinedText,
       embedding: embeddingResponse.embedding,
       faqId
     });
 
     // Update usage count
-    const usage = databaseService.getProjectUsage(projectId);
+    const usage = databaseService.getProjectUsage(faqData.projectId);
     if (usage) {
-      databaseService.updateProjectUsage(projectId, {
+      databaseService.updateProjectUsage(faqData.projectId, {
         faqCount: (usage.faq_count || 0) + 1
       });
     }
 
-    return databaseService.getFAQsByProjectId(projectId).find(faq => faq.id === faqId);
+    return databaseService.getFAQsByProjectId(faqData.projectId).find(faq => faq.id === faqId);
+  }
+
+  // Bulk create FAQs for better performance
+  async bulkCreateFAQs(projectId: string, faqs: Array<{ question: string; answer: string; category?: string }>) {
+    const createdFAQs = [];
+    
+    try {
+      // Process FAQs in batches to avoid overwhelming the system
+      const batchSize = 5;
+      for (let i = 0; i < faqs.length; i += batchSize) {
+        const batch = faqs.slice(i, i + batchSize);
+        
+        // Process batch concurrently
+        const batchPromises = batch.map(async (faq) => {
+          try {
+            return await this.createFAQ({
+              projectId,
+              question: faq.question,
+              answer: faq.answer,
+              category: faq.category
+            });
+          } catch (error) {
+            console.error('Error creating FAQ:', error);
+            return null;
+          }
+        });
+        
+        const batchResults = await Promise.all(batchPromises);
+        createdFAQs.push(...batchResults.filter(faq => faq !== null));
+        
+        // Small delay between batches to prevent overwhelming the system
+        if (i + batchSize < faqs.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+      
+      return createdFAQs;
+    } catch (error) {
+      console.error('Bulk FAQ creation error:', error);
+      throw error;
+    }
   }
 
   async updateFAQ(faqId: string, question: string, answer: string) {

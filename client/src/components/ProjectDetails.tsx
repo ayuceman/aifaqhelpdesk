@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ContentManager from './ContentManager';
 
 interface FAQ {
   id: string;
@@ -57,6 +58,15 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [selectedFAQs, setSelectedFAQs] = useState<string[]>([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [bulkCategory, setBulkCategory] = useState('');
+  const [showBulkEditModal, setShowBulkEditModal] = useState(false);
+  const [bulkEditCategory, setBulkEditCategory] = useState('');
+  const [bulkEditPrefix, setBulkEditPrefix] = useState('');
+  const [bulkEditSuffix, setBulkEditSuffix] = useState('');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [gridEditingFAQ, setGridEditingFAQ] = useState<string | null>(null);
+  const [editingData, setEditingData] = useState<{question: string, answer: string, category: string}>({question: '', answer: '', category: ''});
+  const [activeTab, setActiveTab] = useState<'faqs' | 'content'>('faqs');
 
   useEffect(() => {
     fetchProjectDetails();
@@ -261,6 +271,116 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
     }
   };
 
+  const handleBulkCategoryUpdate = async () => {
+    if (selectedFAQs.length === 0 || !bulkCategory) return;
+    
+    if (!confirm(`Are you sure you want to update the category for ${selectedFAQs.length} FAQs to "${bulkCategory}"?`)) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`http://localhost:3001/api/faq/${projectId}/bulk-operations`, {
+        operation: 'update',
+        faqIds: selectedFAQs,
+        data: { category: bulkCategory }
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.success) {
+        setSelectedFAQs([]);
+        setBulkCategory('');
+        fetchFAQs();
+        fetchCategories();
+        alert(`Successfully updated category for ${response.data.processed} FAQs`);
+      }
+    } catch (error: any) {
+      console.error('Error bulk updating FAQ categories:', error);
+      alert(error.response?.data?.error || 'Failed to update FAQ categories');
+    }
+  };
+
+  const handleBulkEditApply = async () => {
+    if (selectedFAQs.length === 0) return;
+    
+    const changes = [];
+    if (bulkEditCategory) changes.push(`category to "${bulkEditCategory}"`);
+    if (bulkEditPrefix) changes.push(`add prefix "${bulkEditPrefix}" to questions`);
+    if (bulkEditSuffix) changes.push(`add suffix "${bulkEditSuffix}" to answers`);
+    
+    if (changes.length === 0) {
+      alert('Please select at least one change to apply');
+      return;
+    }
+    
+    if (!confirm(`Are you sure you want to apply these changes to ${selectedFAQs.length} FAQs?\n\n${changes.join('\n')}`)) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`http://localhost:3001/api/faq/${projectId}/bulk-operations`, {
+        operation: 'bulk-edit',
+        faqIds: selectedFAQs,
+        data: {
+          category: bulkEditCategory || undefined,
+          questionPrefix: bulkEditPrefix || undefined,
+          answerSuffix: bulkEditSuffix || undefined
+        }
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.success) {
+        setSelectedFAQs([]);
+        setBulkEditCategory('');
+        setBulkEditPrefix('');
+        setBulkEditSuffix('');
+        setShowBulkEditModal(false);
+        fetchFAQs();
+        fetchCategories();
+        alert(`Successfully applied changes to ${response.data.processed} FAQs`);
+      }
+    } catch (error: any) {
+      console.error('Error bulk editing FAQs:', error);
+      alert(error.response?.data?.error || 'Failed to apply bulk edits');
+    }
+  };
+
+  const handleStartEdit = (faq: any) => {
+    setGridEditingFAQ(faq.id);
+    setEditingData({
+      question: faq.question,
+      answer: faq.answer,
+      category: faq.category || ''
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setGridEditingFAQ(null);
+    setEditingData({question: '', answer: '', category: ''});
+  };
+
+  const handleSaveEdit = async (faqId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(`http://localhost:3001/api/faq/${faqId}`, {
+        question: editingData.question,
+        answer: editingData.answer,
+        category: editingData.category
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.success) {
+        setGridEditingFAQ(null);
+        setEditingData({question: '', answer: '', category: ''});
+        fetchFAQs();
+        fetchCategories();
+      }
+    } catch (error: any) {
+      console.error('Error updating FAQ:', error);
+      alert(error.response?.data?.error || 'Failed to update FAQ');
+    }
+  };
+
   const handleExport = async (format: string) => {
     try {
       const token = localStorage.getItem('token');
@@ -402,18 +522,113 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
           </div>
         </div>
 
-        {/* Professional Admin Header */}
+        {/* Tab Navigation */}
         <div className="bg-white border border-slate-200 rounded-lg shadow-sm mb-6">
-          {/* Header Section */}
-          <div className="px-6 py-4 border-b border-slate-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-slate-900">FAQ Management</h2>
-                <p className="text-sm text-slate-600 mt-1">
-                  Manage and organize your knowledge base ({totalFAQs} total FAQs)
-                </p>
-              </div>
+          <div className="border-b border-slate-200">
+            <nav className="flex space-x-8 px-6" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab('faqs')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'faqs'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>FAQs ({totalFAQs})</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('content')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'content'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Content Sources</span>
+                </div>
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* Content Management Tab */}
+        {activeTab === 'content' && (
+          <div className="mb-6">
+            <ContentManager
+              projectId={projectId}
+              onContentAdded={(content) => {
+                console.log('Content added:', content);
+              }}
+              onFAQsGenerated={(faqs) => {
+                console.log('FAQs generated:', faqs);
+                fetchFAQs();
+                if (project) {
+                  setProject({ ...project, faq_count: project.faq_count + faqs.length });
+                }
+              }}
+              toast={{
+                success: (message) => alert(`Success: ${message}`),
+                error: (message) => alert(`Error: ${message}`),
+                info: (message) => console.log(`Info: ${message}`)
+              }}
+            />
+          </div>
+        )}
+
+        {/* FAQ Management Tab */}
+        {activeTab === 'faqs' && (
+          <>
+            {/* Professional Admin Header */}
+            <div className="bg-white border border-slate-200 rounded-lg shadow-sm mb-6">
+              {/* Header Section */}
+              <div className="px-6 py-4 border-b border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-slate-900">FAQ Management</h2>
+                    <p className="text-sm text-slate-600 mt-1">
+                      Manage and organize your knowledge base ({totalFAQs} total FAQs)
+                    </p>
+                  </div>
               <div className="flex items-center gap-3">
+                {/* View Mode Toggle */}
+                <div className="flex items-center bg-slate-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                      viewMode === 'table'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0V4a2 2 0 012-2h14a2 2 0 012 2v16a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                    </svg>
+                    Table
+                  </button>
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                      viewMode === 'grid'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    Grid
+                  </button>
+                </div>
+
                 <button
                   onClick={() => setShowAnalytics(!showAnalytics)}
                   className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -533,15 +748,50 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
                     {selectedFAQs.length} of {faqs.length} FAQs selected
                   </span>
                   {selectedFAQs.length > 0 && (
-                    <button
-                      onClick={handleBulkDelete}
-                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      Delete Selected
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleBulkDelete}
+                        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete Selected
+                      </button>
+                      
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={bulkCategory}
+                          onChange={(e) => setBulkCategory(e.target.value)}
+                          className="text-sm border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">Set Category</option>
+                          {categories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={handleBulkCategoryUpdate}
+                          disabled={!bulkCategory}
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                          </svg>
+                          Update Category
+                        </button>
+                        
+                        <button
+                          onClick={() => setShowBulkEditModal(true)}
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          Advanced Edit
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -711,9 +961,10 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
             </div>
           ) : (
             <div>
-              {/* Table */}
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200">
+              {viewMode === 'table' ? (
+                /* Table View */
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-slate-200">
                   <thead className="bg-slate-50">
                     <tr>
                       {showBulkActions && (
@@ -813,8 +1064,117 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                  </table>
+                </div>
+              ) : (
+                /* Grid View */
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-6">
+                  {faqs.map((faq) => (
+                    <div key={faq.id} className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      {gridEditingFAQ === faq.id ? (
+                        /* Edit Mode */
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                              Question
+                            </label>
+                            <textarea
+                              value={editingData.question}
+                              onChange={(e) => setEditingData({...editingData, question: e.target.value})}
+                              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                              rows={2}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                              Answer
+                            </label>
+                            <textarea
+                              value={editingData.answer}
+                              onChange={(e) => setEditingData({...editingData, answer: e.target.value})}
+                              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                              rows={3}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                              Category
+                            </label>
+                            <select
+                              value={editingData.category}
+                              onChange={(e) => setEditingData({...editingData, category: e.target.value})}
+                              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                            >
+                              <option value="">No category</option>
+                              {categories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="flex justify-end gap-2 pt-2">
+                            <button
+                              onClick={handleCancelEdit}
+                              className="px-3 py-1 text-sm text-slate-600 hover:text-slate-800"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => handleSaveEdit(faq.id)}
+                              className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        /* View Mode */
+                        <div>
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="text-sm font-medium text-slate-900 line-clamp-2">
+                              {faq.question}
+                            </h3>
+                            <div className="flex gap-1 ml-2">
+                              <button
+                                onClick={() => handleStartEdit(faq)}
+                                className="text-blue-600 hover:text-blue-800 p-1"
+                                title="Edit"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteFAQ(faq.id)}
+                                className="text-red-600 hover:text-red-800 p-1"
+                                title="Delete"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-sm text-slate-600 line-clamp-3 mb-3">
+                            {faq.answer}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            {faq.category ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {faq.category}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-slate-400">No category</span>
+                            )}
+                            <span className="text-xs text-slate-500">
+                              {new Date(faq.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
               
               {/* Professional Pagination */}
               {totalPages > 1 && (
@@ -897,6 +1257,8 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
             </div>
           )}
         </div>
+          </>
+        )}
       </main>
 
       {/* Edit Project Modal */}
@@ -1009,6 +1371,90 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
                 className="btn-primary"
               >
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Edit Modal */}
+      {showBulkEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">Bulk Edit FAQs</h3>
+              <button
+                onClick={() => setShowBulkEditModal(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>{selectedFAQs.length} FAQs</strong> selected for bulk editing
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Update Category
+                </label>
+                <select
+                  value={bulkEditCategory}
+                  onChange={(e) => setBulkEditCategory(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Keep current categories</option>
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Add Prefix to Questions
+                </label>
+                <input
+                  type="text"
+                  value={bulkEditPrefix}
+                  onChange={(e) => setBulkEditPrefix(e.target.value)}
+                  placeholder="e.g., 'FAQ: ' or 'Q: '"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Add Suffix to Answers
+                </label>
+                <input
+                  type="text"
+                  value={bulkEditSuffix}
+                  onChange={(e) => setBulkEditSuffix(e.target.value)}
+                  placeholder="e.g., ' - Contact support for more help'"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowBulkEditModal(false)}
+                className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkEditApply}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+              >
+                Apply Changes
               </button>
             </div>
           </div>

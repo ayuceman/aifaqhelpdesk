@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { FileParser } from '../services/fileParser';
 import { llmService } from '../services/llmService';
+import { databaseService } from '../services/databaseService';
 
 const router = express.Router();
 
@@ -55,6 +56,28 @@ router.post('/file', upload.single('file'), async (req, res) => {
     // Clean up uploaded file
     fs.unlinkSync(filePath);
 
+    // Also save to content sources database if projectId is provided
+    if (req.body.projectId) {
+      try {
+        const sourceId = databaseService.generateId();
+        databaseService.createContentSource({
+          id: sourceId,
+          projectId: req.body.projectId,
+          type: 'file',
+          name: filename,
+          content: parsedContent.text,
+          fileSize: req.file.size,
+          metadata: {
+            fileName: filename,
+            mimeType: req.file.mimetype,
+            ...parsedContent.metadata
+          }
+        });
+      } catch (error) {
+        console.log('Note: Could not save to content sources database:', error);
+      }
+    }
+
     res.json({
       success: true,
       content: parsedContent.text,
@@ -96,6 +119,29 @@ router.post('/url', async (req, res) => {
     const parsedContent = await FileParser.parseURL(url, crawlDepth);
 
     console.log(`[CRAWL] Success: ${parsedContent.text.length} chars extracted`);
+    
+    // Also save to content sources database if projectId is provided
+    if (req.body.projectId) {
+      try {
+        const sourceId = databaseService.generateId();
+        databaseService.createContentSource({
+          id: sourceId,
+          projectId: req.body.projectId,
+          type: 'url',
+          name: url,
+          content: parsedContent.text,
+          url: url,
+          metadata: {
+            url,
+            pagesCrawled: parsedContent.metadata?.pagesCrawled || 1,
+            crawlDepth: crawlDepth
+          }
+        });
+      } catch (error) {
+        console.log('Note: Could not save to content sources database:', error);
+      }
+    }
+    
     res.json({
       success: true,
       content: parsedContent.text,

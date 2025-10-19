@@ -47,7 +47,7 @@ class LLMService {
   async chat(messages: ChatMessage[]): Promise<LLMResponse> {
     try {
       const model = this.useOllama 
-        ? (process.env.OLLAMA_MODEL || 'llama3.2')
+        ? (process.env.OLLAMA_MODEL || 'qwen2.5:3b')
         : (process.env.LLM_MODEL || 'gpt-3.5-turbo');
 
       const response = await this.client.chat.completions.create({

@@ -118,6 +118,22 @@ export class DatabaseService {
       )
     `);
 
+    // Content sources table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS content_sources (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL,
+        type TEXT NOT NULL CHECK(type IN ('file', 'url')),
+        name TEXT NOT NULL,
+        content TEXT NOT NULL,
+        file_size INTEGER,
+        url TEXT,
+        metadata TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE
+      )
+    `);
+
     // Payment intents table
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS payment_intents (
@@ -172,6 +188,14 @@ export class DatabaseService {
       }
       if (!columnNames.includes('trial_plan_id')) {
         this.db.exec('ALTER TABLE users ADD COLUMN trial_plan_id TEXT');
+      }
+
+      // Check if category column exists in faqs table, if not add it
+      const faqColumns = this.db.pragma('table_info(faqs)') as any[];
+      const faqColumnNames = faqColumns.map(col => col.name);
+      
+      if (!faqColumnNames.includes('category')) {
+        this.db.exec('ALTER TABLE faqs ADD COLUMN category TEXT');
       }
     } catch (error) {
       console.log('Migration completed or no migration needed:', error);
@@ -484,6 +508,63 @@ export class DatabaseService {
   // Utility methods
   generateId(): string {
     return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+  }
+
+  // Content sources methods
+  createContentSource(sourceData: {
+    id: string;
+    projectId: string;
+    type: 'file' | 'url';
+    name: string;
+    content: string;
+    fileSize?: number;
+    url?: string;
+    metadata?: any;
+  }) {
+    const stmt = this.db.prepare(`
+      INSERT INTO content_sources (id, project_id, type, name, content, file_size, url, metadata, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    
+    return stmt.run(
+      sourceData.id,
+      sourceData.projectId,
+      sourceData.type,
+      sourceData.name,
+      sourceData.content,
+      sourceData.fileSize || null,
+      sourceData.url || null,
+      sourceData.metadata ? JSON.stringify(sourceData.metadata) : null,
+      new Date().toISOString()
+    );
+  }
+
+  getContentSources(projectId: string) {
+    const stmt = this.db.prepare('SELECT * FROM content_sources WHERE project_id = ? ORDER BY created_at DESC');
+    const sources = stmt.all(projectId) as any[];
+    
+    return sources.map(source => ({
+      ...source,
+      metadata: source.metadata ? JSON.parse(source.metadata) : null
+    }));
+  }
+
+  getContentSource(sourceId: string) {
+    const stmt = this.db.prepare('SELECT * FROM content_sources WHERE id = ?');
+    const source = stmt.get(sourceId) as any;
+    
+    if (source) {
+      return {
+        ...source,
+        metadata: source.metadata ? JSON.parse(source.metadata) : null
+      };
+    }
+    return null;
+  }
+
+  deleteContentSource(sourceId: string) {
+    const stmt = this.db.prepare('DELETE FROM content_sources WHERE id = ?');
+    return stmt.run(sourceId);
   }
 
   close() {
