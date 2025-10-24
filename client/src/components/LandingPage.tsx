@@ -47,13 +47,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
             </div>
             
             <h1 className="text-5xl lg:text-7xl font-extrabold text-white mb-8 leading-tight animate-fade-in">
-              Reduce Support Costs by
-              <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 text-transparent bg-clip-text">70% with AI-Powered FAQs</span>
+              Turn Your Docs Into
+              <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 text-transparent bg-clip-text">Instant AI-Powered Answers</span>
             </h1>
             
             <p className="text-xl lg:text-2xl text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed animate-fade-in">
-              Transform your knowledge base into intelligent, self-service support that works 24/7. 
-              <span className="block mt-2 text-blue-300 font-semibold">Save $50,000+ annually on customer support.</span>
+              Generate intelligent FAQs from your content in minutes. Embed a smart chatbot that answers customer questions 24/7.
+              <span className="block mt-2 text-blue-300 font-semibold">Reduce repetitive support tickets by 60-70%.</span>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-scale-in">
@@ -120,8 +120,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               <div className="text-slate-600 font-medium">Uptime SLA</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">70%</div>
-              <div className="text-slate-600 font-medium">Cost Reduction</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">60-70%</div>
+              <div className="text-slate-600 font-medium">Fewer Support Tickets</div>
             </div>
           </div>
         </div>
@@ -444,71 +444,111 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
         </div>
       </div>
 
-      {/* ROI Calculator Section */}
+      {/* Value Proposition Section */}
       <div className="py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">
-              Calculate Your ROI
+              Why AI FAQ Generator?
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              See how much you can save by automating customer support with AI
+              Transform your knowledge into instant, accurate answers for your customers
             </p>
           </div>
           
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-              <div className="grid md:grid-cols-2 gap-12">
-                <div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-6">Traditional Support</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center py-3 border-b">
-                      <span className="text-slate-600">3 Support Agents</span>
-                      <span className="font-bold text-slate-900">$180,000/yr</span>
-                    </div>
-                    <div className="flex justify-between items-center py-3 border-b">
-                      <span className="text-slate-600">Support Tools</span>
-                      <span className="font-bold text-slate-900">$12,000/yr</span>
-                    </div>
-                    <div className="flex justify-between items-center py-3 border-b">
-                      <span className="text-slate-600">Training & Overhead</span>
-                      <span className="font-bold text-slate-900">$18,000/yr</span>
-                    </div>
-                    <div className="flex justify-between items-center pt-4">
-                      <span className="text-lg font-bold text-slate-900">Total Annual Cost</span>
-                      <span className="text-2xl font-bold text-red-600">$210,000</span>
-                    </div>
-                  </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Benefit 1 */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Instant Answers</h3>
+              <p className="text-slate-600 mb-4">
+                Customers get immediate responses 24/7 without waiting for email or support tickets
+              </p>
+              <div className="text-3xl font-bold text-blue-600">0 sec</div>
+              <div className="text-sm text-slate-500">Average response time</div>
+            </div>
+
+            {/* Benefit 2 */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Reduce Support Load</h3>
+              <p className="text-slate-600 mb-4">
+                Handle 60-70% of common questions automatically, freeing your team for complex issues
+              </p>
+              <div className="text-3xl font-bold text-green-600">60-70%</div>
+              <div className="text-sm text-slate-500">Reduction in repetitive tickets</div>
+            </div>
+
+            {/* Benefit 3 */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Affordable & Scalable</h3>
+              <p className="text-slate-600 mb-4">
+                Start at just $39/month and handle unlimited questions as you grow
+              </p>
+              <div className="text-3xl font-bold text-purple-600">$39</div>
+              <div className="text-sm text-slate-500">Starting monthly price</div>
+            </div>
+          </div>
+
+          {/* Use Cases */}
+          <div className="mt-16 max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 md:p-12">
+            <h3 className="text-2xl font-bold text-slate-900 mb-8 text-center">Perfect For</h3>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
-                
                 <div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-6">With AI FAQ Generator</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center py-3 border-b">
-                      <span className="text-slate-600">1 Support Agent</span>
-                      <span className="font-bold text-slate-900">$60,000/yr</span>
-                    </div>
-                    <div className="flex justify-between items-center py-3 border-b">
-                      <span className="text-slate-600">AI FAQ Generator (Pro)</span>
-                      <span className="font-bold text-slate-900">$468/yr</span>
-                    </div>
-                    <div className="flex justify-between items-center py-3 border-b">
-                      <span className="text-slate-600">Training & Overhead</span>
-                      <span className="font-bold text-slate-900">$6,000/yr</span>
-                    </div>
-                    <div className="flex justify-between items-center pt-4">
-                      <span className="text-lg font-bold text-slate-900">Total Annual Cost</span>
-                      <span className="text-2xl font-bold text-green-600">$66,468</span>
-                    </div>
-                  </div>
+                  <h4 className="font-semibold text-slate-900 mb-2">SaaS Companies</h4>
+                  <p className="text-slate-600 text-sm">Answer product questions, onboarding, troubleshooting</p>
                 </div>
               </div>
-              
-              <div className="mt-12 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
-                <div className="text-center">
-                  <div className="text-sm font-semibold text-green-800 mb-2">ANNUAL SAVINGS</div>
-                  <div className="text-5xl font-bold text-green-600 mb-2">$143,532</div>
-                  <div className="text-lg text-green-700">68% cost reduction + 24/7 availability</div>
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-2">E-commerce</h4>
+                  <p className="text-slate-600 text-sm">Shipping, returns, product info, order status</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-2">Documentation Sites</h4>
+                  <p className="text-slate-600 text-sm">Turn docs into conversational Q&A instantly</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-2">Service Businesses</h4>
+                  <p className="text-slate-600 text-sm">Hours, pricing, booking, common questions</p>
                 </div>
               </div>
             </div>
@@ -656,7 +696,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
             Ready to Transform Your Support?
           </h2>
           <p className="text-xl text-slate-300 mb-12">
-            Join 10,000+ businesses saving an average of $143,000 annually with AI-powered support.
+            Join 10,000+ businesses reducing support workload with AI-powered FAQs.
             <span className="block mt-2 text-blue-300 font-semibold">Start your 14-day free trial today. No credit card required.</span>
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
