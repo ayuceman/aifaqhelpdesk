@@ -9,7 +9,7 @@ export class OpenAIProvider extends BaseAIProvider {
 
   constructor() {
     super();
-    const apiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY || 'dummy-key';
     this.chatModel = process.env.OPENAI_MODEL || process.env.LLM_MODEL || 'gpt-3.5-turbo';
     this.embeddingModel = process.env.OPENAI_EMBEDDING_MODEL || process.env.EMBEDDING_MODEL || 'text-embedding-3-small';
 
@@ -18,12 +18,12 @@ export class OpenAIProvider extends BaseAIProvider {
       baseURL: 'https://api.openai.com/v1',
     });
 
-    console.log(`[${this.name}] Initialized - Chat: ${this.chatModel}, Embedding: ${this.embeddingModel}`);
+    console.log(`[${this.name}] Initialized - Configured: ${this.isConfigured()}`);
   }
 
   isConfigured(): boolean {
     const apiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY;
-    return !!apiKey && apiKey !== 'your_openai_api_key_here';
+    return !!apiKey && apiKey !== 'your_openai_api_key_here' && apiKey !== 'dummy-key';
   }
 
   async chat(messages: ChatMessage[]): Promise<LLMResponse> {

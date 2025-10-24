@@ -14,11 +14,11 @@ export class HuggingFaceProvider extends BaseAIProvider {
     this.chatModel = process.env.HUGGINGFACE_MODEL || 'microsoft/phi-2';
     this.embeddingModel = process.env.HUGGINGFACE_EMBEDDING_MODEL || 'sentence-transformers/all-MiniLM-L6-v2';
 
-    console.log(`[${this.name}] Initialized - Chat: ${this.chatModel}, Embedding: ${this.embeddingModel}`);
+    console.log(`[${this.name}] Initialized - Configured: ${this.isConfigured()}`);
   }
 
   isConfigured(): boolean {
-    return !!this.apiKey && this.apiKey !== 'your_huggingface_api_key_here';
+    return !!this.apiKey && this.apiKey !== 'your_huggingface_api_key_here' && this.apiKey !== '';
   }
 
   async chat(messages: ChatMessage[]): Promise<LLMResponse> {

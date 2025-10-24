@@ -14,11 +14,11 @@ export class GeminiProvider extends BaseAIProvider {
     this.chatModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
     this.embeddingModel = process.env.GEMINI_EMBEDDING_MODEL || 'text-embedding-004';
 
-    console.log(`[${this.name}] Initialized - Chat: ${this.chatModel}, Embedding: ${this.embeddingModel}`);
+    console.log(`[${this.name}] Initialized - Configured: ${this.isConfigured()}`);
   }
 
   isConfigured(): boolean {
-    return !!this.apiKey && this.apiKey !== 'your_gemini_api_key_here';
+    return !!this.apiKey && this.apiKey !== 'your_gemini_api_key_here' && this.apiKey !== '';
   }
 
   async chat(messages: ChatMessage[]): Promise<LLMResponse> {
