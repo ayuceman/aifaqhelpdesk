@@ -1,5 +1,6 @@
-import OpenAI from 'openai';
+import { ProviderManager, AIProviderType } from './aiProviders/ProviderManager';
 
+// Re-export types for backward compatibility
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -23,48 +24,33 @@ export interface EmbeddingResponse {
 }
 
 class LLMService {
-  private client: OpenAI;
-  private useOllama: boolean;
+  private providerManager: ProviderManager;
 
   constructor() {
-    // Default to Ollama if no API key is provided
-    this.useOllama = !process.env.LLM_API_KEY || process.env.LLM_API_KEY === 'your_openai_api_key_here' || process.env.USE_OLLAMA === 'true';
-    
-    const apiKey = this.useOllama ? 'ollama' : process.env.LLM_API_KEY;
-    const baseURL = this.useOllama 
-      ? (process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1')
-      : (process.env.LLM_BASE_URL || 'https://api.openai.com/v1');
+    this.providerManager = new ProviderManager();
+    console.log(`LLM Service initialized with provider: ${this.providerManager.getActiveProviderName()}`);
+  }
 
-    this.client = new OpenAI({
-      apiKey,
-      baseURL,
-    });
+  // Get current provider info
+  getActiveProvider(): string {
+    return this.providerManager.getActiveProviderName();
+  }
 
-    console.log(`LLM Service initialized: ${this.useOllama ? 'Ollama (Local)' : 'OpenAI'}`);
-    console.log(`Base URL: ${baseURL}`);
+  getActiveProviderType(): AIProviderType {
+    return this.providerManager.getActiveProviderType();
+  }
+
+  getAvailableProviders(): Array<{ type: AIProviderType; name: string; configured: boolean }> {
+    return this.providerManager.getAvailableProviders();
+  }
+
+  setProvider(providerType: AIProviderType): boolean {
+    return this.providerManager.setActiveProvider(providerType);
   }
 
   async chat(messages: ChatMessage[]): Promise<LLMResponse> {
     try {
-      const model = this.useOllama 
-        ? (process.env.OLLAMA_MODEL || 'qwen2.5:3b')
-        : (process.env.LLM_MODEL || 'gpt-3.5-turbo');
-
-      const response = await this.client.chat.completions.create({
-        model,
-        messages,
-        temperature: 0.7,
-        max_tokens: this.useOllama ? 2000 : undefined, // Limit output for faster generation
-      });
-
-      return {
-        content: response.choices[0]?.message?.content || '',
-        usage: response.usage ? {
-          prompt_tokens: response.usage.prompt_tokens,
-          completion_tokens: response.usage.completion_tokens,
-          total_tokens: response.usage.total_tokens,
-        } : undefined,
-      };
+      return await this.providerManager.chat(messages);
     } catch (error) {
       console.error('LLM Chat Error:', error);
       throw new Error('Failed to generate response from LLM');
@@ -73,42 +59,7 @@ class LLMService {
 
   async generateEmbedding(text: string): Promise<EmbeddingResponse> {
     try {
-      const model = this.useOllama 
-        ? (process.env.OLLAMA_EMBEDDING_MODEL || 'nomic-embed-text')
-        : (process.env.EMBEDDING_MODEL || 'text-embedding-ada-002');
-
-      console.log(`[EMBEDDING] Using model: ${model}, Ollama: ${this.useOllama}`);
-
-      // Use native Ollama API for embeddings (OpenAI-compatible API has issues)
-      if (this.useOllama) {
-        const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1';
-        const ollamaApiUrl = ollamaBaseUrl.replace('/v1', '/api/embeddings');
-        
-        const axios = require('axios');
-        const response = await axios.post(ollamaApiUrl, {
-          model,
-          prompt: text
-        });
-
-        return {
-          embedding: response.data.embedding || [],
-          usage: undefined,
-        };
-      }
-
-      // Use OpenAI API for non-Ollama models
-      const response = await this.client.embeddings.create({
-        model,
-        input: text,
-      });
-
-      return {
-        embedding: response.data[0]?.embedding || [],
-        usage: response.usage ? {
-          prompt_tokens: response.usage.prompt_tokens,
-          total_tokens: response.usage.total_tokens,
-        } : undefined,
-      };
+      return await this.providerManager.generateEmbedding(text);
     } catch (error) {
       console.error('Embedding Error:', error);
       throw new Error('Failed to generate embedding');
