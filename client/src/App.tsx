@@ -23,6 +23,8 @@ import CheckoutPage from './components/CheckoutPage';
 import PaymentSuccess from './components/PaymentSuccess';
 import PaymentCancel from './components/PaymentCancel';
 import SubscriptionManagement from './components/SubscriptionManagement';
+import AnalyticsPage from './components/AnalyticsPage';
+import SettingsPage from './components/SettingsPage';
 
 type Step = 'upload' | 'generate' | 'review' | 'embed';
 
@@ -347,6 +349,24 @@ function AppContent() {
               <SubscriptionManagement 
                 onBack={() => navigate('/dashboard')}
                 onUpgrade={handleUpgrade}
+              />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/analytics" element={
+            <ProtectedRoute>
+              <AnalyticsPage 
+                user={user!}
+                onLogout={handleLogout}
+              />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <SettingsPage 
+                user={user!}
+                onLogout={handleLogout}
               />
             </ProtectedRoute>
           } />
