@@ -1,11 +1,11 @@
 import express, { Router } from 'express';
 import { llmService } from '../services/llmService';
-import { authMiddleware } from '../middleware/authMiddleware';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router: Router = express.Router();
 
 // Get current AI provider and available providers
-router.get('/provider', authMiddleware, async (req, res) => {
+router.get('/provider', authenticateToken, async (req, res) => {
   try {
     const activeProvider = llmService.getActiveProviderType();
     const availableProviders = llmService.getAvailableProviders();
@@ -22,7 +22,7 @@ router.get('/provider', authMiddleware, async (req, res) => {
 });
 
 // Set AI provider (requires authentication)
-router.post('/provider', authMiddleware, async (req, res) => {
+router.post('/provider', authenticateToken, async (req, res) => {
   try {
     const { provider } = req.body;
 
@@ -59,7 +59,7 @@ router.post('/provider', authMiddleware, async (req, res) => {
 });
 
 // Test AI provider (send a test message)
-router.post('/provider/test', authMiddleware, async (req, res) => {
+router.post('/provider/test', authenticateToken, async (req, res) => {
   try {
     const { provider } = req.body;
 
