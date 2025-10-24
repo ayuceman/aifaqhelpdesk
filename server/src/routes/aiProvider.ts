@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { llmService } from '../services/llmService';
 import { authMiddleware } from '../middleware/authMiddleware';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // Get current AI provider and available providers
 router.get('/provider', authMiddleware, async (req, res) => {
