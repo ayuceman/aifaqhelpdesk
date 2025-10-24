@@ -8,7 +8,8 @@ import {
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 
 interface DashboardLayoutProps {
@@ -64,6 +65,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user, onLog
               </div>
             )}
           </div>
+          
+          {/* Back to Home Button */}
+          <button
+            onClick={() => navigate('/')}
+            className="mt-4 w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors text-sm"
+          >
+            <ArrowLeftIcon className="w-4 h-4" />
+            {!sidebarCollapsed && <span>Back to Home</span>}
+          </button>
         </div>
 
         {/* Navigation */}
