@@ -34,66 +34,111 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
       <Header variant="landing" />
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:32px_32px]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-40">
           <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-sm font-medium mb-8 animate-fade-in">
-              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse-slow"></span>
-              Enterprise-Grade AI Solutions
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-sm font-medium mb-8 animate-fade-in backdrop-blur-sm">
+              <span className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></span>
+              Trusted by 10,000+ businesses worldwide
             </div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 mb-8 leading-tight animate-fade-in">
-              Transform Content Into
-              <span className="block text-gradient-primary">Smart Helpdesk & FAQ Systems</span>
+            <h1 className="text-5xl lg:text-7xl font-extrabold text-white mb-8 leading-tight animate-fade-in">
+              Reduce Support Costs by
+              <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 text-transparent bg-clip-text">70% with AI-Powered FAQs</span>
             </h1>
             
-            <p className="text-xl lg:text-2xl text-slate-600 mb-12 max-w-4xl mx-auto leading-relaxed animate-fade-in">
-              Enterprise-ready AI platform. Transform documents and websites into 
-              intelligent FAQ systems and chatbot assistants for comprehensive customer support.
+            <p className="text-xl lg:text-2xl text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed animate-fade-in">
+              Transform your knowledge base into intelligent, self-service support that works 24/7. 
+              <span className="block mt-2 text-blue-300 font-semibold">Save $50,000+ annually on customer support.</span>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-scale-in">
               <button
                 onClick={onGetStarted}
-                className="btn-primary text-lg px-8 py-4"
+                className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg shadow-lg hover:shadow-blue-500/50 transform hover:scale-105 transition-all duration-200"
               >
-                Start Building
+                <span className="relative z-10">Start Free Trial</span>
+                <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
               </button>
               <Link
                 to="/demo"
-                className="btn-secondary text-lg px-8 py-4"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/20 transition-all duration-200"
               >
-                View Demo
+                <svg className="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Watch Demo
               </Link>
-              <button
-                onClick={onLoadDemo}
-                className="btn-ghost text-lg px-8 py-4"
-              >
-                Try Now
-              </button>
             </div>
             
             {/* Trust Indicators */}
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-12 text-sm text-slate-500 animate-fade-in">
+            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-slate-400 animate-fade-in">
               <div className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                Enterprise Security
+                <span className="text-white font-medium">No credit card required</span>
               </div>
               <div className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                SOC 2 Compliant
+                <span className="text-white font-medium">14-day free trial</span>
               </div>
               <div className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                99.9% Uptime
+                <span className="text-white font-medium">Cancel anytime</span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      <div className="bg-white py-16 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">10,000+</div>
+              <div className="text-slate-600 font-medium">Active Users</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">2M+</div>
+              <div className="text-slate-600 font-medium">FAQs Generated</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">99.9%</div>
+              <div className="text-slate-600 font-medium">Uptime SLA</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">70%</div>
+              <div className="text-slate-600 font-medium">Cost Reduction</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Social Proof - Customer Logos */}
+      <div className="bg-slate-50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-slate-500 text-sm font-medium mb-8 uppercase tracking-wider">
+            Trusted by leading companies
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 items-center opacity-60">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center justify-center h-12 bg-slate-200 rounded-lg">
+                <span className="text-slate-400 font-bold text-sm">COMPANY {i + 1}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -399,22 +444,230 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
         </div>
       </div>
 
+      {/* ROI Calculator Section */}
+      <div className="py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">
+              Calculate Your ROI
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              See how much you can save by automating customer support with AI
+            </p>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+              <div className="grid md:grid-cols-2 gap-12">
+                <div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6">Traditional Support</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-3 border-b">
+                      <span className="text-slate-600">3 Support Agents</span>
+                      <span className="font-bold text-slate-900">$180,000/yr</span>
+                    </div>
+                    <div className="flex justify-between items-center py-3 border-b">
+                      <span className="text-slate-600">Support Tools</span>
+                      <span className="font-bold text-slate-900">$12,000/yr</span>
+                    </div>
+                    <div className="flex justify-between items-center py-3 border-b">
+                      <span className="text-slate-600">Training & Overhead</span>
+                      <span className="font-bold text-slate-900">$18,000/yr</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-4">
+                      <span className="text-lg font-bold text-slate-900">Total Annual Cost</span>
+                      <span className="text-2xl font-bold text-red-600">$210,000</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6">With AI FAQ Generator</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-3 border-b">
+                      <span className="text-slate-600">1 Support Agent</span>
+                      <span className="font-bold text-slate-900">$60,000/yr</span>
+                    </div>
+                    <div className="flex justify-between items-center py-3 border-b">
+                      <span className="text-slate-600">AI FAQ Generator (Pro)</span>
+                      <span className="font-bold text-slate-900">$468/yr</span>
+                    </div>
+                    <div className="flex justify-between items-center py-3 border-b">
+                      <span className="text-slate-600">Training & Overhead</span>
+                      <span className="font-bold text-slate-900">$6,000/yr</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-4">
+                      <span className="text-lg font-bold text-slate-900">Total Annual Cost</span>
+                      <span className="text-2xl font-bold text-green-600">$66,468</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-12 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
+                <div className="text-center">
+                  <div className="text-sm font-semibold text-green-800 mb-2">ANNUAL SAVINGS</div>
+                  <div className="text-5xl font-bold text-green-600 mb-2">$143,532</div>
+                  <div className="text-lg text-green-700">68% cost reduction + 24/7 availability</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials Section */}
+      <div className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">
+              Loved by Thousands of Businesses
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              See what our customers have to say about transforming their support with AI
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-2xl shadow-lg border border-slate-200">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-slate-700 mb-6 italic">
+                "We reduced our support ticket volume by 60% in the first month. The AI handles repetitive questions perfectly, letting our team focus on complex issues."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                  SM
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900">Sarah Mitchell</div>
+                  <div className="text-sm text-slate-500">Head of Support, TechCorp</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-2xl shadow-lg border border-slate-200">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-slate-700 mb-6 italic">
+                "The ROI was incredible. We're saving over $100K annually while providing better 24/7 support. Setup took less than an hour!"
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                  JD
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900">James Davidson</div>
+                  <div className="text-sm text-slate-500">CEO, GrowthHub</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-2xl shadow-lg border border-slate-200">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-slate-700 mb-6 italic">
+                "Customer satisfaction improved dramatically. Our CSAT scores jumped from 3.8 to 4.7 stars. The AI provides instant, accurate answers."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                  LP
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900">Lisa Park</div>
+                  <div className="text-sm text-slate-500">VP Customer Success, InnovateCo</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Trust Badges Section */}
+      <div className="py-16 bg-slate-50 border-y border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-slate-500 text-sm font-medium mb-8 uppercase tracking-wider">
+            Enterprise-Grade Security & Compliance
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-8 items-center">
+            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-slate-200">
+              <svg className="w-12 h-12 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span className="text-xs font-semibold text-slate-600">SOC 2</span>
+            </div>
+            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-slate-200">
+              <svg className="w-12 h-12 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span className="text-xs font-semibold text-slate-600">GDPR</span>
+            </div>
+            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-slate-200">
+              <svg className="w-12 h-12 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <span className="text-xs font-semibold text-slate-600">Stripe</span>
+            </div>
+            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-slate-200">
+              <svg className="w-12 h-12 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <span className="text-xs font-semibold text-slate-600">PayPal</span>
+            </div>
+            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-slate-200">
+              <svg className="w-12 h-12 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span className="text-xs font-semibold text-slate-600">SSL</span>
+            </div>
+            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-slate-200">
+              <svg className="w-12 h-12 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span className="text-xs font-semibold text-slate-600">99.9% SLA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* CTA Section */}
-      <div className="py-24 bg-gradient-to-r from-slate-900 to-slate-800">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-white mb-6">
+      <div className="py-24 bg-gradient-to-r from-slate-900 to-slate-800 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:32px_32px]" />
+        <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Ready to Transform Your Support?
           </h2>
           <p className="text-xl text-slate-300 mb-12">
-            Join thousands of enterprises already using AI FAQ Generator to deliver 
-            exceptional customer experiences with intelligent FAQ systems and chatbot assistants.
+            Join 10,000+ businesses saving an average of $143,000 annually with AI-powered support.
+            <span className="block mt-2 text-blue-300 font-semibold">Start your 14-day free trial today. No credit card required.</span>
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={onGetStarted}
-              className="btn-primary bg-white text-slate-900 hover:bg-slate-100 text-lg px-8 py-4"
+              className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-slate-900 bg-white rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
-              Start Free Trial
+              <span className="relative z-10">Start Free Trial</span>
+              <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </button>
             <Link
               to="/contact"
@@ -423,6 +676,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLoadDemo }) =
               Contact Sales
             </Link>
           </div>
+          <p className="mt-8 text-sm text-slate-400">
+            💳 No credit card required • ✨ 14-day free trial • 🔒 Cancel anytime
+          </p>
         </div>
       </div>
 
