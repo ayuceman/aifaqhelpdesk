@@ -1,302 +1,456 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
-import axios from 'axios';
+import { PlusIcon, TrashIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 interface SettingsPageProps {
   user: any;
   onLogout: () => void;
 }
 
+interface AIProviderConfig {
+  id?: number;
+  providerType: 'openai' | 'gemini' | 'huggingface' | 'ollama';
+  apiKey?: string;
+  model?: string;
+  embeddingModel?: string;
+  baseUrl?: string;
+  isActive: boolean;
+}
+
 const SettingsPage: React.FC<SettingsPageProps> = ({ user, onLogout }) => {
-  const [activeProvider, setActiveProvider] = useState<string>('ollama');
-  const [availableProviders, setAvailableProviders] = useState<any[]>([]);
+  const [configs, setConfigs] = useState<AIProviderConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<any>(null);
   const [saving, setSaving] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newConfig, setNewConfig] = useState<Partial<AIProviderConfig>>({
+    providerType: 'openai',
+    model: 'gpt-3.5-turbo',
+    embeddingModel: 'text-embedding-3-small',
+    baseUrl: '',
+    isActive: false,
+  });
 
   useEffect(() => {
-    fetchProviderInfo();
+    fetchConfigs();
   }, []);
 
-  const fetchProviderInfo = async () => {
+  const fetchConfigs = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3001/api/ai/provider', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await fetch('http://localhost:3001/api/ai/configs', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
-
-      if (response.data.success) {
-        setActiveProvider(response.data.activeProvider);
-        setAvailableProviders(response.data.availableProviders);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setConfigs(data.configs || []);
       }
     } catch (error) {
-      console.error('Error fetching provider info:', error);
+      console.error('Error fetching configs:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleProviderChange = async (newProvider: string) => {
+  const saveConfig = async (config: Partial<AIProviderConfig>) => {
     setSaving(true);
-    setTestResult(null);
-    
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(
-        'http://localhost:3001/api/ai/provider',
-        { provider: newProvider },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (response.data.success) {
-        setActiveProvider(newProvider);
-        alert(`✅ Successfully switched to ${newProvider}!`);
+      const response = await fetch('http://localhost:3001/api/ai/configs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(config),
+      });
+      
+      if (response.ok) {
+        await fetchConfigs();
+        setShowAddForm(false);
+        setNewConfig({
+          providerType: 'openai',
+          model: 'gpt-3.5-turbo',
+          embeddingModel: 'text-embedding-3-small',
+          baseUrl: '',
+          isActive: false,
+        });
+      } else {
+        const error = await response.json();
+        alert(`Failed to save configuration: ${error.error}`);
       }
-    } catch (error: any) {
-      alert(`❌ Failed to switch provider: ${error.response?.data?.error || error.message}`);
+    } catch (error) {
+      console.error('Error saving config:', error);
+      alert('Failed to save configuration');
     } finally {
       setSaving(false);
     }
   };
 
-  const testProvider = async (provider: string) => {
+  const testConfig = async (config: Partial<AIProviderConfig>) => {
     setTesting(true);
     setTestResult(null);
-
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(
-        'http://localhost:3001/api/ai/provider/test',
-        { provider },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setTestResult(response.data);
-    } catch (error: any) {
-      setTestResult({
-        success: false,
-        error: error.response?.data?.error || error.message
+      const response = await fetch('http://localhost:3001/api/ai/configs/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(config),
       });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setTestResult(result.result);
+      } else {
+        const error = await response.json();
+        setTestResult({ success: false, message: error.error });
+      }
+    } catch (error) {
+      console.error('Error testing config:', error);
+      setTestResult({ success: false, message: 'Test failed' });
     } finally {
       setTesting(false);
     }
   };
 
+  const deleteConfig = async (providerType: string) => {
+    if (!confirm('Are you sure you want to delete this configuration?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3001/api/ai/configs/${providerType}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        await fetchConfigs();
+      } else {
+        const error = await response.json();
+        alert(`Failed to delete configuration: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting config:', error);
+      alert('Failed to delete configuration');
+    }
+  };
+
   const getProviderIcon = (type: string) => {
     switch (type) {
-      case 'ollama':
-        return '🖥️';
-      case 'openai':
-        return '🤖';
-      case 'gemini':
-        return '✨';
-      case 'huggingface':
-        return '🤗';
-      default:
-        return '🔧';
+      case 'ollama': return '🦙';
+      case 'openai': return '🤖';
+      case 'huggingface': return '🤗';
+      case 'gemini': return '💎';
+      default: return '⚙️';
     }
   };
 
   const getProviderDescription = (type: string) => {
     switch (type) {
-      case 'ollama':
-        return 'Run AI models locally on your machine. Free, private, no API costs.';
-      case 'openai':
-        return 'Industry-leading AI from OpenAI. $5 free credit for new accounts. Best quality.';
-      case 'gemini':
-        return 'Google\'s AI model. Free tier available (15 req/min). Good quality.';
-      case 'huggingface':
-        return 'Open-source models. Free tier available. Good for testing.';
-      default:
-        return '';
+      case 'ollama': return 'Local AI models - Free, private, runs on your machine';
+      case 'openai': return 'OpenAI GPT models - Powerful, cloud-based AI';
+      case 'huggingface': return 'Hugging Face models - Open source AI models';
+      case 'gemini': return 'Google Gemini - Advanced AI by Google';
+      default: return 'AI Provider';
     }
+  };
+
+  const getDefaultModels = (providerType: string) => {
+    switch (providerType) {
+      case 'openai':
+        return { model: 'gpt-3.5-turbo', embeddingModel: 'text-embedding-3-small' };
+      case 'gemini':
+        return { model: 'gemini-1.5-flash', embeddingModel: 'text-embedding-004' };
+      case 'huggingface':
+        return { model: 'microsoft/phi-2', embeddingModel: 'sentence-transformers/all-MiniLM-L6-v2' };
+      case 'ollama':
+        return { model: 'qwen2.5:3b', embeddingModel: 'nomic-embed-text', baseUrl: 'http://localhost:11434' };
+      default:
+        return { model: '', embeddingModel: '', baseUrl: '' };
+    }
+  };
+
+  const handleProviderTypeChange = (providerType: string) => {
+    const defaults = getDefaultModels(providerType);
+    setNewConfig({
+      ...newConfig,
+      providerType: providerType as any,
+      model: defaults.model,
+      embeddingModel: defaults.embeddingModel,
+      baseUrl: defaults.baseUrl,
+    });
   };
 
   return (
     <DashboardLayout user={user} onLogout={onLogout}>
       <div className="p-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Settings</h1>
-          <p className="text-slate-600 mb-8">Manage your account and AI provider preferences</p>
-          
-          {/* AI Provider Selection Card */}
+          <p className="text-slate-600 mb-8">Manage your account and AI provider configurations</p>
+
+          {/* AI Provider Configuration */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">AI Provider</h2>
-            <p className="text-slate-600 text-sm mb-6">
-              Choose which AI service to use for generating FAQs and answering questions
-            </p>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">AI Provider Configuration</h2>
+                <p className="text-slate-600 text-sm">
+                  Configure and manage your AI providers for FAQ generation and chat responses
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <PlusIcon className="w-4 h-4" />
+                <span>Add Provider</span>
+              </button>
+            </div>
 
             {loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-slate-600">Loading configurations...</span>
               </div>
             ) : (
               <div className="space-y-4">
-                {availableProviders.map((provider) => (
-                  <div
-                    key={provider.type}
-                    className={`border-2 rounded-lg p-4 transition-all cursor-pointer ${
-                      activeProvider === provider.type
-                        ? 'border-blue-500 bg-blue-50'
-                        : provider.configured
-                        ? 'border-slate-200 hover:border-blue-300'
-                        : 'border-slate-200 opacity-50'
-                    }`}
-                    onClick={() => provider.configured && handleProviderChange(provider.type)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center mb-2">
-                          <span className="text-2xl mr-3">{getProviderIcon(provider.type)}</span>
-                          <div>
-                            <h3 className="font-semibold text-slate-900">
-                              {provider.name}
-                              {activeProvider === provider.type && (
-                                <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
-                                  Active
-                                </span>
-                              )}
-                            </h3>
-                            <p className="text-sm text-slate-600">{getProviderDescription(provider.type)}</p>
-                          </div>
-                        </div>
-                        
-                        {!provider.configured && (
-                          <div className="mt-2 text-xs text-orange-600 bg-orange-50 px-3 py-2 rounded">
-                            ⚠️ Not configured - Add API key to .env file
-                          </div>
-                        )}
-                      </div>
-                      
-                      {provider.configured && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            testProvider(provider.type);
-                          }}
-                          disabled={testing}
-                          className="ml-4 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                        >
-                          {testing ? 'Testing...' : 'Test'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Test Results */}
-            {testResult && (
-              <div className={`mt-6 p-4 rounded-lg ${
-                testResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
-              }`}>
-                {testResult.success ? (
-                  <div>
-                    <div className="flex items-center mb-2">
-                      <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="font-semibold text-green-900">Test Successful!</span>
-                    </div>
-                    <div className="text-sm text-green-800">
-                      <p><strong>Chat:</strong> {testResult.chatTest.response.substring(0, 100)}</p>
-                      <p><strong>Embeddings:</strong> {testResult.embeddingTest.dimensions} dimensions</p>
-                    </div>
+                {configs.length === 0 ? (
+                  <div className="text-center py-8 text-slate-500">
+                    <p>No AI providers configured yet.</p>
+                    <p className="text-sm">Click "Add Provider" to get started.</p>
                   </div>
                 ) : (
-                  <div>
-                    <div className="flex items-center mb-2">
-                      <svg className="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                      <span className="font-semibold text-red-900">Test Failed</span>
+                  configs.map((config) => (
+                    <div
+                      key={config.providerType}
+                      className={`border-2 rounded-lg p-4 transition-all ${
+                        config.isActive
+                          ? 'border-green-500 bg-green-50'
+                          : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center mb-2">
+                            <span className="text-2xl mr-3">{getProviderIcon(config.providerType)}</span>
+                            <div>
+                              <h3 className="font-semibold text-slate-900 capitalize">
+                                {config.providerType}
+                                {config.isActive && (
+                                  <span className="ml-2 px-2 py-1 bg-green-500 text-white text-xs rounded-full">
+                                    Active
+                                  </span>
+                                )}
+                              </h3>
+                              <p className="text-sm text-slate-600">{getProviderDescription(config.providerType)}</p>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 text-sm text-slate-600">
+                            <div>
+                              <span className="font-medium">Model:</span> {config.model || 'Not set'}
+                            </div>
+                            <div>
+                              <span className="font-medium">Embedding:</span> {config.embeddingModel || 'Not set'}
+                            </div>
+                            {config.baseUrl && (
+                              <div className="col-span-2">
+                                <span className="font-medium">Base URL:</span> {config.baseUrl}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 ml-4">
+                          <button
+                            onClick={() => testConfig(config)}
+                            disabled={testing}
+                            className="px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            {testing ? 'Testing...' : 'Test'}
+                          </button>
+                          <button
+                            onClick={() => deleteConfig(config.providerType)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <TrashIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-sm text-red-800">{testResult.error || testResult.details}</p>
-                  </div>
+                  ))
                 )}
               </div>
             )}
+
+            {testResult && (
+              <div className={`mt-4 p-4 rounded-lg ${
+                testResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+              }`}>
+                <div className="flex items-center">
+                  {testResult.success ? (
+                    <CheckIcon className="w-5 h-5 text-green-600 mr-2" />
+                  ) : (
+                    <XMarkIcon className="w-5 h-5 text-red-600 mr-2" />
+                  )}
+                  <span className={`font-medium ${
+                    testResult.success ? 'text-green-800' : 'text-red-800'
+                  }`}>
+                    {testResult.success ? 'Test Successful' : 'Test Failed'}
+                  </span>
+                </div>
+                <p className={`text-sm mt-1 ${
+                  testResult.success ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  {testResult.message}
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Account Info Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+          {/* Add Provider Form */}
+          {showAddForm && (
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Add AI Provider</h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  saveConfig(newConfig);
+                }}
+                className="space-y-4"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Provider Type
+                    </label>
+                    <select
+                      value={newConfig.providerType}
+                      onChange={(e) => handleProviderTypeChange(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="openai">OpenAI</option>
+                      <option value="gemini">Google Gemini</option>
+                      <option value="huggingface">Hugging Face</option>
+                      <option value="ollama">Ollama</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      API Key
+                    </label>
+                    <input
+                      type="password"
+                      value={newConfig.apiKey || ''}
+                      onChange={(e) => setNewConfig({ ...newConfig, apiKey: e.target.value })}
+                      placeholder="Enter your API key"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Chat Model
+                    </label>
+                    <input
+                      type="text"
+                      value={newConfig.model || ''}
+                      onChange={(e) => setNewConfig({ ...newConfig, model: e.target.value })}
+                      placeholder="Model name"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Embedding Model
+                    </label>
+                    <input
+                      type="text"
+                      value={newConfig.embeddingModel || ''}
+                      onChange={(e) => setNewConfig({ ...newConfig, embeddingModel: e.target.value })}
+                      placeholder="Embedding model name"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  {newConfig.providerType === 'ollama' && (
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Base URL
+                      </label>
+                      <input
+                        type="text"
+                        value={newConfig.baseUrl || ''}
+                        onChange={(e) => setNewConfig({ ...newConfig, baseUrl: e.target.value })}
+                        placeholder="http://localhost:11434"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    checked={newConfig.isActive || false}
+                    onChange={(e) => setNewConfig({ ...newConfig, isActive: e.target.checked })}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                  />
+                  <label htmlFor="isActive" className="ml-2 text-sm text-slate-700">
+                    Set as active provider
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    {saving ? 'Saving...' : 'Save Configuration'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddForm(false)}
+                    className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Account Information */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Account Information</h2>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-                <div className="px-4 py-2 bg-slate-50 rounded-lg border border-slate-200 text-slate-900">
-                  {user?.name || 'N/A'}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                <div className="px-4 py-2 bg-slate-50 rounded-lg border border-slate-200 text-slate-900">
-                  {user?.email || 'N/A'}
+                <label className="block text-sm font-medium text-slate-700 mb-2">Name</label>
+                <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg">
+                  {user.name}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Plan</label>
-                <div className="px-4 py-2 bg-blue-50 rounded-lg border border-blue-200 text-blue-900 font-semibold">
-                  {user?.plan || 'Free'} Plan
+                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg">
+                  {user.email}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Coming Soon Features */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 border border-blue-200">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">More Settings Coming Soon</h3>
-              <p className="text-slate-600 mb-6">We're working on additional settings including:</p>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-lg p-4 border border-slate-200">
-                <div className="flex items-center mb-2">
-                  <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                  </svg>
-                  <span className="font-semibold text-slate-900">Password Change</span>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Plan</label>
+                <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg capitalize">
+                  {user.plan}
                 </div>
-                <p className="text-sm text-slate-600">Update your account password</p>
-              </div>
-              
-              <div className="bg-white rounded-lg p-4 border border-slate-200">
-                <div className="flex items-center mb-2">
-                  <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                  <span className="font-semibold text-slate-900">Notifications</span>
-                </div>
-                <p className="text-sm text-slate-600">Email and notification preferences</p>
-              </div>
-              
-              <div className="bg-white rounded-lg p-4 border border-slate-200">
-                <div className="flex items-center mb-2">
-                  <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                  <span className="font-semibold text-slate-900">Team Management</span>
-                </div>
-                <p className="text-sm text-slate-600">Invite team members and manage roles</p>
-              </div>
-              
-              <div className="bg-white rounded-lg p-4 border border-slate-200">
-                <div className="flex items-center mb-2">
-                  <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                  <span className="font-semibold text-slate-900">API Keys</span>
-                </div>
-                <p className="text-sm text-slate-600">Generate and manage API access keys</p>
               </div>
             </div>
           </div>
@@ -307,4 +461,3 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, onLogout }) => {
 };
 
 export default SettingsPage;
-

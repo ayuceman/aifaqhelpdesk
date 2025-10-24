@@ -134,6 +134,24 @@ export class DatabaseService {
       )
     `);
 
+    // AI Provider Configs table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS ai_provider_configs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL,
+        provider_type TEXT NOT NULL CHECK(provider_type IN ('openai', 'gemini', 'huggingface', 'ollama')),
+        api_key TEXT,
+        model TEXT,
+        embedding_model TEXT,
+        base_url TEXT,
+        is_active BOOLEAN DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+        UNIQUE(user_id, provider_type)
+      )
+    `);
+
     // Payment intents table
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS payment_intents (
@@ -312,6 +330,16 @@ export class DatabaseService {
       WHERE p.user_id = ? AND p.slug = ?
     `);
     return stmt.get(userId, slug) as any;
+  }
+
+  getProjectBySlugPublic(slug: string) {
+    const stmt = this.db.prepare(`
+      SELECT p.*, pu.faq_count, pu.chat_count, pu.daily_chat_count, pu.last_chat_date
+      FROM projects p
+      LEFT JOIN project_usage pu ON p.id = pu.project_id
+      WHERE p.slug = ?
+    `);
+    return stmt.get(slug) as any;
   }
 
   updateProject(projectId: string, updates: Partial<{
@@ -565,6 +593,90 @@ export class DatabaseService {
   deleteContentSource(sourceId: string) {
     const stmt = this.db.prepare('DELETE FROM content_sources WHERE id = ?');
     return stmt.run(sourceId);
+  }
+
+  // AI Provider Config methods
+  createAIProviderConfig(configData: {
+    userId: string;
+    providerType: 'openai' | 'gemini' | 'huggingface' | 'ollama';
+    apiKey?: string;
+    model?: string;
+    embeddingModel?: string;
+    baseUrl?: string;
+    isActive: boolean;
+  }) {
+    const stmt = this.db.prepare(`
+      INSERT OR REPLACE INTO ai_provider_configs 
+      (user_id, provider_type, api_key, model, embedding_model, base_url, is_active, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `);
+    
+    return stmt.run(
+      configData.userId,
+      configData.providerType,
+      configData.apiKey || null,
+      configData.model || null,
+      configData.embeddingModel || null,
+      configData.baseUrl || null,
+      configData.isActive ? 1 : 0
+    );
+  }
+
+  getAIProviderConfigs(userId: string) {
+    const stmt = this.db.prepare(`
+      SELECT * FROM ai_provider_configs 
+      WHERE user_id = ? 
+      ORDER BY updated_at DESC
+    `);
+    return stmt.all(userId) as any[];
+  }
+
+  getAIProviderConfig(userId: string, providerType?: string) {
+    if (providerType) {
+      const stmt = this.db.prepare(`
+        SELECT * FROM ai_provider_configs 
+        WHERE user_id = ? AND provider_type = ?
+      `);
+      return stmt.get(userId, providerType) as any;
+    } else {
+      const stmt = this.db.prepare(`
+        SELECT * FROM ai_provider_configs 
+        WHERE user_id = ? AND is_active = 1
+        ORDER BY updated_at DESC
+        LIMIT 1
+      `);
+      return stmt.get(userId) as any;
+    }
+  }
+
+  updateAIProviderConfig(userId: string, providerType: string, updates: Partial<{
+    apiKey: string;
+    model: string;
+    embeddingModel: string;
+    baseUrl: string;
+    isActive: boolean;
+  }>) {
+    const fields = Object.keys(updates).map(key => {
+      if (key === 'isActive') return 'is_active = ?';
+      return `${key} = ?`;
+    }).join(', ');
+    const values = Object.values(updates);
+    values.push(userId, providerType);
+
+    const stmt = this.db.prepare(`
+      UPDATE ai_provider_configs 
+      SET ${fields}, updated_at = CURRENT_TIMESTAMP 
+      WHERE user_id = ? AND provider_type = ?
+    `);
+    return stmt.run(...values);
+  }
+
+  deleteAIProviderConfig(userId: string, providerType: string) {
+    const stmt = this.db.prepare(`
+      DELETE FROM ai_provider_configs 
+      WHERE user_id = ? AND provider_type = ?
+    `);
+    return stmt.run(userId, providerType);
   }
 
   close() {

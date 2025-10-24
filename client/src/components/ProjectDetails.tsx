@@ -66,6 +66,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [gridEditingFAQ, setGridEditingFAQ] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<{question: string, answer: string, category: string}>({question: '', answer: '', category: ''});
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
   const [activeTab, setActiveTab] = useState<'faqs' | 'content'>('faqs');
 
   useEffect(() => {
@@ -74,6 +75,23 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
     fetchCategories();
     fetchAnalytics();
   }, [projectId]);
+
+  // Close export dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showExportDropdown) {
+        const target = event.target as Element;
+        if (!target.closest('.export-dropdown')) {
+          setShowExportDropdown(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showExportDropdown]);
 
   const fetchCategories = async () => {
     try {
@@ -647,36 +665,47 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
                   </svg>
                   Bulk Actions
                 </button>
-                <div className="relative">
-                  <button className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div className="relative export-dropdown">
+                  <button 
+                    onClick={() => setShowExportDropdown(!showExportDropdown)}
+                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     Export
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 ml-1 transition-transform ${showExportDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-md shadow-lg z-10">
-                    <button
-                      onClick={() => handleExport('json')}
-                      className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                    >
-                      <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                      Export as JSON
-                    </button>
-                    <button
-                      onClick={() => handleExport('csv')}
-                      className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                    >
-                      <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      Export as CSV
-                    </button>
-                  </div>
+                  {showExportDropdown && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-md shadow-lg z-10">
+                      <button
+                        onClick={() => {
+                          handleExport('json');
+                          setShowExportDropdown(false);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                      >
+                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        Export as JSON
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleExport('csv');
+                          setShowExportDropdown(false);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                      >
+                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Export as CSV
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

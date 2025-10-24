@@ -11,6 +11,7 @@ import { projectRoutes } from './routes/projects';
 import { contentSourcesRoutes } from './routes/contentSources';
 import paymentRoutes from './routes/payment';
 import aiProviderRouter from './routes/aiProvider';
+import aiConfigRouter from './routes/aiConfig';
 
 // Load environment variables
 dotenv.config({ path: './.env' });
@@ -88,6 +89,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/projects', contentSourcesRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/ai', aiProviderRouter);
+app.use('/api/ai', aiConfigRouter);
 app.use('/api/upload', fileUploadRoutes);
 app.use('/api/faq', faqRoutes);
 app.use('/api/public', publicRoutes);
