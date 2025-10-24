@@ -41,16 +41,16 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp, onUpgrade: _
       period: 'forever',
       description: 'Perfect for trying out the platform',
       features: [
-        '100 FAQs maximum',
-        '500 chat questions per month',
+        '50 FAQs maximum',
+        '100 chat questions per month',
         'Basic analytics',
         'Community support',
-        'Standard templates',
+        '1 project',
         'Mobile responsive widget'
       ],
       limitations: [
         'Limited to 1 project',
-        'Basic customization only',
+        'Basic features only',
         'AI FAQ Generator branding'
       ],
       popular: false,
@@ -60,20 +60,21 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp, onUpgrade: _
     {
       id: 'starter',
       name: 'Starter',
-      price: 19,
+      price: 15,
       period: 'month',
       description: 'Perfect for small businesses getting started',
       features: [
-        '1,000 FAQs maximum',
-        '2,000 chat questions per month',
+        '500 FAQs maximum',
+        '1,000 chat questions per month',
         'Basic analytics dashboard',
         'Email support',
-        'Standard templates',
-        'Mobile responsive widget'
+        'Up to 3 projects',
+        'Mobile responsive widget',
+        'Custom branding'
       ],
       limitations: [
-        'Limited to 1 project',
-        'Basic customization only'
+        'Up to 3 projects',
+        'Email support only'
       ],
       popular: false,
       cta: 'Start Free Trial',
@@ -82,19 +83,19 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp, onUpgrade: _
     {
       id: 'professional',
       name: 'Professional',
-      price: 49,
+      price: 39,
       period: 'month',
       description: 'Ideal for growing businesses with higher needs',
       features: [
-        '5,000 FAQs maximum',
-        '10,000 chat questions per month',
+        '2,500 FAQs maximum',
+        '5,000 chat questions per month',
         'Advanced analytics & insights',
         'Priority email support',
-        'Custom branding & themes',
-        'Multiple projects (up to 5)',
+        'Up to 10 projects',
         'API access',
         'Advanced customization',
-        'Integration with popular tools'
+        'Remove branding',
+        'Export functionality'
       ],
       limitations: [],
       popular: true,
@@ -102,22 +103,47 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigateToApp, onUpgrade: _
       ctaVariant: 'primary' as const
     },
     {
+      id: 'business',
+      name: 'Business',
+      price: 79,
+      period: 'month',
+      description: 'For agencies and teams with multiple clients',
+      features: [
+        '10,000 FAQs maximum',
+        '15,000 chat questions per month',
+        'Advanced analytics & reports',
+        'Priority phone & email support',
+        'Unlimited projects',
+        'Full API access',
+        'White-label solution',
+        'Custom integrations',
+        'Team collaboration tools',
+        'Dedicated account manager'
+      ],
+      limitations: [],
+      popular: false,
+      cta: 'Start Free Trial',
+      ctaVariant: 'secondary' as const
+    },
+    {
       id: 'enterprise',
       name: 'Enterprise',
-      price: 149,
+      price: 199,
       period: 'month',
       description: 'For large organizations with unlimited needs',
       features: [
         'Unlimited FAQs',
         'Unlimited chat questions',
-        'White-label solution',
-        'Full API access',
-        'Custom integrations',
+        'Enterprise-grade analytics',
+        '24/7 dedicated support',
         'Unlimited projects',
-        'Dedicated account manager',
-        '24/7 phone support',
+        'Full API & webhook access',
+        'White-label solution',
+        'Custom integrations',
+        'Advanced security (SSO, SAML)',
+        'SLA guarantee (99.9% uptime)',
         'Custom training & onboarding',
-        'SLA guarantees'
+        'Dedicated success manager'
       ],
       limitations: [],
       popular: false,

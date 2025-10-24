@@ -4,18 +4,17 @@ import dotenv from 'dotenv';
 // Load environment variables first
 dotenv.config({ path: './.env' });
 
-// PayPal configuration - using direct API calls instead of SDK
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || 'AeRf10ifzd8JVqLFd58rBo2cclgoeRsJ0fWYkqJhnYER7kvTtXznb_6SffvsJtZbKr3elNij829RkIT4';
-const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || 'EFqo1ESbzpqB2XUW5laqGIHIZWNvnovGk0cnJhD6GcKbav-jg5uylJSvuvbRM_T3d9fEfeGr25pajYvt';
+// PayPal configuration - do NOT hardcode credentials here. Provide via environment variables or a secrets manager.
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 const PAYPAL_BASE_URL = process.env.NODE_ENV === 'production' 
   ? 'https://api-m.paypal.com' 
   : 'https://api.sandbox.paypal.com';
 
-// Debug environment variables
-console.log('PayPal service environment variables:');
-console.log('PAYPAL_CLIENT_ID:', PAYPAL_CLIENT_ID);
-console.log('PAYPAL_CLIENT_SECRET:', PAYPAL_CLIENT_SECRET);
-console.log('NODE_ENV:', process.env.NODE_ENV);
+// Log only presence of credentials (never log secret values)
+console.log('PayPal service initialized. NODE_ENV:', process.env.NODE_ENV);
+console.log('PAYPAL_CLIENT_ID set:', !!PAYPAL_CLIENT_ID);
+console.log('PAYPAL_CLIENT_SECRET set:', !!PAYPAL_CLIENT_SECRET);
 
 export interface PricingPlan {
   id: string;
@@ -38,69 +37,102 @@ export const pricingPlans: PricingPlan[] = [
     price: 0,
     interval: 'month',
     features: [
-      'Up to 10 FAQs',
-      '50 chat questions per day',
-      '500 total chat questions',
-      'Basic support'
+      'Up to 50 FAQs',
+      '100 chat questions per month',
+      'Basic analytics',
+      'Community support',
+      '1 project'
     ],
     limits: {
-      maxFAQs: 10,
-      maxChatQuestionsPerDay: 50,
-      maxChatQuestionsTotal: 500
+      maxFAQs: 50,
+      maxChatQuestionsPerDay: 10,
+      maxChatQuestionsTotal: 100
     }
   },
   {
     id: 'starter',
     name: 'Starter',
-    price: 9.99,
+    price: 15,
     interval: 'month',
     features: [
-      'Up to 100 FAQs',
-      '500 chat questions per day',
-      '5,000 total chat questions',
-      'Priority support',
-      'Analytics dashboard'
+      'Up to 500 FAQs',
+      '1,000 chat questions per month',
+      'Basic analytics dashboard',
+      'Email support',
+      'Up to 3 projects',
+      'Mobile responsive widget',
+      'Custom branding'
     ],
     limits: {
-      maxFAQs: 100,
-      maxChatQuestionsPerDay: 500,
-      maxChatQuestionsTotal: 5000
+      maxFAQs: 500,
+      maxChatQuestionsPerDay: 50,
+      maxChatQuestionsTotal: 1000
     }
   },
   {
     id: 'professional',
     name: 'Professional',
-    price: 29.99,
+    price: 39,
     interval: 'month',
     features: [
-      'Up to 1,000 FAQs',
-      '2,000 chat questions per day',
-      '20,000 total chat questions',
-      'Priority support',
-      'Advanced analytics',
-      'Custom categories',
+      'Up to 2,500 FAQs',
+      '5,000 chat questions per month',
+      'Advanced analytics & insights',
+      'Priority email support',
+      'Up to 10 projects',
+      'API access',
+      'Advanced customization',
+      'Remove branding',
       'Export functionality'
     ],
     limits: {
-      maxFAQs: 1000,
-      maxChatQuestionsPerDay: 2000,
-      maxChatQuestionsTotal: 20000
+      maxFAQs: 2500,
+      maxChatQuestionsPerDay: 200,
+      maxChatQuestionsTotal: 5000
     },
     popular: true
   },
   {
+    id: 'business',
+    name: 'Business',
+    price: 79,
+    interval: 'month',
+    features: [
+      'Up to 10,000 FAQs',
+      '15,000 chat questions per month',
+      'Advanced analytics & reports',
+      'Priority phone & email support',
+      'Unlimited projects',
+      'Full API access',
+      'White-label solution',
+      'Custom integrations',
+      'Team collaboration tools',
+      'Dedicated account manager'
+    ],
+    limits: {
+      maxFAQs: 10000,
+      maxChatQuestionsPerDay: 500,
+      maxChatQuestionsTotal: 15000
+    }
+  },
+  {
     id: 'enterprise',
     name: 'Enterprise',
-    price: 99.99,
+    price: 199,
     interval: 'month',
     features: [
       'Unlimited FAQs',
       'Unlimited chat questions',
+      'Enterprise-grade analytics',
+      '24/7 dedicated support',
+      'Unlimited projects',
+      'Full API & webhook access',
       'White-label solution',
-      'Dedicated support',
       'Custom integrations',
-      'Advanced security',
-      'SLA guarantee'
+      'Advanced security (SSO, SAML)',
+      'SLA guarantee (99.9% uptime)',
+      'Custom training & onboarding',
+      'Dedicated success manager'
     ],
     limits: {
       maxFAQs: -1, // Unlimited
@@ -129,8 +161,8 @@ export class PaymentService {
         throw new Error(`PayPal API error: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
-      return data.access_token;
+  const data: any = await response.json();
+  return data.access_token;
     } catch (error) {
       console.error('PayPal access token error:', error);
       throw new Error('Failed to get PayPal access token');
@@ -199,7 +231,7 @@ export class PaymentService {
         body: JSON.stringify(orderData)
       });
 
-      const result = await response.json();
+  const result: any = await response.json();
       
       if (result.id) {
         // Store payment intent in database
@@ -281,7 +313,7 @@ export class PaymentService {
         body: JSON.stringify(orderData)
       });
 
-      const result = await response.json();
+  const result: any = await response.json();
       console.log('PayPal order creation response:', result);
       
       if (result.id) {
@@ -336,7 +368,7 @@ export class PaymentService {
         body: JSON.stringify({})
       });
 
-      const result = await response.json();
+  const result: any = await response.json();
       
       if (result.status === 'COMPLETED') {
         const capture = result.purchase_units[0].payments.captures[0];
