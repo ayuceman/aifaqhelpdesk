@@ -25,6 +25,7 @@ import PaymentCancel from './components/PaymentCancel';
 import SubscriptionManagement from './components/SubscriptionManagement';
 import AnalyticsPage from './components/AnalyticsPage';
 import SettingsPage from './components/SettingsPage';
+import ProjectsPage from './components/ProjectsPage';
 
 type Step = 'upload' | 'generate' | 'review' | 'embed';
 
@@ -278,6 +279,15 @@ function AppContent() {
                 onNavigateToHome={() => navigate('/')}
                 onNavigateToUpgrade={() => navigate('/upgrade')}
                 onNavigateToSubscriptionManagement={() => navigate('/subscription')}
+              />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/projects" element={
+            <ProtectedRoute>
+              <ProjectsPage 
+                user={user!}
+                onLogout={handleLogout}
               />
             </ProtectedRoute>
           } />
