@@ -3,7 +3,44 @@ import { faqService } from '../services/faqService';
 import { databaseService } from '../services/databaseService';
 import { llmService } from '../services/llmService';
 
+type EmbeddingRecord = {
+  id: string;
+  text: string;
+  embedding: number[];
+  faqId?: string;
+  similarity?: number;
+};
+
 const router = express.Router();
+
+// Helper function to provide friendly fallback responses
+function getFriendlyFallback(question: string): string {
+  const lowerQuestion = question.toLowerCase().trim();
+  
+  // Check for greetings
+  const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening'];
+  if (greetings.some(greeting => lowerQuestion === greeting || lowerQuestion.startsWith(greeting + ' ') || lowerQuestion.startsWith(greeting + ','))) {
+    return "Hello! 👋 How can I help you today? Feel free to ask me any questions about our services, features, or anything else you'd like to know!";
+  }
+  
+  // Check for "how are you" type questions
+  if (lowerQuestion.includes('how are you') || lowerQuestion.includes('how r u')) {
+    return "I'm doing great, thank you for asking! 😊 I'm here to help answer your questions. What would you like to know?";
+  }
+  
+  // Check for "thank you"
+  if (lowerQuestion.includes('thank') || lowerQuestion.includes('thanks')) {
+    return "You're welcome! Is there anything else I can help you with?";
+  }
+  
+  // Check for help requests
+  if (lowerQuestion.includes('help') && lowerQuestion.length < 20) {
+    return "I'm here to help! You can ask me questions about our services, features, pricing, or anything else. What would you like to know?";
+  }
+  
+  // Default friendly response
+  return "I'm here to help! While I couldn't find a specific answer to your question in my knowledge base, feel free to rephrase your question or ask about something else. You can also contact our support team for more detailed assistance. What else would you like to know?";
+}
 
 // Get all FAQs for public access (with project support)
 router.get('/faq', async (req, res) => {
@@ -24,7 +61,7 @@ router.get('/faq', async (req, res) => {
     }
     
     // For other projects, find by slug
-    const projectData = databaseService.getProjectBySlug('', project);
+    const projectData = databaseService.getProjectBySlugPublic(project);
     if (!projectData) {
       return res.status(404).json({ error: 'Project not found' });
     }
@@ -40,7 +77,7 @@ router.get('/faq', async (req, res) => {
 // Chat endpoint for widget (with project support)
 router.post('/chat', async (req, res) => {
   try {
-    const { question, project = 'default', threshold = 0.5, topK = 5 } = req.body;
+    const { question, project = 'default', threshold = 0.3, topK = 5 } = req.body;
     
     if (!question || typeof question !== 'string') {
       return res.status(400).json({ error: 'Question is required' });
@@ -71,7 +108,7 @@ router.post('/chat', async (req, res) => {
       }
     } else {
       // Handle database projects
-      const projectData = databaseService.getProjectBySlug('', project);
+      const projectData = databaseService.getProjectBySlugPublic(project);
       if (projectData) {
         faqs = await faqService.getFAQs(projectData.id);
         const embedData = await faqService.getEmbeddings(projectData.id);
@@ -95,29 +132,60 @@ router.post('/chat', async (req, res) => {
       });
     }
 
+    console.log(`[CHAT] Found ${embeddings.length} embeddings for project ${project}`);
+    if (embeddings.length > 0) {
+      console.log(`[CHAT] First embedding sample:`, {
+        id: embeddings[0].id,
+        text: embeddings[0].text.substring(0, 50) + '...',
+        embeddingLength: embeddings[0].embedding.length,
+        faqId: embeddings[0].faqId
+      });
+    }
+
     // Calculate similarities
-    const similarities = embeddings.map(emb => {
-      const similarity = cosineSimilarity(queryEmbedding.embedding, emb.embedding);
+    const similarities: EmbeddingRecord[] = (embeddings as any[]).map((emb: any) => {
+      // Parse the embedding from JSON string to array
+      const embeddingArray = typeof emb.embedding === 'string' 
+        ? JSON.parse(emb.embedding) 
+        : emb.embedding;
+      
+      console.log(`[CHAT] Embedding type: ${typeof emb.embedding}, Array length: ${embeddingArray.length}, Query length: ${queryEmbedding.embedding.length}`);
+      console.log(`[CHAT] First few query values:`, queryEmbedding.embedding.slice(0, 3));
+      console.log(`[CHAT] First few embedding values:`, embeddingArray.slice(0, 3));
+      
+      const similarity = cosineSimilarity(queryEmbedding.embedding, embeddingArray);
       return {
-        ...emb,
+        id: emb.id,
+        text: emb.text,
+        embedding: embeddingArray,
+        faqId: emb.faqId,
         similarity
-      };
+      } as EmbeddingRecord;
     });
 
+    console.log(`[CHAT] Calculated similarities for ${similarities.length} embeddings`);
+    console.log(`[CHAT] Top 3 similarities:`, [...similarities]
+      .sort((a: EmbeddingRecord, b: EmbeddingRecord) => (b.similarity || 0) - (a.similarity || 0))
+      .slice(0, 3)
+      .map((s: EmbeddingRecord) => ({ text: s.text.substring(0, 50) + '...', similarity: s.similarity }))
+    );
+
     // Sort by similarity and get top results
-    const topResults = similarities
-      .sort((a, b) => b.similarity - a.similarity)
+    const topResults = [...similarities]
+      .sort((a: EmbeddingRecord, b: EmbeddingRecord) => (b.similarity || 0) - (a.similarity || 0))
       .slice(0, topK);
 
     console.log(`[CHAT] Top ${topResults.length} results found`);
+  console.log('[CHAT] Top results details:', topResults.map(r => ({ id: r.id, faqId: r.faqId, similarity: r.similarity })));
 
     // Check if we have a good match
     const bestMatch = topResults[0];
-    if (bestMatch && bestMatch.similarity >= threshold) {
-      console.log(`[CHAT] Found good match with similarity ${bestMatch.similarity.toFixed(3)}`);
+    const bestSimilarity = bestMatch ? (bestMatch.similarity || 0) : 0;
+    if (bestMatch && bestSimilarity >= threshold) {
+      console.log(`[CHAT] Found good match with similarity ${bestSimilarity.toFixed(3)}`);
       
       // Find the FAQ for this match
-      const matchedFAQ = faqs.find(faq => faq.id === bestMatch.faqId);
+  const matchedFAQ = faqs.find((faq: any) => faq.id === bestMatch.faqId);
       if (matchedFAQ) {
         return res.json({
           success: true,
@@ -127,23 +195,37 @@ router.post('/chat', async (req, res) => {
           confidence: bestMatch.similarity,
           processingTime: Date.now() - startTime
         });
+      } else {
+        // Frequently demo embeddings have faqId values that don't match demo faqs (different ID schemes).
+        // Fallback: return the embedding text snippet so the widget still provides a helpful response.
+        console.warn(`[CHAT] Best match faqId ${bestMatch.faqId} not found for project ${project}. Using embedding text fallback.`);
+        return res.json({
+          success: true,
+          answer: bestMatch.text || "I found related content but couldn't map it to a saved FAQ.",
+          question: null,
+          source: 'embedding_text_fallback',
+          confidence: bestMatch.similarity,
+          processingTime: Date.now() - startTime
+        });
       }
     }
 
     // If no good match, use LLM to generate answer from context
-    console.log(`[CHAT] No good match found, using LLM with context`);
+  console.log(`[CHAT] No good match found (bestSimilarity=${bestSimilarity.toFixed(3)}), using LLM with context`);
     
     const contextFAQs = topResults
-      .filter(result => result.similarity > 0.3) // Lower threshold for context
-      .map(result => {
-        const faq = faqs.find(f => f.id === result.faqId);
-        return faq ? `Q: ${faq.question}\nA: ${faq.answer}` : null;
+      .filter((result: EmbeddingRecord) => (result.similarity || 0) > 0.3) // Lower threshold for context
+      .map((result: EmbeddingRecord) => {
+        const faq = faqs.find((f: any) => f.id === result.faqId);
+        // If no FAQ matches the faqId, use the embedding text as context snippet
+        return faq ? `Q: ${faq.question}\nA: ${faq.answer}` : `Context snippet: ${result.text}`;
       })
       .filter(Boolean)
       .slice(0, 3);
 
     if (contextFAQs.length > 0) {
       const context = contextFAQs.join('\n\n');
+      console.log('[CHAT] Context provided to LLM:', context);
       const prompt = `Based on the following FAQ context, please provide a helpful answer to the user's question. If the question isn't directly covered, provide the most relevant information available.
 
 Context:
@@ -154,27 +236,31 @@ User Question: ${question}
 Please provide a concise and helpful answer:`;
 
       try {
-        const llmResponse = await llmService.generateChatCompletion([
-          { role: 'user', content: prompt }
-        ]);
+        const llmAnswer = await llmService.generateAnswer(question, [context]);
+        console.log('[CHAT] LLM answer:', llmAnswer && llmAnswer.substring ? llmAnswer.substring(0, 500) : llmAnswer);
 
-        return res.json({
-          success: true,
-          answer: llmResponse.content,
-          source: 'llm_generated',
-          confidence: 0.7,
-          processingTime: Date.now() - startTime
-        });
+        if (typeof llmAnswer === 'string' && llmAnswer.trim().length > 0) {
+          return res.json({
+            success: true,
+            answer: llmAnswer,
+            source: 'llm_generated',
+            confidence: 0.7,
+            processingTime: Date.now() - startTime
+          });
+        } else {
+          console.warn('[CHAT] LLM returned empty or whitespace-only response');
+        }
       } catch (llmError) {
         console.error('[CHAT] LLM generation failed:', llmError);
       }
     }
 
-    // Fallback response
+    // Fallback response - provide a friendly greeting or helpful message
+    const friendlyFallback = getFriendlyFallback(question);
     return res.json({
       success: true,
-      answer: "I couldn't find a relevant answer to your question. Please try rephrasing your question or contact support for more specific help.",
-      source: 'no_match',
+      answer: friendlyFallback,
+      source: 'friendly_fallback',
       confidence: 0,
       processingTime: Date.now() - startTime
     });
@@ -190,21 +276,30 @@ Please provide a concise and helpful answer:`;
 
 // Helper function for cosine similarity
 function cosineSimilarity(a: number[], b: number[]): number {
-  if (a.length !== b.length) return 0;
-  
+  // If lengths differ, compute similarity on the common prefix and log the discrepancy
+  const minLen = Math.min(a.length, b.length);
+  if (minLen === 0) return 0;
+  if (a.length !== b.length) {
+    console.warn(`[CHAT] Embedding length mismatch: a=${a.length}, b=${b.length}. Using prefix length ${minLen} for similarity.`);
+  }
+
   let dotProduct = 0;
   let normA = 0;
   let normB = 0;
-  
-  for (let i = 0; i < a.length; i++) {
-    dotProduct += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
+
+  for (let i = 0; i < minLen; i++) {
+    const ai = Number(a[i]) || 0;
+    const bi = Number(b[i]) || 0;
+    dotProduct += ai * bi;
+    normA += ai * ai;
+    normB += bi * bi;
   }
-  
+
   if (normA === 0 || normB === 0) return 0;
-  
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+
+  const sim = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+  if (!isFinite(sim) || isNaN(sim)) return 0;
+  return sim;
 }
 
 export { router as publicRoutes };

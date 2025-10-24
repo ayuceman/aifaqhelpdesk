@@ -77,6 +77,26 @@ class LLMService {
         ? (process.env.OLLAMA_EMBEDDING_MODEL || 'nomic-embed-text')
         : (process.env.EMBEDDING_MODEL || 'text-embedding-ada-002');
 
+      console.log(`[EMBEDDING] Using model: ${model}, Ollama: ${this.useOllama}`);
+
+      // Use native Ollama API for embeddings (OpenAI-compatible API has issues)
+      if (this.useOllama) {
+        const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1';
+        const ollamaApiUrl = ollamaBaseUrl.replace('/v1', '/api/embeddings');
+        
+        const axios = require('axios');
+        const response = await axios.post(ollamaApiUrl, {
+          model,
+          prompt: text
+        });
+
+        return {
+          embedding: response.data.embedding || [],
+          usage: undefined,
+        };
+      }
+
+      // Use OpenAI API for non-Ollama models
       const response = await this.client.embeddings.create({
         model,
         input: text,
